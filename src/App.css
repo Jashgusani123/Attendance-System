@@ -1,0 +1,154 @@
+@import "tailwindcss";
+
+body, html {
+  height: 100%;
+  width: 100%;
+  overflow-x: hidden; /* Prevent horizontal scroll */
+}
+
+#root {
+  height: 100%;
+  width: 100%;
+}
+
+.btn {
+  border: 2px solid rgb(4, 4, 186);
+  font-size: larger;
+  background-color: rgba(255, 255, 255, 0.219);
+}
+
+.btn:hover {
+  background-color: #080889;
+  color: rgb(224, 224, 224);
+  transition: 0.5s;
+}
+
+.balls {
+  background-color: blue;
+  position: absolute;
+  top: 0%;
+  left: 100%;
+  width: 0px;
+  height: 0px;
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  animation: ballPulse 2s 1s ease-in-out infinite alternate;
+}
+
+.downBalls {
+  background-color: blue;
+  position: absolute;
+  top: 100%;
+  left: 100%;
+  width: 0px;
+  height: 0px;
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  animation: ballPulse 2s 2s ease-in-out infinite alternate;
+}
+
+@keyframes ballPulse {
+  0% {
+    width: 100px;
+    height: 100px;
+    opacity: 0.5;
+  }
+  50% {
+    width: 300px;
+    height: 300px;
+    opacity: 1;
+  }
+  100% {
+    width: 100px;
+    height: 100px;
+    opacity: 0.5;
+  }
+}
+
+/* Adjust the form images' positioning for mobile */
+.loginFormsImage,
+.signupFormsImage {
+  max-width: 100%;
+  object-fit: contain;
+  margin: 0 auto;
+  animation: ImageUpDown 2s ease-in-out infinite alternate;
+}
+
+.signupFormsImage {
+  animation: ImageUpDown 2s ease-in-out infinite alternate;
+}
+
+@keyframes ImageUpDown {
+  0% {
+    transform: translateY(0); /* Start at original position */
+  }
+  50% {
+    transform: translateY(10px); /* Moves slightly down */
+  }
+  100% {
+    transform: translateY(0); /* Moves back up */
+  }
+}
+
+.logo_with_dashboard {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 40;
+  animation: runningLogo 15s ease-in-out infinite alternate;
+}
+
+@keyframes runningLogo {
+  0% {
+    left: 0;
+    top: 0;
+    opacity: 1;
+  }
+  25% {
+    opacity: 0;
+  }
+  50% {
+    left: 20.5%;
+    top: 0%;
+    opacity: 1;
+  }
+  75% {
+    opacity: 0;
+  }
+  100% {
+    left: 79.5%;
+    top: 0%;
+    opacity: 1;
+  }
+}
+
+/* Media Queries to Adjust Layout */
+@media (max-width: 768px) {
+  /* For small screens (Mobile first) */
+  .loginFormsImage,
+  .signupFormsImage {
+    margin-bottom: 20px; /* Space below the form */
+  }
+
+  .DashbordLanding_Container .left, .DashbordLanding_Container .right {
+    flex-direction: column !important; /* Stack the form and image vertically */
+    align-items: center;
+    justify-content: center;
+  }
+
+}
+
+@media (min-width: 768px) {
+  /* For larger screens (Tablets, Desktops) */
+  .DashbordLanding_Container .left, .DashbordLanding_Container .right {
+    flex-direction: row !important; /* Stack horizontally for wider screens */
+  }
+
+  .DashbordLanding_Container .right {
+    margin-top: 0; /* Remove extra margin for large screens */
+  }
+
+  .signupFormsImage {
+    animation: none; /* Remove animation for large screens */
+  }
+}
