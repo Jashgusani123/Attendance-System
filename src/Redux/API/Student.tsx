@@ -1,45 +1,38 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
-import { StudentRequest, StudentResponse } from "../../Types/API/StudentApiType";
-
-// export const UserAPI = createApi({
-//     reducerPath: "UserAPI",
-//     baseQuery: fetchBaseQuery({ baseUrl: `${import.meta.env.VITE_SERVER}/api/v1/user/` }),
-//     tagTypes:["users"],
-//     endpoints: (builders) => ({
-//       login: builders.mutation<MessageResponse, User>({
-//         query: (user) => ({
-//           url: "new",
-//           method: "post",
-//           body: user,
-//         }),
-//         invalidatesTags:["users"]
-//       }),
-//       allUsers:builders.query<AllUsersRespones , string>({
-//         query:(id)=>`all?id=${id}`,
-//         providesTags:["users"]
-//       }),
-//       deleteUser:builders.mutation<MessageResponse,DeleteUserRequest>({
-//         query: ({userId , adminUserId}) => ({
-//           url: `${userId}?id=${adminUserId}`,
-//           method: "DELETE",
-//         }),
-//         invalidatesTags:["users"]
-//       })
-//     }),
-//   });
+import { StudentLogout, StudentRequest, StudentRequestForLogin, StudentResponse } from "../../Types/API/StudentApiType";
 
 export const StudentAPI = createApi({
-    reducerPath:"StudentAPI",
-    baseQuery: fetchBaseQuery({ baseUrl: `${import.meta.env.VITE_SERVER}/student/` }),
-     endpoints: (builders) => ({
-        signup:builders.mutation<StudentResponse,StudentRequest>({
-            query:({fullName , collegeJoiningDate , departmentName , collegeName , email , enrollmentNumber , password , semester})=>({
-                url:"register",
-                method:"POST",
-                body:{fullName , collegeJoiningDate , departmentName , collegeName , email , enrollmentNumber , password , semester}
-            })
+    reducerPath: "StudentAPI",
+    baseQuery: fetchBaseQuery({ 
+        baseUrl: `${import.meta.env.VITE_SERVER}/student/`, 
+        credentials: "include"  // ✅ Ensure cookies are sent with requests
+    }),
+    tagTypes: ["students"],  //  Added tagTypes for caching
+    endpoints: (builders) => ({
+        signup: builders.mutation<StudentResponse, StudentRequest>({
+            query: (formData) => ({
+                url: "register",
+                method: "POST",
+                body: formData,
+            }),
+            invalidatesTags: ["students"]  //  Invalidate cache after signup
+        }),
+        login: builders.mutation<StudentResponse, StudentRequestForLogin>({
+            query: (formData) => ({
+                url: "login",
+                method: "POST",
+                body: formData,
+            }),
+            invalidatesTags: ["students"]  //  Invalidate cache after login
+        }),
+        logout:builders.mutation<StudentLogout , null>({
+            query:()=>({
+                url:"logout",
+                method:"GET"
+            }),
+            invalidatesTags:["students"]
         })
-     })
+    })
 });
 
-export const {useSignupMutation} = StudentAPI;
+export const { useSignupMutation , useLoginMutation , useLogoutMutation} = StudentAPI;

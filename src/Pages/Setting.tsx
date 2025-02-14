@@ -8,20 +8,42 @@ import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 import { Avatar, Box, Button, Card, Stack, SvgIconTypeMap, Switch, TextField, Typography } from "@mui/material";
 import { OverridableComponent } from "@mui/material/OverridableComponent";
 import { MouseEventHandler, useState } from "react";
-import LandingNav from "../Components/LandingNav";
+import { useDispatch } from "react-redux";
 import { useLocation } from "react-router-dom";
+import LandingNav from "../Components/LandingNav";
+import { useLogoutMutation as StudentLogoutMutation } from "../Redux/API/Student";
+import { useLogoutMutation as TeacherLogoutMutation } from "../Redux/API/Teacher";
+import { studentNotExits } from "../Redux/slices/StudentSlices";
+import { teacherNotExits } from "../Redux/slices/TeacherSlice";
 
 const Setting = () => {
     const location = useLocation();
+    const [StudentLogout ] = StudentLogoutMutation();
+    const [TeacherLogout] = TeacherLogoutMutation();
     const type = location.state?.type ; 
-    console.log(type);
-    
+    const dispatch = useDispatch();
+
     const [openSection, setOpenSection] = useState<string | null>(null);
 
     const toggleSection = (section: string) => {
         setOpenSection(openSection === section ? null : section);
     };
-    const handelLogout = ()=>{}
+    const handelLogout = async()=>{
+        if(type === "Student" ){
+        const res = await StudentLogout(null);
+            if(res.data?.success){
+                dispatch(studentNotExits());
+            }
+        }else if(type === "Teacher" ){
+            // console.log("etew");
+            const res = await TeacherLogout(null);
+            if(res.data?.success){
+                dispatch(teacherNotExits());
+
+            }
+            
+        }
+    }
     const handelDelete = ()=>{}
 
     return (

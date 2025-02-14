@@ -1,7 +1,71 @@
 import { useState } from "react";
+import { StudentRequestForLogin } from "../Types/API/StudentApiType";
+import { useLoginMutation as StudentLoginMutation } from "../Redux/API/Student";
+import { useLoginMutation as TeacherLoginMutation } from "../Redux/API/Teacher";
+import { useNavigate } from "react-router-dom";
+import { useDispatch } from "react-redux";
+import { studentExits, studentNotExits } from "../Redux/slices/StudentSlices";
+import { teacherExits, teacherNotExits } from "../Redux/slices/TeacherSlice";
 
 const LoginForm = () => {
+  const dispatch = useDispatch();
+  const navigate =useNavigate();
   const [role, setRole] = useState("student");
+  const [studentLogin] = StudentLoginMutation();
+  const [teacherLogin] = TeacherLoginMutation();
+
+  const [formData, setFormData] = useState<StudentRequestForLogin>({
+    fullName: "",
+    email: "",
+    enrollmentNumber: "",
+    password: "",
+  });
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    
+    try {
+      let res;
+  
+      // Check role and call the respective login API
+      if (role === "student") {
+        res = await studentLogin(formData);
+        
+        if (res && "data" in res && res.data?.success) {
+          // Dispatch action to store student info in Redux
+          dispatch(teacherNotExits())
+
+          dispatch(studentExits(res.data?.user));
+        } else {
+          // Handle login failure
+          console.error("Login failed: ", res?.data?.message || "Unknown error");
+        }
+      } else if (role === "teacher") {
+        res = await teacherLogin(formData);
+        // console.log(res.data , role);
+        
+        if (res && "data" in res && res.data?.success) {
+          // Dispatch action to store teacher info in Redux
+          dispatch(studentNotExits())
+          dispatch(teacherExits(res.data?.user));
+        } else {
+          // Handle login failure
+          console.error("Login failed: ", res?.data?.message || "Unknown error");
+        }
+      }
+      
+  
+    } catch (error) {
+      console.error("Signup Error:", error);
+    }
+  };
+  
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+  };
 
   return (
     <div className="flex items-center justify-center overflow-hidden p-6 h-full">
@@ -20,7 +84,7 @@ const LoginForm = () => {
           <option value="admin">Admin</option>
         </select>
         
-        <form className="space-y-4">
+        <form className="space-y-4" onSubmit={handleSubmit}>
           {/* Common Name Field */}
           {role !== "admin" && (
             <input 
@@ -28,6 +92,8 @@ const LoginForm = () => {
               placeholder="Full Name" 
               className="w-full p-2 border rounded-md focus:ring-2 focus:ring-blue-400" 
               required 
+              onChange={handleChange}
+              name="fullName"
             />
           )}
           <input 
@@ -35,12 +101,18 @@ const LoginForm = () => {
             placeholder="Email" 
             className="w-full p-2 border rounded-md" 
             required 
+            onChange={handleChange}
+            name="email"
+
           />
           <input 
             type="password" 
             placeholder="Password" 
             className="w-full p-2 border rounded-md" 
             required 
+            onChange={handleChange}
+            name="password"
+
           />
           
           {/* Student Fields */}
@@ -51,6 +123,9 @@ const LoginForm = () => {
                 placeholder="Enrollment Number" 
                 className="w-full p-2 border rounded-md" 
                 required 
+              onChange={handleChange}
+              name="enrollmentNumber"
+
               />
             </>
           )}

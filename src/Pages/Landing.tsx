@@ -5,11 +5,13 @@ import SignupImage from '../assets/signup.png';
 import LandingNav from "../Components/LandingNav";
 import LoginForm from "../Components/Login";
 import SignUpForm from "../Components/SignUp";
+// import LocationComponent from "../Components/Location";
 
 const Landing = ({ login, register }: { login: boolean, register: boolean }) => {
 
   return (
     <>
+    {/* <LocationComponent /> */}
       {login && <div className="DashbordLanding_Container h-screen w-full relative z-10">
         {/* Navbar */}
         <LandingNav />

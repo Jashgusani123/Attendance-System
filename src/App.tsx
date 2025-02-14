@@ -1,30 +1,116 @@
-import './App.css'
-import { Route, Routes } from 'react-router-dom'
-import Landing from './Pages/Landing'
-import StudentDashboard from './Pages/StudentDashboard'
-import StudentLanding from './Pages/StudentLanding'
-import TeacherDashboard from './Pages/TeacherDashboard'
-import Setting from './Pages/Setting'
-import TeacherLanding from './Pages/TeacherLanding'
-import AttendanceSheet from './Pages/AttendanceSheet'
+import { useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { Route, Routes, useNavigate } from "react-router-dom";
+import "./App.css";
+import AttendanceSheet from "./Pages/AttendanceSheet";
+import Landing from "./Pages/Landing";
+import Setting from "./Pages/Setting";
+import StudentDashboard from "./Pages/StudentDashboard";
+import StudentLanding from "./Pages/StudentLanding";
+import TeacherDashboard from "./Pages/TeacherDashboard";
+import TeacherLanding from "./Pages/TeacherLanding";
+import { StudentReducerInitialState } from "./Types/API/StudentApiType";
+import { TeacherReducerInitialState } from "./Types/API/TeacherApiType";
+import { studentExits, studentNotExits } from "./Redux/slices/StudentSlices";
+import { teacherExits, teacherNotExits } from "./Redux/slices/TeacherSlice";
 
 function App() {
+  const { loading: studentLoading, student } = useSelector(
+    (state: { student: StudentReducerInitialState }) => state.student
+  );
+  const { loading: teacherLoading, teacher } = useSelector(
+    (state: { teacher: TeacherReducerInitialState }) => state.teacher
+  );
+  // console.log(student);
+  
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
+
+  const loading = studentLoading || teacherLoading ;
+  const user = student ? "Student" : teacher ? "Teacher" : "";
+  useEffect(() => {
+    const fetchUser = async () => {
+      try {
+        const res = await fetch("http://localhost:3000/getuser", {
+          method: "GET",
+          credentials: "include",
+        });
+  
+        const data = await res.json();
+        // console.log("Fetched User Data:", data); // ✅ Log API response
+  
+        if (data.type === "Student") {
+          dispatch(studentExits(data.user)); // ✅ Ensure this runs
+          // console.log("Dispatched student:", data.user);
+        } else if (data.type === "Teacher") {
+          dispatch(teacherExits(data.user)); // ✅ Ensure this runs
+          // console.log("Dispatched teacher:", data.user);
+        }else {
+          dispatch(studentNotExits());
+          dispatch(teacherNotExits());
+        }
+      } catch (error) {
+        console.error("Fetch user error:", error);
+      }
+    };
+  
+    fetchUser();
+  }, []);
+  
+
+  useEffect(() => {
+    if (!loading) {
+      if (user === "Student" && window.location.pathname !== "/student") {
+        navigate("/student", { replace: true });
+      } else if (user === "Teacher" && window.location.pathname !== "/teacher") {
+        navigate("/teacher", { replace: true });
+      } else if (!user && !["/login", "/register"].includes(window.location.pathname)) {
+        navigate("/", { replace: true });
+      }
+    }
+  }, [user]);  // ✅ Run whenever `user` updates
+  
+
   return (
     <>
-      <Routes>
-        <Route path='/' element={<Landing login={false} register={false}/>} />
-        <Route path='/login' element={<Landing login={true} register={false}/>}/>
-        <Route path='/register' element={<Landing register={true} login={false}/>}/>
-        <Route path='/student' element={<StudentLanding />}/>
-        <Route path='/teacher' element={<TeacherLanding />}/>
-        <Route path='/student/dashboard' element={<StudentDashboard />}/>
-        <Route path='/teacher/dashboard' element={<TeacherDashboard />}/>
-        <Route path='/student/setting' element={<Setting />}/>
-        <Route path='/teacher/setting' element={<Setting />}/>
-        <Route path='/attendance' element={<AttendanceSheet />}/>
-      </Routes>
+      {loading ? (
+        <div>Loading...</div> // Show loading state
+      ) : (
+        <Routes>
+          {/* Public Routes */}
+          {!user && (
+            <>
+              <Route path="/" element={<Landing login={false} register={false} />} />
+              <Route path="/login" element={<Landing login={true} register={false} />} />
+              <Route path="/register" element={<Landing register={true} login={false} />} />
+            </>
+          )}
+
+          {/* Student Routes */}
+          {user === "Student" && (
+            <>
+              <Route path="/student" element={<StudentLanding />} />
+              <Route path="/student/dashboard" element={<StudentDashboard />} />
+              <Route path="/student/setting" element={<Setting />} />
+            </>
+          )}
+
+          {/* Teacher Routes */}
+          {user === "Teacher" && (
+            <>
+              <Route path="/teacher" element={<TeacherLanding />} />
+              <Route path="/teacher/dashboard" element={<TeacherDashboard />} />
+              <Route path="/teacher/setting" element={<Setting />} />
+              <Route path="/attendance" element={<AttendanceSheet />} />
+            </>
+          )}
+
+          {/* 404 Page */}
+          <Route path="*" element={<>Sorry, page not found</>} />
+        </Routes>
+      )}
     </>
-  )
+  );
 }
 
-export default App
+export default App;

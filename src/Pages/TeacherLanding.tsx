@@ -7,7 +7,7 @@ const TeacherLanding = () => {
     <>
       <div className="DashbordLanding_Container h-screen w-full relative overflow-hidden">
         {/* Navbar */}
-        <LandingNav path={"/teacher/dashboard"} setting={"/teacher/setting"} type="Teacher" />
+        <LandingNav path={"/teacher/dashboard"} setting={"/teacher/setting"} type="Teacher" home="/teacher" />
 
         {/* Main Section */}
         <section className="h-[33vh] flex justify-center items-center flex-wrap md:h-screen md:mt-2">

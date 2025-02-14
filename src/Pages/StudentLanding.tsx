@@ -1,13 +1,16 @@
 import { Typewriter } from "react-simple-typewriter";
 import LandingNav from "../Components/LandingNav";
 import DashBordImage from "../assets/DashBordImage.jpg";
+// import LocationComponent from "../Components/Location";
 
 const StudentLanding = () => {
   return (
     <>
       <div className="DashbordLanding_Container h-screen w-full relative overflow-hidden">
+        {/* <LocationComponent /> */}
+
         {/* Navbar */}
-        <LandingNav path={"/student/dashboard"} setting={"/student/setting"} type="Student"/>
+        <LandingNav path={"/student/dashboard"} setting={"/student/setting"} type="Student" home="/student"/>
 
         {/* Main Section */}
         <section className="h-[33vh] flex justify-center  items-center flex-wrap md:h-screen md:mt-2">

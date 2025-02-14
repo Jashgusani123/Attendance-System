@@ -6,15 +6,28 @@ export interface StudentRequest {
     "departmentName":string, 
     "enrollmentNumber":string, 
     "collegeName":string, 
-    "collegeJoiningDate":Date
+    "collegeJoiningDate":string
+}
+
+export interface StudentRequestForLogin {
+    "fullName":string,
+    "email":string,
+    "password":string,
+    "enrollmentNumber":string
 }
 
 export interface StudentResponse {
     success:boolean,
-    message:string
+    message:string,
+    user:StudentRequest
 }
 
 export interface StudentReducerInitialState {
     student:StudentRequest | null;
     loading:boolean
+}
+
+export interface StudentLogout {
+    success:boolean,
+    message:string
 }

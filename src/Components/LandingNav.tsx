@@ -2,7 +2,7 @@ import { Settings } from "@mui/icons-material"
 import { Tooltip } from "@mui/material"
 import { Link, useNavigate } from "react-router-dom"
 
-const LandingNav = ({ path, setting , type }: { path?: string, setting?: string  , type?:string}) => {
+const LandingNav = ({ path, setting , type , home}: { path?: string, setting?: string  , type?:string , home?:string}) => {
     const navigate = useNavigate();
     const handleSetting = () => {
         if (setting) {
@@ -13,7 +13,7 @@ const LandingNav = ({ path, setting , type }: { path?: string, setting?: string 
         <div className="landing_navbar sticky top-0 h-15 w-full z-20">
             <nav className="flex justify-between items-center p-2 w-full h-full bg-amber-400">
                 <div className="image">
-                    <Link to={"/"} className="font-bold text-2xl text-blue-900">QuickAttend</Link>
+                    <Link to={home?home:"/"} className="font-bold text-2xl text-blue-900">QuickAttend</Link>
                 </div>
                 {path ?
                     <div className="options flex justify-around items-center gap-4">
