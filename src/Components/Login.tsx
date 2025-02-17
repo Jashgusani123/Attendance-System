@@ -40,7 +40,8 @@ const LoginForm = () => {
           console.error("Login failed: ", res?.data?.message || "Unknown error");
         }
       } else if (role === "teacher") {
-        res = await teacherLogin(formData);
+        
+        res = await teacherLogin({fullName:formData.fullName , email:formData.email , password:formData.password });
         // console.log(res.data , role);
         
         if (res && "data" in res && res.data?.success) {

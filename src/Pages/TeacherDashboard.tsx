@@ -1,5 +1,8 @@
+import { Add } from "@mui/icons-material";
 import { Avatar, Button, Card } from "@mui/material";
 import { Bell, Calendar, FileText } from "lucide-react";
+import { useEffect, useState } from "react";
+import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import {
   CartesianGrid,
@@ -10,6 +13,9 @@ import {
   XAxis,
   YAxis,
 } from "recharts";
+import CreateClassDialog from "../Components/Dialog";
+import { TeacherReducerInitialState } from "../Types/API/TeacherApiType";
+import socket from "../Components/Socket";
 
 const attendanceGraphData = [
   { date: "Mon", totalStudents: 70, studentsAttended: 60 },
@@ -21,13 +27,167 @@ const attendanceGraphData = [
   { date: "Sun", totalStudents: 70, studentsAttended: 55 },
 ];
 
+interface ClassFormData {
+  subjectName: string;
+  startingTime: string;
+  endingTime: string;
+  semester: string;
+  department: string;
+  location: string;
+}
+
+interface ClassType {
+  _id: string;
+  subjectName: string;
+  starting: string;
+  ending: string;
+  semester: string;
+  departmentName: string;
+  startingTime?: string;  // Optional fallback fields
+  endingTime?: string;
+}
+
 export default function TeacherDashboard() {
+  const { loading: teacherLoading, teacher } = useSelector(
+    (state: { teacher: TeacherReducerInitialState }) => state.teacher
+  );
+  const [Classes, setClasses] = useState<ClassType[]>([]);
+  const [createClass, setCreateClass] = useState(false);
+  const [loadingLocation, setLoadingLocation] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const [formData, setFormData] = useState<ClassFormData>({
+    subjectName: "",
+    startingTime: "",
+    endingTime: "",
+    semester: "",
+    department: "",
+    location: "",
+  });
   const navigate = useNavigate();
 
   const attendancesheet = ({ sub }: { sub: string }) => {
-    console.log(sub);
     navigate("/attendance", { state: { sub } });
   };
+
+  const handleCreateClass = () => {
+    setCreateClass(true);
+  };
+
+  const handleCloseDialog = () => {
+    setCreateClass(false);
+  };
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setFormData((prevData) => ({
+      ...prevData,
+      [name]: value,
+    }));
+  };
+
+  const handleSubmitForm = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    try {
+      const response = await fetch("http://localhost:3000/class/create", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+
+        },
+        credentials: "include",
+        body: JSON.stringify({
+          subjectName: formData.subjectName,
+          starting: formData.startingTime,
+          ending: formData.endingTime,
+          semester: formData.semester,
+          departmentName: formData.department,
+          location: formData.location
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! Status: ${response.status}`);
+      }
+
+      const data = await response.json();
+      socket.connect();
+      socket.emit("start-class", data.newClass.allStudent, formData)
+      setFormData({
+        subjectName: "",
+        startingTime: "",
+        endingTime: "",
+        semester: "",
+        department: "",
+        location: "",
+      })
+      setCreateClass(false); // ✅ Close the dialog after successful submission
+    } catch (error) {
+      console.error("Error creating class:", error);
+    }
+  };
+
+  useEffect(() => {
+    if (navigator.geolocation) {
+      setLoadingLocation(true);
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          const { latitude, longitude } = position.coords;
+          // You can use an API like reverse geocoding to convert latitude and longitude to an address
+          setFormData((prevState) => ({
+            ...prevState,
+            location: `Lat: ${latitude.toFixed(2)}, Lon: ${longitude.toFixed(2)}`,
+          }));
+          setLoadingLocation(false);
+        },
+        (error) => {
+          console.error(error);
+          setLoadingLocation(false);
+        }
+      );
+    } else {
+      alert("Geolocation is not supported by this browser.");
+    }
+  }, []);
+
+  useEffect(() => {
+    const fetchClasses = async () => {
+      try {
+        const response = await fetch("http://localhost:3000/teacher/getclasses", {
+          method: "GET",
+          credentials: "include",
+        });
+        
+        if (!response.ok) throw new Error("Failed to fetch classes");
+      
+        const data = await response.json();
+        setClasses(data.upcomingClasses);
+      } catch (error) {
+        setError("Could not load classes.");
+      }
+      
+    };
+
+    fetchClasses();
+  }, [])
+
+  useEffect(() => {
+    socket.on("class-live", (receivedClassDetails) => {
+
+      // Check if the received class _id is in the list
+      if (!Classes.includes(receivedClassDetails._id)) {
+        setClasses((prevDetails) => [...prevDetails, receivedClassDetails]);
+      } else {
+        console.log(`Class ${receivedClassDetails._id} already exists, not adding.`);
+      }
+    });
+
+    return () => {
+      socket.off("class-live");
+    };
+  }, [Classes]);
+
 
   return (
     <>
@@ -40,18 +200,28 @@ export default function TeacherDashboard() {
         {/* Header */}
         <div className="flex justify-between items-center mb-6 bg-amber-400 p-4 rounded-2xl shadow-xl">
           <h1 className="text-3xl font-bold text-blue-900">Teacher Dashboard</h1>
-          <Bell className="text-blue-900 w-6 h-6 cursor-pointer" />
+          <div className="optionss flex flex-wrap gap-3 items-center">
+            <span onClick={handleCreateClass}>
+              <Add className="text-blue-900 w-6 h-6 cursor-pointer border-2 border-blue-900 rounded-4xl" titleAccess="Create Class" />
+            </span>
+            <span>
+              <Bell className="text-blue-900 w-6 h-6 cursor-pointer" />
+            </span>
+          </div>
         </div>
+
+        {/* Create Class Form Dialog */}
+        <CreateClassDialog createClass={createClass} handleCloseDialog={handleCloseDialog} handleInputChange={handleInputChange} formData={formData} handleSubmitForm={handleSubmitForm} loadingLocation={false} />
 
         {/* Profile Section */}
         <Card className="bg-blue-900 text-white p-6 rounded-2xl flex items-center shadow-lg">
           <Avatar
-            src="https://ui-avatars.com/api/?name=Teacher+Name"
+            src={`https://ui-avatars.com/api/?name=${teacher?.fullName}`}
             className="mr-4 w-16 h-16"
           />
           <div>
-            <h2 className="text-xl font-semibold">Teacher Name</h2>
-            <p className="text-sm text-gray-300">Subject: Mathematics</p>
+            <h2 className="text-xl font-semibold">{teacher?.fullName}</h2>
+            <p className="text-sm text-gray-300">Department: {teacher?.departmentName}</p>
           </div>
         </Card>
 
@@ -73,6 +243,33 @@ export default function TeacherDashboard() {
                   <Line type="monotone" dataKey="studentsAttended" stroke="#1e3a8a" strokeWidth={3} dot={false} />
                 </LineChart>
               </ResponsiveContainer>
+            </Card>
+          </div>
+
+          {/* Live Classes */}
+          {error && <p className="text-red-500">{error}</p>}
+
+          <div className="w-[100%] lg:w-full">
+            <Card className="bg-blue-900 text-white p-6 rounded-2xl shadow-lg">
+              <h2 className="text-lg font-bold mb-4 flex items-center bg-amber-400 p-2 rounded-2xl w-fit">
+                <Calendar className="mr-2" /> Live Classes
+              </h2>
+              <ul className="space-y-3">
+                {Classes.map((i) => (
+                  <li
+                    key={i._id}
+                    className="flex justify-between items-center bg-[#183687] p-3 rounded-lg shadow-md"
+                    onClick={() => attendancesheet({ sub: i.subjectName })}
+                  >
+                    <div>
+                      <p className="text-base font-medium text-white">{i.subjectName}</p>
+                      <p className="text-sm text-gray-400">{i.starting?i.starting:i.startingTime} - {i.ending?i.ending:i.endingTime}</p>
+                    </div>
+                    <p className="text-sm font-semibold text-blue-500 cursor-pointer">View Details</p>
+                  </li>
+                ))}
+
+              </ul>
             </Card>
           </div>
 

@@ -59,7 +59,7 @@ function App() {
   
 
   useEffect(() => {
-    if (!loading) {
+  
       if (user === "Student" && window.location.pathname !== "/student") {
         navigate("/student", { replace: true });
       } else if (user === "Teacher" && window.location.pathname !== "/teacher") {
@@ -67,7 +67,7 @@ function App() {
       } else if (!user && !["/login", "/register"].includes(window.location.pathname)) {
         navigate("/", { replace: true });
       }
-    }
+  
   }, [user]);  // ✅ Run whenever `user` updates
   
 

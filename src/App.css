@@ -89,6 +89,15 @@ body, html {
     transform: translateY(0); /* Moves back up */
   }
 }
+.setting-icon {
+  transition: transform 2s all;
+  cursor: pointer;
+}
+
+.setting-icon:hover {
+  
+  transform: rotate(200deg);
+}
 
 .logo_with_dashboard {
   position: absolute;
@@ -151,4 +160,69 @@ body, html {
   .signupFormsImage {
     animation: none; /* Remove animation for large screens */
   }
+}
+/* Dialog container - Yellow background with dark yellow border */
+.dialogforclass {
+  background-color: rgba(0, 38, 255, 0.525); /* Yellow background */
+  border: 4px solid #170bb8; /* Dark yellow border */
+  overflow: hidden;
+  border-radius: 8px;
+}
+.innerHeading{
+  background-color: var(--color-amber-400);
+  color: #080889;
+  font-weight: bold;
+  font-size: larger;
+}
+/* Dialog content styling */
+.innerClassDialog {
+  background-color: var(--color-blue-100);
+  color: black;
+  font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+  font-weight: bold;
+}
+
+/* Scrollable form inside dialog */
+.dialogforclass .MuiDialogContent-root {
+  max-height: 300px; /* Adjust as needed */
+  overflow-y: auto;
+}
+
+/* Styling for input fields */
+.MuiTextField-root {
+  background-color: transparent !important;
+  border-radius: 4px;
+}
+
+.MuiTextField-root input {
+  font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
+  font-size: large;
+  color: rgb(0, 0, 0) !important;
+}
+
+.MuiTextField-root label {
+  color: rgb(255, 0, 0) !important;
+}
+
+.MuiTextField-root .MuiInputBase-root {
+  border-color: rgb(255, 0, 0) !important;
+}
+
+/* Scrollbar styles */
+.dialogforclass .MuiDialogContent-root::-webkit-scrollbar {
+  width: 8px;
+}
+
+.dialogforclass .MuiDialogContent-root::-webkit-scrollbar-track {
+  background: #440ff1; /* Light yellow */
+  border-radius: 4px;
+}
+
+.dialogforclass .MuiDialogContent-root::-webkit-scrollbar-thumb {
+  background: #0b0eb8; /* Dark yellow */
+  border-radius: 4px;
+}
+
+.dialogforclass .MuiDialogContent-root::-webkit-scrollbar-thumb:hover {
+  background: #ffc800;
 }

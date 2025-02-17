@@ -1,9 +1,14 @@
 import { Typewriter } from "react-simple-typewriter";
 import LandingNav from "../Components/LandingNav";
 import DashBordImage from "../assets/DashBordImage.jpg";
+import { useSelector } from "react-redux";
+import { TeacherReducerInitialState } from "../Types/API/TeacherApiType";
 
 const TeacherLanding = () => {
-  return (
+  const { loading: teacherLoading, teacher } = useSelector(
+    (state: { teacher: TeacherReducerInitialState }) => state.teacher
+  );
+  return teacherLoading ? <>Loading.....</> : (
     <>
       <div className="DashbordLanding_Container h-screen w-full relative overflow-hidden">
         {/* Navbar */}
@@ -17,7 +22,7 @@ const TeacherLanding = () => {
             <p className="lg:text-[30px] font-bold text-gray-800 text-2xl">
               <span className="text-blue-600">
                 <Typewriter
-                  words={["Hello ,", "Jash Gusani !!"]}
+                  words={["Hello ,", ` ${teacher?.fullName} !!`]}
                   loop={Infinity}
                   cursor
                   cursorStyle="|"

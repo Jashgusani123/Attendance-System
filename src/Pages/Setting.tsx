@@ -48,7 +48,7 @@ const Setting = () => {
 
     return (
         <>
-           {type == "Student" ?  <LandingNav path="/student/dashboard" /> :  <LandingNav path="/teacher/dashboard" />}
+           {type == "Student" ?  <LandingNav path="/student/dashboard" home="/student"/> :  <LandingNav path="/teacher/dashboard" home="/teacher"/>}
 
             <section className="flex justify-around flex-col gap-5 items-center mt-5 w-full">
                 {/* Profile Section */}

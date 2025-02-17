@@ -1,16 +1,27 @@
 import { Typewriter } from "react-simple-typewriter";
 import LandingNav from "../Components/LandingNav";
 import DashBordImage from "../assets/DashBordImage.jpg";
+import { useSelector } from "react-redux";
+import { StudentReducerInitialState } from "../Types/API/StudentApiType";
+import socket from "../Components/Socket";
 // import LocationComponent from "../Components/Location";
 
 const StudentLanding = () => {
-  return (
+  const { loading: studentLoading, student } = useSelector(
+    (state: { student: StudentReducerInitialState }) => state.student
+  );
+
+  const handleClickToDashBord = ()=>{
+    socket.connect();
+    socket.emit("register-student" , student?.enrollmentNumber)
+  }
+  return studentLoading ? <>Loading .....</> : (
     <>
       <div className="DashbordLanding_Container h-screen w-full relative overflow-hidden">
         {/* <LocationComponent /> */}
 
         {/* Navbar */}
-        <LandingNav path={"/student/dashboard"} setting={"/student/setting"} type="Student" home="/student"/>
+        <LandingNav path={"/student/dashboard"} setting={"/student/setting"} type="Student" home="/student" handleClickToDashBord={handleClickToDashBord}/>
 
         {/* Main Section */}
         <section className="h-[33vh] flex justify-center  items-center flex-wrap md:h-screen md:mt-2">
@@ -20,7 +31,7 @@ const StudentLanding = () => {
             <p className="lg:text-[30px] font-bold text-gray-800 text-2xl">
               <span className="text-blue-600">
                 <Typewriter
-                  words={["Hello ,", "Jash Gusani !!"]}
+                  words={["Hello ,", `${student?.fullName} !!`]}
                   loop={Infinity}
                   cursor
                   cursorStyle="|"

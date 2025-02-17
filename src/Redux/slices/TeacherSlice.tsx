@@ -3,7 +3,7 @@ import { TeacherReducerInitialState, TeacherRequest } from "../../Types/API/Teac
 
 const initialState: TeacherReducerInitialState = {
     teacher: null,
-    loading: true
+    loading: false
 };
 
 const TeacherReducer = createSlice({
@@ -12,8 +12,6 @@ const TeacherReducer = createSlice({
     reducers: {
         teacherExits: (state, action: PayloadAction<TeacherRequest>) => {
             state.loading = false;
-            console.log("coming " , action.payload);
-            
             state.teacher = action.payload;
         },
         teacherNotExits: (state) => {

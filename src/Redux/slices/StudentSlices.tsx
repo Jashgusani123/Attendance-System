@@ -3,7 +3,7 @@ import { StudentReducerInitialState, StudentRequest } from "../../Types/API/Stud
 
 const initialState: StudentReducerInitialState = {
     student: null,
-    loading: true
+    loading: false
 };
 
 const StudentReducer = createSlice({

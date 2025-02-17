@@ -1,14 +1,16 @@
-import { useState, useEffect } from "react";
 import { Avatar, Card } from "@mui/material";
-import { Bell, Calendar, CheckCircle, LogOut } from "lucide-react";
+import { Bell, Calendar, LogOut } from "lucide-react";
 import { QRCodeSVG } from "qrcode.react";
-import { CartesianGrid, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis, Line as RechartLine } from "recharts";
+import { useEffect, useState } from "react";
+import { CartesianGrid, LineChart, Line as RechartLine, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
+import socket from "../Components/Socket";
+import { useSelector } from "react-redux";
+import { StudentReducerInitialState } from "../Types/API/StudentApiType";
+import QrScanner from "../Components/QrScanner";
 
-// Sample student data
-const studentId = "12345"; // Unique student ID
+const studentId = "12345";
 const studentName = "John Doe";
 
-// Sample attendance data
 const data = [
   { date: "Mon", totalClasses: 7, yourAttendance: 7 },
   { date: "Tue", totalClasses: 7, yourAttendance: 5 },
@@ -19,59 +21,80 @@ const data = [
   { date: "Sun", totalClasses: 7, yourAttendance: 0 },
 ];
 
-// Sample class schedule
-const classes = [
-  { subject: "Math", time: "9:00 AM", status: "Pending" },
-  { subject: "Physics", time: "11:00 AM", status: "Pending" },
-  { subject: "Chemistry", time: "2:00 PM", status: "Pending" },
-];
-
-// const COLLEGE_LOCATION = { lat: 21.73097858401702, lon: 70.44603628790641 }; // College location
-
-// // Calculate distance between two locations (Haversine formula)
-// const calculateDistance = (lat1: number, lon1: number, lat2: number, lon2: number): number => {
-//   const R = 6371; // Radius of Earth in km
-//   const dLat = (lat2 - lat1) * (Math.PI / 180);
-//   const dLon = (lon2 - lon1) * (Math.PI / 180);
-//   const a =
-//     Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-//     Math.cos(lat1 * (Math.PI / 180)) *
-//       Math.cos(lat2 * (Math.PI / 180)) *
-//       Math.sin(dLon / 2) * Math.sin(dLon / 2);
-//   const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-//   return R * c * 1000; // Convert to meters
-// };
+interface ClassDetail {
+  _id: string;
+  subjectName: string;
+  startingTime?: string;
+  endingTime?: string;
+  starting?: string;
+  ending?: string;
+}
 
 export default function StudentDashboard() {
-  // const [location, setLocation] = useState<{ lat: number; lon: number } | null>(null);
+  const { loading: studentLoading, student } = useSelector(
+    (state: { student: StudentReducerInitialState }) => state.student
+  );
   const [showQRCode, setShowQRCode] = useState(false);
+  const [classDetails, setClassDetails] = useState<ClassDetail[]>([]);
+  const [allClasses, setAllClasses] = useState<string[]>([]);
 
-  // useEffect(() => {
-  //   if (navigator.geolocation) {
-  //     navigator.geolocation.getCurrentPosition(
-  //       (position) => {
-  //         console.log("User Location:", position.coords.latitude, position.coords.longitude);
-  //         setLocation({
-  //           lat: position.coords.latitude,
-  //           lon: position.coords.longitude,
-  //         });
-  //       },
-  //       (error) => console.error("Error getting location:", error)
-  //     );
-  //   }
-  // }, []);
+  // Fetch enrolled classes from API
+  useEffect(() => {
+    const fetchClasses = async () => {
+      try {
+        const response = await fetch("http://localhost:3000/class/getAll", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          credentials: "include",
+          body: JSON.stringify({ enrollmentNumber: student?.enrollmentNumber }),
+        });
+        const data = await response.json();
 
-  // // Check if student is within 500m of college
-  // const isStudentNearCollege = () => {
-  //   if (!location) return false;
-  //   const distance = calculateDistance(location.lat, location.lon, COLLEGE_LOCATION.lat, COLLEGE_LOCATION.lon);
-  //   // console.log(distance);
+        if (data?.Classes) {
+          console.log("Fetched Classes:", data.Classes);
 
-  //   return distance <= 500;
-  // };
+          // Store only class _ids for quick lookup
+          setAllClasses(data.Classes.map((cls: any) => cls._id));
+          setClassDetails(data.Classes)
+        }
+      } catch (error) {
+        console.error("Error fetching classes:", error);
+      }
+    };
+
+    fetchClasses();
+  }, [student?.enrollmentNumber]);
+
+  // Handle incoming classes via socket
+  useEffect(() => {
+    socket.on("class-live", (receivedClassDetails) => {
+      console.log("Received class details:", receivedClassDetails);
+
+      // Check if the received class _id is in the list
+      if (!allClasses.includes(receivedClassDetails._id)) {
+        setClassDetails((prevDetails) => [...prevDetails, receivedClassDetails]);
+      } else {
+        console.log(`Class ${receivedClassDetails._id} already exists, not adding.`);
+      }
+    });
+
+    return () => {
+      socket.off("class-live");
+    };
+  }, [allClasses]); // Depend on `allClasses` to update filtering dynamically
+
+  const handleScanSuccess = (data: string) => {
+    console.log("Scanned Data:", data);
+    setShowQRCode(false); // Hide scanner after success
+  };
 
   return (
     <div className="min-h-screen bg-[#f8eee3] p-6 text-white font-sans">
+      {/* Logo Section */}
+      <div className="logo_with_dashboard rounded-bl-2xl rounded-br-2xl bg-[#c0bfbf] w-fit p-2">
+        <p className="font-bold text-2xl text-blue-900">QuickAttend</p>
+      </div>
+
       {/* Dashboard Header */}
       <div className="flex justify-between items-center mb-6 bg-amber-400 p-4 rounded-2xl">
         <h1 className="text-3xl font-bold text-blue-900">Student Dashboard</h1>
@@ -83,10 +106,10 @@ export default function StudentDashboard() {
 
       {/* Student Info */}
       <Card className="bg-blue-900 text-white p-6 rounded-2xl flex items-center shadow-lg">
-        <Avatar src="https://ui-avatars.com/api/?name=John+Doe" className="mr-4 w-16 h-16" />
+        <Avatar src={`https://ui-avatars.com/api/?name=${student?.fullName}`} className="mr-4 w-16 h-16" />
         <div>
-          <h2 className="text-xl font-semibold">{studentName}</h2>
-          <p className="text-sm text-gray-300">Roll No: {studentId}</p>
+          <h2 className="text-xl font-semibold">{student?.fullName}</h2>
+          <p className="text-sm text-gray-300">Roll No: {student?.enrollmentNumber}</p>
         </div>
       </Card>
 
@@ -111,39 +134,32 @@ export default function StudentDashboard() {
           <h2 className="text-lg font-bold mb-4 flex items-center bg-amber-400 p-2 rounded-2xl w-fit">
             <Calendar className="mr-2" /> Today's Classes
           </h2>
-          <ul className="space-y-3">
-            {classes.map((cls, index) => (
-              <li key={index} className="flex justify-between items-center bg-[#183687] p-3 rounded-lg shadow-md">
-                <div>
-                  <p className="text-base font-medium text-white">{cls.subject}</p>
-                  <p className="text-sm text-gray-400">{cls.time}</p>
-                </div>
-                {/* Join Button */}
-                <button
-                  className="bg-green-500 text-white px-4 py-2 rounded-lg"
-                  // onClick={() => {
-                  //   if (isStudentNearCollege()) {
-                  //     setShowQRCode(true); // Show QR code when "Join" is clicked
-                  //   } else {
-                  //     alert("You must be within 500m of the college to join the class.");
-                  //   }
-                  // }}
-                >
-                  Join
-                </button>
-              </li>
-            ))}
-          </ul>
-        </Card>
-      </div>
 
-      {/* QR Code Section */}
-      {showQRCode && (
-        <Card className="bg-blue-900 text-white p-6 mt-6 rounded-2xl shadow-lg text-center">
-          <h2 className="text-lg font-bold mb-4 bg-amber-400 rounded-2xl w-fit p-2">Scan QR to Mark Attendance</h2>
-          <QRCodeSVG value={`student_id=${studentId}&timestamp=${Date.now()}`} size={200} />
+          {classDetails.length === 0 ? (
+            <p className="text-gray-300 text-center">No classes available</p>
+          ) : (
+            <ul className="space-y-3">
+              {classDetails.map((cls, index) => (
+                <li key={index} className="flex justify-between items-center bg-[#183687] p-3 rounded-lg shadow-md">
+                  <div>
+                    <p className="text-base font-medium text-white">{cls.subjectName}</p>
+                    <p className="text-sm text-gray-400">{cls.startingTime ? cls.startingTime : cls.starting} to {cls.endingTime ? cls.endingTime : cls.ending}</p>
+                  </div>
+                  <button
+                    className="bg-green-500 text-white px-4 py-2 rounded-lg"
+                    onClick={()=>setShowQRCode(true)}
+                  >
+                    Join
+                  </button>
+                </li>
+              ))}
+            </ul>
+          )}
         </Card>
-      )}
+
+      </div>
+      {showQRCode && <QrScanner onScanSuccess={handleScanSuccess} onClose={() => setShowQRCode(false)} />}
+     
     </div>
   );
 }
