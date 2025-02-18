@@ -1,14 +1,12 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useDispatch } from "react-redux";
 import { useSignupMutation as StudentSignupMution } from "../Redux/API/Student";
 import { useSignupMutation as TeacherSignupMution } from "../Redux/API/Teacher";
-import { StudentRequest } from "../Types/API/StudentApiType";
-import { useDispatch } from "react-redux";
 import { studentExits } from "../Redux/slices/StudentSlices";
 import { teacherExits } from "../Redux/slices/TeacherSlice";
+import { StudentRequest } from "../Types/API/StudentApiType";
 
 const SignUp = () => {
-  const navigate = useNavigate();
   const dispatch = useDispatch();
   
   const [role, setRole] = useState("student");
