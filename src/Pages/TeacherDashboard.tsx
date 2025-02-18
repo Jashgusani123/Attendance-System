@@ -14,8 +14,8 @@ import {
   YAxis,
 } from "recharts";
 import CreateClassDialog from "../Components/Dialog";
-import { TeacherReducerInitialState } from "../Types/API/TeacherApiType";
 import socket from "../Components/Socket";
+import { TeacherReducerInitialState } from "../Types/API/TeacherApiType";
 
 const attendanceGraphData = [
   { date: "Mon", totalStudents: 70, studentsAttended: 60 },
@@ -128,6 +128,7 @@ export default function TeacherDashboard() {
       console.error("Error creating class:", error);
     }
   };
+console.log(loadingLocation);
 
   useEffect(() => {
     if (navigator.geolocation) {
@@ -190,7 +191,7 @@ export default function TeacherDashboard() {
   }, [Classes]);
 
 
-  return (
+  return teacherLoading?<>Loading....</>:(
     <>
       <div className="min-h-screen bg-[#f8eee3] p-6 text-white font-sans">
         {/* Logo */}

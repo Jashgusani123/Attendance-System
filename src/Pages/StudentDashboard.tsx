@@ -84,7 +84,7 @@ export default function StudentDashboard() {
     setShowQRCode(false); // Hide scanner after success
   };
 
-  return (
+  return studentLoading?<>Loding...</>:(
     <div className="min-h-screen bg-[#f8eee3] p-6 text-white font-sans">
       {/* Logo Section */}
       <div className="logo_with_dashboard rounded-bl-2xl rounded-br-2xl bg-[#c0bfbf] w-fit p-2">

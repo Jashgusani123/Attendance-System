@@ -1,15 +1,13 @@
 import { useState } from "react";
-import { StudentRequestForLogin } from "../Types/API/StudentApiType";
+import { useDispatch } from "react-redux";
 import { useLoginMutation as StudentLoginMutation } from "../Redux/API/Student";
 import { useLoginMutation as TeacherLoginMutation } from "../Redux/API/Teacher";
-import { useNavigate } from "react-router-dom";
-import { useDispatch } from "react-redux";
 import { studentExits, studentNotExits } from "../Redux/slices/StudentSlices";
 import { teacherExits, teacherNotExits } from "../Redux/slices/TeacherSlice";
+import { StudentRequestForLogin } from "../Types/API/StudentApiType";
 
 const LoginForm = () => {
   const dispatch = useDispatch();
-  const navigate =useNavigate();
   const [role, setRole] = useState("student");
   const [studentLogin] = StudentLoginMutation();
   const [teacherLogin] = TeacherLoginMutation();
