@@ -90,7 +90,7 @@ export default function TeacherDashboard() {
     e.preventDefault();
 
     try {
-      const response = await fetch("http://localhost:3000/class/create", {
+      const response = await fetch(`${import.meta.env.VITE_SERVER}/class/create`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -114,6 +114,7 @@ export default function TeacherDashboard() {
       const data = await response.json();
       socket.connect();
       socket.emit("start-class", data.newClass.allStudent, formData)
+      navigate("/qr_code", { state: { classDetails:formData,  students:data.newClass.allStudent } });
       setFormData({
         subjectName: "",
         startingTime: "",
@@ -154,7 +155,7 @@ export default function TeacherDashboard() {
   useEffect(() => {
     const fetchClasses = async () => {
       try {
-        const response = await fetch("http://localhost:3000/teacher/getclasses", {
+        const response = await fetch(`${import.meta.env.VITE_SERVER}/teacher/getclasses`, {
           method: "GET",
           credentials: "include",
         });

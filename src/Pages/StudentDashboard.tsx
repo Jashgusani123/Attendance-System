@@ -1,15 +1,11 @@
 import { Avatar, Card } from "@mui/material";
 import { Bell, Calendar, LogOut } from "lucide-react";
-import { QRCodeSVG } from "qrcode.react";
 import { useEffect, useState } from "react";
-import { CartesianGrid, LineChart, Line as RechartLine, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
-import socket from "../Components/Socket";
 import { useSelector } from "react-redux";
-import { StudentReducerInitialState } from "../Types/API/StudentApiType";
+import { CartesianGrid, LineChart, Line as RechartLine, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 import QrScanner from "../Components/QrScanner";
-
-const studentId = "12345";
-const studentName = "John Doe";
+import socket from "../Components/Socket";
+import { StudentReducerInitialState } from "../Types/API/StudentApiType";
 
 const data = [
   { date: "Mon", totalClasses: 7, yourAttendance: 7 },
@@ -42,7 +38,7 @@ export default function StudentDashboard() {
   useEffect(() => {
     const fetchClasses = async () => {
       try {
-        const response = await fetch("http://localhost:3000/class/getAll", {
+        const response = await fetch(`${import.meta.env.VITE_SERVER}/class/getAll`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           credentials: "include",

@@ -1,48 +1,54 @@
-import React, { useEffect, useState } from "react";
-import { Html5QrcodeScanner } from "html5-qrcode";
+import { BrowserMultiFormatReader } from '@zxing/library';
+import { useEffect, useRef, useState } from 'react';
+import { Link } from 'react-router-dom';
 
-interface ScannerProps {
+interface QrScannerProps {
   onScanSuccess: (text: string) => void;
   onClose: () => void;
 }
 
-const QrScanner = ({ onScanSuccess, onClose }: ScannerProps) => {
-  const [scanner, setScanner] = useState<Html5QrcodeScanner | null>(null);
+const QrScannerPage = ({ onScanSuccess, onClose }: QrScannerProps) => {
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const codeReader = new BrowserMultiFormatReader();
+  const [scanned, setScanned] = useState(false);
 
   useEffect(() => {
-    const qrScanner = new Html5QrcodeScanner(
-      "qr-scanner",
-      {
-        fps: 10,
-        qrbox: { width: 250, height: 250 },
-      },
-      false
-    );
-
-    qrScanner.render(
-      (decodedText) => {
-        onScanSuccess(decodedText);
-        qrScanner.clear();
-        onClose(); // Close scanner after successful scan
-      },
-      (errorMessage) => {
-        console.log("QR Code scan failed: ", errorMessage);
-      }
-    );
-
-    setScanner(qrScanner);
+    if (videoRef.current) {
+      codeReader.decodeFromVideoDevice(null, videoRef.current, (result, error) => {
+        if (result) {
+          onScanSuccess(result.getText());
+          setScanned(true);  // Trigger animation
+          codeReader.reset();
+          onClose();
+        }
+        if (error) {
+          console.error('Error decoding QR code:', error);
+        }
+      });
+    }
 
     return () => {
-      qrScanner.clear().catch((err) => console.log("Failed to clear scanner", err));
+      codeReader.reset();
     };
   }, [onScanSuccess, onClose]);
 
   return (
-    <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-80 z-50">
-      <div className="bg-white p-6 rounded-lg shadow-lg w-full max-w-md text-black">
-        <h2 className="text-xl font-bold text-center mb-2">Scan QR Code</h2>
-        <div id="qr-scanner" className="w-full h-64 border border-gray-300 rounded"></div>
-        <button onClick={onClose} className="mt-4 w-full bg-red-500 text-white py-2 rounded hover:bg-red-600">
+    <div className="qr-scanner-container">
+      <div className="scanner-inner">
+        {/* Close Button */}
+        <Link to="/student" className="back-button">
+          <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#fff">
+            <path d="m313-440 224 224-57 56-320-320 320-320 57 56-224 224h487v80H313Z" />
+          </svg>
+        </Link>
+
+        {/* QR Scanner */}
+        <div className={`scanner-video-wrapper ${scanned ? 'scanned' : ''}`}>
+          <video ref={videoRef} className="scanner-video" width="100%" />
+        </div>
+
+        {/* Close Button */}
+        <button onClick={onClose} className="scanner-close-button">
           Close
         </button>
       </div>
@@ -50,4 +56,4 @@ const QrScanner = ({ onScanSuccess, onClose }: ScannerProps) => {
   );
 };
 
-export default QrScanner;
+export default QrScannerPage;

@@ -13,6 +13,7 @@ import { StudentReducerInitialState } from "./Types/API/StudentApiType";
 import { TeacherReducerInitialState } from "./Types/API/TeacherApiType";
 import { studentExits, studentNotExits } from "./Redux/slices/StudentSlices";
 import { teacherExits, teacherNotExits } from "./Redux/slices/TeacherSlice";
+import QrCode from "./Components/QrCode";
 
 function App() {
   const { loading: studentLoading, student } = useSelector(
@@ -31,7 +32,7 @@ function App() {
   useEffect(() => {
     const fetchUser = async () => {
       try {
-        const res = await fetch("http://localhost:3000/getuser", {
+        const res = await fetch(`${import.meta.env.VITE_SERVER}/getuser`, {
           method: "GET",
           credentials: "include",
         });
@@ -92,6 +93,7 @@ function App() {
               <Route path="/student" element={<StudentLanding />} />
               <Route path="/student/dashboard" element={<StudentDashboard />} />
               <Route path="/student/setting" element={<Setting />} />
+              
             </>
           )}
 
@@ -102,6 +104,7 @@ function App() {
               <Route path="/teacher/dashboard" element={<TeacherDashboard />} />
               <Route path="/teacher/setting" element={<Setting />} />
               <Route path="/attendance" element={<AttendanceSheet />} />
+              <Route path="/qr_code" element={<QrCode />} />
             </>
           )}
 
