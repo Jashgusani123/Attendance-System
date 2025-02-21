@@ -16,6 +16,7 @@ import {
 import CreateClassDialog from "../Components/Dialog";
 import socket from "../Components/Socket";
 import { TeacherReducerInitialState } from "../Types/API/TeacherApiType";
+import { GetLiveClasses } from "../Utils/APIFunction";
 
 const attendanceGraphData = [
   { date: "Mon", totalStudents: 70, studentsAttended: 60 },
@@ -33,7 +34,7 @@ interface ClassFormData {
   endingTime: string;
   semester: string;
   department: string;
-  location: string;
+  location: { latitude: number; longitude: number };
 }
 
 interface ClassType {
@@ -62,8 +63,9 @@ export default function TeacherDashboard() {
     endingTime: "",
     semester: "",
     department: "",
-    location: "",
+    location: { latitude: 0, longitude: 0 },
   });
+
   const navigate = useNavigate();
 
   const attendancesheet = ({ sub }: { sub: string }) => {
@@ -103,7 +105,8 @@ export default function TeacherDashboard() {
           ending: formData.endingTime,
           semester: formData.semester,
           departmentName: formData.department,
-          location: formData.location
+          location: {latitude:formData.location.latitude.toFixed(7),longitude:formData.location.longitude.toFixed(7)},
+          teacherName:teacher?.fullName
         }),
       });
 
@@ -113,45 +116,24 @@ export default function TeacherDashboard() {
 
       const data = await response.json();
       socket.connect();
-      socket.emit("start-class", data.newClass.allStudent, formData)
-      navigate("/qr_code", { state: { classDetails:formData,  students:data.newClass.allStudent } });
+      socket.emit("start-class", data.newClass.allStudent, formData , data.newClass._id)
+      
+      navigate("/qr_code", { state: { classID:data.newClass._id, socketIDs:socket.id,classDetails:data.newClass,  students:data.newClass.allStudent } });
       setFormData({
         subjectName: "",
         startingTime: "",
         endingTime: "",
         semester: "",
         department: "",
-        location: "",
+        location: { latitude: 0, longitude: 0 },
       })
       setCreateClass(false); // ✅ Close the dialog after successful submission
     } catch (error) {
       console.error("Error creating class:", error);
     }
   };
-console.log(loadingLocation);
 
-  useEffect(() => {
-    if (navigator.geolocation) {
-      setLoadingLocation(true);
-      navigator.geolocation.getCurrentPosition(
-        (position) => {
-          const { latitude, longitude } = position.coords;
-          // You can use an API like reverse geocoding to convert latitude and longitude to an address
-          setFormData((prevState) => ({
-            ...prevState,
-            location: `Lat: ${latitude.toFixed(2)}, Lon: ${longitude.toFixed(2)}`,
-          }));
-          setLoadingLocation(false);
-        },
-        (error) => {
-          console.error(error);
-          setLoadingLocation(false);
-        }
-      );
-    } else {
-      alert("Geolocation is not supported by this browser.");
-    }
-  }, []);
+  
 
   useEffect(() => {
     const fetchClasses = async () => {
@@ -170,13 +152,34 @@ console.log(loadingLocation);
       }
       
     };
+    if (navigator.geolocation) {
+      setLoadingLocation(true);
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          const { latitude, longitude } = position.coords;
+          // You can use an API like reverse geocoding to convert latitude and longitude to an address
+          setFormData((prevState) => ({
+            ...prevState,
+            location: {latitude , longitude},
+          }));
+          setLoadingLocation(false);
+        },
+        (error) => {
+          console.error(error);
+          setLoadingLocation(false);
+        }
+      );
+    } else {
+      alert("Geolocation is not supported by this browser.");
+    }
+    socket.emit("register-teacher" , teacher?.fullName);
 
     fetchClasses();
   }, [])
-
+  
   useEffect(() => {
     socket.on("class-live", (receivedClassDetails) => {
-
+      
       // Check if the received class _id is in the list
       if (!Classes.includes(receivedClassDetails._id)) {
         setClasses((prevDetails) => [...prevDetails, receivedClassDetails]);
@@ -300,7 +303,6 @@ console.log(loadingLocation);
                     <p className="text-base font-medium text-white">Java</p>
                     <p className="text-sm text-gray-400">10:00 AM</p>
                   </div>
-                  <p className="text-sm font-semibold text-blue-500 cursor-pointer">View Details</p>
                 </li>
               </ul>
             </Card>

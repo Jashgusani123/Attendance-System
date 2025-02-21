@@ -7,7 +7,7 @@ interface FormData {
   endingTime: string;
   semester: string;
   department: string;
-  location: string;
+  location: { latitude: number; longitude: number };
 }
 
 interface CreateClassDialogProps {
@@ -91,7 +91,7 @@ const CreateClassDialog: React.FC<CreateClassDialogProps> = ({
 
           <TextField
             name="location"
-            value={formData.location}
+            value={`${formData.location.latitude } , ${ formData.location.longitude}`}
             onChange={handleInputChange}
             fullWidth
             required

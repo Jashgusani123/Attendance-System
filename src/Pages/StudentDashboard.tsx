@@ -6,6 +6,8 @@ import { CartesianGrid, LineChart, Line as RechartLine, ResponsiveContainer, Too
 import QrScanner from "../Components/QrScanner";
 import socket from "../Components/Socket";
 import { StudentReducerInitialState } from "../Types/API/StudentApiType";
+import { GetMyLocation, isStudentWithinDistance } from "../Utils/Functions";
+import { GetLiveClasses } from "../Utils/APIFunction";
 
 const data = [
   { date: "Mon", totalClasses: 7, yourAttendance: 7 },
@@ -26,6 +28,11 @@ interface ClassDetail {
   ending?: string;
 }
 
+interface Location {
+  latitude: number;
+  longitude: number;
+}
+
 export default function StudentDashboard() {
   const { loading: studentLoading, student } = useSelector(
     (state: { student: StudentReducerInitialState }) => state.student
@@ -33,6 +40,13 @@ export default function StudentDashboard() {
   const [showQRCode, setShowQRCode] = useState(false);
   const [classDetails, setClassDetails] = useState<ClassDetail[]>([]);
   const [allClasses, setAllClasses] = useState<string[]>([]);
+  const [ActiveCode, setActiveCode] = useState("");
+  const [loadingLocation, setLoadingLocation] = useState(false);
+  const [location, setLocation] = useState<Location | null>(null);
+
+
+
+
 
   // Fetch enrolled classes from API
   useEffect(() => {
@@ -79,12 +93,65 @@ export default function StudentDashboard() {
     };
   }, [allClasses]); // Depend on `allClasses` to update filtering dynamically
 
-  const handleScanSuccess = (data: string) => {
-    console.log("Scanned Data:", data);
-    setShowQRCode(false); // Hide scanner after success
+  const handleScanSuccess = async (qrData: string) => {
+    try {
+      if (!location) {
+        alert("Fetching location, please try again.");
+        return;
+      }
+
+      const data = JSON.parse(qrData);
+      console.log(data);
+      console.log(location, data.classDetails.location);
+
+      const isNearBy = isStudentWithinDistance(location, data.classDetails.location);
+
+      if (isNearBy) {
+        const response = await fetch(`${import.meta.env.VITE_SERVER}/student/scan`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          credentials: "include",
+          body: JSON.stringify({ classDetails: data.classDetails, students: data.students, ID: ActiveCode })
+        });
+
+        const res = await response.json();
+
+        if (res.success) {
+          console.log("That Success", data);
+
+          const response2 = await fetch(`${import.meta.env.VITE_SERVER}/class/accept`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            credentials: "include",
+            body: JSON.stringify({ classDetails: data.classDetails })
+          });
+
+          const resin = await response2.json();
+          if (resin.success) {
+            alert(resin.message);
+          }
+        } else {
+          console.log(res.message);
+        }
+
+        setActiveCode("");
+        setShowQRCode(false);
+      } else {
+        setActiveCode("");
+        setShowQRCode(false);
+        alert("You are Not in Range!");
+        return
+      }
+    } catch (error) {
+      console.error("Error parsing QR data:", error);
+    }
   };
 
-  return studentLoading?<>Loding...</>:(
+  useEffect(() => {
+    GetMyLocation(setLoadingLocation, setLocation);
+  }, [])
+
+  return studentLoading ? <>Loding...</> : (
     <div className="min-h-screen bg-[#f8eee3] p-6 text-white font-sans">
       {/* Logo Section */}
       <div className="logo_with_dashboard rounded-bl-2xl rounded-br-2xl bg-[#c0bfbf] w-fit p-2">
@@ -143,7 +210,12 @@ export default function StudentDashboard() {
                   </div>
                   <button
                     className="bg-green-500 text-white px-4 py-2 rounded-lg"
-                    onClick={()=>setShowQRCode(true)}
+                    onClick={() => {
+                      GetMyLocation(setLoadingLocation, setLocation); // ✅ No need to assign return value
+                      setActiveCode(cls._id);
+                      setShowQRCode(true);
+                    }}
+
                   >
                     Join
                   </button>
@@ -155,7 +227,7 @@ export default function StudentDashboard() {
 
       </div>
       {showQRCode && <QrScanner onScanSuccess={handleScanSuccess} onClose={() => setShowQRCode(false)} />}
-     
+
     </div>
   );
 }

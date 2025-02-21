@@ -12,17 +12,19 @@ const QrScannerPage = ({ onScanSuccess, onClose }: QrScannerProps) => {
   const codeReader = new BrowserMultiFormatReader();
   const [scanned, setScanned] = useState(false);
 
+  
   useEffect(() => {
     if (videoRef.current) {
       codeReader.decodeFromVideoDevice(null, videoRef.current, (result, error) => {
         if (result) {
+          console.log(result);
+          
           onScanSuccess(result.getText());
           setScanned(true);  // Trigger animation
           codeReader.reset();
           onClose();
         }
         if (error) {
-          console.error('Error decoding QR code:', error);
         }
       });
     }
