@@ -16,7 +16,6 @@ import {
 import CreateClassDialog from "../Components/Dialog";
 import socket from "../Components/Socket";
 import { TeacherReducerInitialState } from "../Types/API/TeacherApiType";
-import { GetLiveClasses } from "../Utils/APIFunction";
 
 const attendanceGraphData = [
   { date: "Mon", totalStudents: 70, studentsAttended: 60 },
@@ -194,7 +193,7 @@ export default function TeacherDashboard() {
   }, [Classes]);
 
 
-  return teacherLoading?<>Loading....</>:(
+  return teacherLoading || loadingLocation?<>Loading....</>:(
     <>
       <div className="min-h-screen bg-[#f8eee3] p-6 text-white font-sans">
         {/* Logo */}

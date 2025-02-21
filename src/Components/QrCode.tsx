@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import { useLocation } from "react-router-dom";
-import socket from "./Socket";
 
 const QrCode = () => {
     const location = useLocation();

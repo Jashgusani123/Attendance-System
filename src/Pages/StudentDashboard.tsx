@@ -7,7 +7,6 @@ import QrScanner from "../Components/QrScanner";
 import socket from "../Components/Socket";
 import { StudentReducerInitialState } from "../Types/API/StudentApiType";
 import { GetMyLocation, isStudentWithinDistance } from "../Utils/Functions";
-import { GetLiveClasses } from "../Utils/APIFunction";
 
 const data = [
   { date: "Mon", totalClasses: 7, yourAttendance: 7 },
@@ -151,7 +150,7 @@ export default function StudentDashboard() {
     GetMyLocation(setLoadingLocation, setLocation);
   }, [])
 
-  return studentLoading ? <>Loding...</> : (
+  return studentLoading || loadingLocation? <>Loding...</> : (
     <div className="min-h-screen bg-[#f8eee3] p-6 text-white font-sans">
       {/* Logo Section */}
       <div className="logo_with_dashboard rounded-bl-2xl rounded-br-2xl bg-[#c0bfbf] w-fit p-2">
