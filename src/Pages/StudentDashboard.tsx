@@ -6,7 +6,8 @@ import { CartesianGrid, LineChart, Line as RechartLine, ResponsiveContainer, Too
 import QrScanner from "../Components/QrScanner";
 import socket from "../Components/Socket";
 import { StudentReducerInitialState } from "../Types/API/StudentApiType";
-import { GetMyLocation, isStudentWithinDistance } from "../Utils/Functions";
+import { GetMyLocation, isStudentWithinDistance } from "../Utils/LocationFunctions";
+import { submitAttendance } from "../Utils/ValidationFunction";
 
 const data = [
   { date: "Mon", totalClasses: 7, yourAttendance: 7 },
@@ -42,7 +43,7 @@ export default function StudentDashboard() {
   const [ActiveCode, setActiveCode] = useState("");
   const [loadingLocation, setLoadingLocation] = useState(false);
   const [location, setLocation] = useState<Location | null>(null);
-
+  const [IsIncognito, setIsIncognito] = useState<boolean>(false)
 
 
 
@@ -150,7 +151,7 @@ export default function StudentDashboard() {
     GetMyLocation(setLoadingLocation, setLocation);
   }, [])
 
-  return studentLoading || loadingLocation? <>Loding...</> : (
+  return studentLoading || loadingLocation ? <>Loding...</> : (
     <div className="min-h-screen bg-[#f8eee3] p-6 text-white font-sans">
       {/* Logo Section */}
       <div className="logo_with_dashboard rounded-bl-2xl rounded-br-2xl bg-[#c0bfbf] w-fit p-2">
@@ -209,12 +210,12 @@ export default function StudentDashboard() {
                   </div>
                   <button
                     className="bg-green-500 text-white px-4 py-2 rounded-lg"
-                    onClick={() => {
-                      GetMyLocation(setLoadingLocation, setLocation); // ✅ No need to assign return value
+                    onClick={async () => {
+                      GetMyLocation(setLoadingLocation, setLocation);
                       setActiveCode(cls._id);
                       setShowQRCode(true);
+                      await submitAttendance(Number(student?.enrollmentNumber),setIsIncognito);
                     }}
-
                   >
                     Join
                   </button>
@@ -225,7 +226,7 @@ export default function StudentDashboard() {
         </Card>
 
       </div>
-      {showQRCode && <QrScanner onScanSuccess={handleScanSuccess} onClose={() => setShowQRCode(false)} />}
+      {(showQRCode && IsIncognito)&& <QrScanner onScanSuccess={handleScanSuccess} onClose={() => setShowQRCode(false)} />}
 
     </div>
   );
