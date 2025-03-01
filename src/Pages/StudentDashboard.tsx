@@ -3,7 +3,6 @@ import { Bell, Calendar, LogOut } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { CartesianGrid, LineChart, Line as RechartLine, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
-import QrScanner from "../Components/QrScanner";
 import socket from "../Components/Socket";
 import { StudentReducerInitialState } from "../Types/API/StudentApiType";
 import { GetMyLocation, isStudentWithinDistance } from "../Utils/LocationFunctions";
@@ -45,36 +44,6 @@ export default function StudentDashboard() {
   const [location, setLocation] = useState<Location | null>(null);
   const [IsIncognito, setIsIncognito] = useState<boolean>(false)
 
-
-
-
-  // Fetch enrolled classes from API
-  useEffect(() => {
-    const fetchClasses = async () => {
-      try {
-        const response = await fetch(`${import.meta.env.VITE_SERVER}/class/getAll`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          credentials: "include",
-          body: JSON.stringify({ enrollmentNumber: student?.enrollmentNumber }),
-        });
-        const data = await response.json();
-
-        if (data?.Classes) {
-          console.log("Fetched Classes:", data.Classes);
-
-          // Store only class _ids for quick lookup
-          setAllClasses(data.Classes.map((cls: any) => cls._id));
-          setClassDetails(data.Classes)
-        }
-      } catch (error) {
-        console.error("Error fetching classes:", error);
-      }
-    };
-
-    fetchClasses();
-  }, [student?.enrollmentNumber]);
-
   // Handle incoming classes via socket
   useEffect(() => {
     socket.on("class-live", (receivedClassDetails) => {
@@ -93,63 +62,24 @@ export default function StudentDashboard() {
     };
   }, [allClasses]); // Depend on `allClasses` to update filtering dynamically
 
-  const handleScanSuccess = async (qrData: string) => {
-    try {
-      if (!location) {
-        alert("Fetching location, please try again.");
-        return;
-      }
 
-      const data = JSON.parse(qrData);
-      console.log(data);
-      console.log(location, data.classDetails.location);
-
-      const isNearBy = isStudentWithinDistance(location, data.classDetails.location);
-
-      if (isNearBy) {
-        const response = await fetch(`${import.meta.env.VITE_SERVER}/student/scan`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          credentials: "include",
-          body: JSON.stringify({ classDetails: data.classDetails, students: data.students, ID: ActiveCode })
-        });
-
-        const res = await response.json();
-
-        if (res.success) {
-          console.log("That Success", data);
-
-          const response2 = await fetch(`${import.meta.env.VITE_SERVER}/class/accept`, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            credentials: "include",
-            body: JSON.stringify({ classDetails: data.classDetails })
-          });
-
-          const resin = await response2.json();
-          if (resin.success) {
-            alert(resin.message);
-          }
-        } else {
-          console.log(res.message);
-        }
-
-        setActiveCode("");
-        setShowQRCode(false);
-      } else {
-        setActiveCode("");
-        setShowQRCode(false);
-        alert("You are Not in Range!");
-        return
-      }
-    } catch (error) {
-      console.error("Error parsing QR data:", error);
-    }
-  };
 
   useEffect(() => {
-    GetMyLocation(setLoadingLocation, setLocation);
-  }, [])
+    const AllFunc = async () => {
+      GetMyLocation(setLoadingLocation, setLocation);
+      // Add any other async operations here
+      const response = await fetch(`${import.meta.env.VITE_SERVER}/student/getclasses`, {
+        method: "GET",
+        credentials: "include",
+      });
+      if (!response.ok) throw new Error("Failed to fetch classes");
+
+      const data = await response.json();
+      setClassDetails(data.upcomingClasses);
+    };
+
+    AllFunc();
+  }, []);
 
   return studentLoading || loadingLocation ? <>Loding...</> : (
     <div className="min-h-screen bg-[#f8eee3] p-6 text-white font-sans">
@@ -211,14 +141,32 @@ export default function StudentDashboard() {
                   <button
                     className="bg-green-500 text-white px-4 py-2 rounded-lg"
                     onClick={async () => {
+                      setLoadingLocation(true);
                       GetMyLocation(setLoadingLocation, setLocation);
-                      setActiveCode(cls._id);
-                      setShowQRCode(true);
-                      await submitAttendance(Number(student?.enrollmentNumber),setIsIncognito);
+
+                      if (location) {
+                        const isWithinRange = isStudentWithinDistance(
+                          location,
+                          { latitude: 20.5937, longitude: 78.9629 }, // Replace with teacher's actual location
+                          1000 // Distance in meters
+                        );
+
+                        if (isWithinRange) {
+                          setActiveCode(cls._id);
+                          await submitAttendance(student?.enrollmentNumber!, cls._id, setIsIncognito);
+                        } else {
+                          alert("You are outside the allowed location range.");
+                        }
+                      } else {
+                        alert("Could not determine your location. Please try again.");
+                      }
+
+                      setLoadingLocation(false);
                     }}
                   >
                     Join
                   </button>
+
                 </li>
               ))}
             </ul>
@@ -226,7 +174,6 @@ export default function StudentDashboard() {
         </Card>
 
       </div>
-      {(showQRCode && IsIncognito)&& <QrScanner onScanSuccess={handleScanSuccess} onClose={() => setShowQRCode(false)} />}
 
     </div>
   );

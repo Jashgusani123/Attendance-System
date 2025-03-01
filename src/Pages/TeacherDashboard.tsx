@@ -16,6 +16,8 @@ import {
 import CreateClassDialog from "../Components/Dialog";
 import socket from "../Components/Socket";
 import { TeacherReducerInitialState } from "../Types/API/TeacherApiType";
+import moment from 'moment';
+
 
 const attendanceGraphData = [
   { date: "Mon", totalStudents: 70, studentsAttended: 60 },
@@ -67,8 +69,8 @@ export default function TeacherDashboard() {
 
   const navigate = useNavigate();
 
-  const attendancesheet = ({ sub }: { sub: string }) => {
-    navigate("/attendance", { state: { sub } });
+  const attendancesheet = ({ sub , classID }: { sub: string , classID:string}) => {
+    navigate("/attendance", { state: { sub  , classID } });
   };
 
   const handleCreateClass = () => {
@@ -89,48 +91,68 @@ export default function TeacherDashboard() {
 
   const handleSubmitForm = async (e: React.FormEvent) => {
     e.preventDefault();
-
+  
+    // Validate time
+    const today = new Date().toISOString().split("T")[0];
+    const startDate = new Date(`${today}T${formData.startingTime}`);
+    const endDate = new Date(`${today}T${formData.endingTime}`);
+  
+    if (endDate <= startDate) {
+      console.error("Error: Ending time must be after starting time!");
+      return; // Stop execution if validation fails
+    }
+  
     try {
       const response = await fetch(`${import.meta.env.VITE_SERVER}/class/create`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-
         },
         credentials: "include",
         body: JSON.stringify({
           subjectName: formData.subjectName,
-          starting: formData.startingTime,
-          ending: formData.endingTime,
+          starting: moment().format("YYYY-MM-DD") + " " + formData.startingTime,  // Store full date
+          ending: moment().format("YYYY-MM-DD") + " " + formData.endingTime,      // Store full date
           semester: formData.semester,
           departmentName: formData.department,
-          location: {latitude:formData.location.latitude.toFixed(7),longitude:formData.location.longitude.toFixed(7)},
-          teacherName:teacher?.fullName
+          location: {
+            latitude: formData.location.latitude.toFixed(7),
+            longitude: formData.location.longitude.toFixed(7),
+          },
+          teacherName: teacher?.fullName,
         }),
+        
       });
-
+  
       if (!response.ok) {
-        throw new Error(`HTTP error! Status: ${response.status}`);
+        const errorMessage = await response.text(); // Get error message
+        throw new Error(`HTTP error! Status: ${response.status}, Message: ${errorMessage}`);
       }
-
+  
       const data = await response.json();
-      socket.connect();
-      socket.emit("start-class", data.newClass.allStudent, formData , data.newClass._id)
-      
-      navigate("/qr_code", { state: { classID:data.newClass._id, socketIDs:socket.id,classDetails:data.newClass,  students:data.newClass.allStudent } });
-      setFormData({
-        subjectName: "",
-        startingTime: "",
-        endingTime: "",
-        semester: "",
-        department: "",
-        location: { latitude: 0, longitude: 0 },
-      })
-      setCreateClass(false); // ✅ Close the dialog after successful submission
+  
+      // Emit event only if data is valid
+      if (data?.newClass) {
+        socket.connect();
+        socket.emit("start-class", data.newClass.allStudent, formData, data.newClass._id);
+        
+        // Reset form
+        setFormData({
+          subjectName: "",
+          startingTime: "",
+          endingTime: "",
+          semester: "",
+          department: "",
+          location: { latitude: 0, longitude: 0 },
+        });
+  
+        setCreateClass(false); // ✅ Close the dialog after successful submission
+      }
     } catch (error) {
       console.error("Error creating class:", error);
     }
   };
+  
 
   
 
@@ -263,7 +285,7 @@ export default function TeacherDashboard() {
                   <li
                     key={i._id}
                     className="flex justify-between items-center bg-[#183687] p-3 rounded-lg shadow-md"
-                    onClick={() => attendancesheet({ sub: i.subjectName })}
+                    onClick={() => attendancesheet({ sub: i.subjectName , classID:i._id})}
                   >
                     <div>
                       <p className="text-base font-medium text-white">{i.subjectName}</p>
@@ -286,7 +308,7 @@ export default function TeacherDashboard() {
               <ul className="space-y-3">
                 <li
                   className="flex justify-between items-center bg-[#183687] p-3 rounded-lg shadow-md"
-                  onClick={() => attendancesheet({ sub: "WebDevelopment" })}
+                  onClick={() => attendancesheet({ sub: "WebDevelopment" ,classID:"67c2a48dc286005439bd4e64" })}
                 >
                   <div>
                     <p className="text-base font-medium text-white">Web Development</p>
@@ -296,7 +318,7 @@ export default function TeacherDashboard() {
                 </li>
                 <li
                   className="flex justify-between items-center bg-[#183687] p-3 rounded-lg shadow-md"
-                  onClick={() => attendancesheet({ sub: "Java" })}
+                  onClick={() => attendancesheet({ sub: "Java" , classID:"67c2a48dc286005439bd4e64" })}
                 >
                   <div>
                     <p className="text-base font-medium text-white">Java</p>

@@ -5,35 +5,80 @@ import socket from "../Components/Socket";
 interface StudentAttendance {
     name: string;
     isPresent: boolean;
-    erno:number;
+    erno: number;
 }
 
 const AttendanceSheet = () => {
     const location = useLocation();
     const Subject = location.state?.sub;
-    const [Accepted, setAccepted] = useState<StudentAttendance[]>([])
+    const classID = location.state?.classID;
+    const [Accepted, setAccepted] = useState<StudentAttendance[]>([]);
 
-
+    // Live updates from socket
     useEffect(() => {
-        socket.on("aproval", (data) => {
-            console.log(data);
-
+        console.log("Socket Connected?", socket.connected);
+    
+        socket.on("approval", (data: StudentAttendance) => {
+            console.log("Socket Data Received:", data);
+    
             setAccepted((prev) => {
-                // Check if the student already exists
-                const isAlreadyPresent = prev.some(student => student.name === data.name);
+                const isAlreadyPresent = prev.some(student => student.erno === data.erno);
                 if (!isAlreadyPresent) {
-                    return [...prev, data]; // Add only if not already present
+                    return [...prev, data];
                 }
-                return prev; // Return previous state if duplicate
+                return prev;
             });
         });
-
+    
         return () => {
-            socket.off("aproval"); // Cleanup to avoid multiple listeners
+            console.log("Socket Disconnected");
+            socket.off("approval"); // Cleanup listener
         };
     }, []);
+    
+    // Fetch attendance from API
+    useEffect(() => {
+        const fetchAttendance = async () => {
+            try {
+                const response = await fetch(`${import.meta.env.VITE_SERVER}/teacher/attendance`, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    credentials: "include",
+                    body: JSON.stringify({ classID }), // Corrected to send an object
+                });
 
+                const data = await response.json();
+                console.log("API Data:", data);
 
+                if (data.success) {
+                    const formattedData = data.allAttendance.map((item: any) => ({
+                        erno: item.erno,
+                        isPresent: item.isPresent ,
+                        name: item.id
+                    }));
+
+                    setAccepted((prev) => {
+                        // Merge API data with existing socket data, avoiding duplicates
+                        const merged = [...prev];
+
+                        formattedData.forEach((newStudent: StudentAttendance) => {
+                            if (!merged.some(student => student.erno === newStudent.erno)) {
+                                merged.push(newStudent);
+                            }
+                        });
+
+                        return merged;
+                    });
+                }
+            } catch (error) {
+                console.error("Error fetching attendance:", error);
+            }
+        };
+
+        fetchAttendance();
+    }, [classID]); // Re-fetch when classID changes
+    console.log(Accepted);
+    
     return (
         <>
             <div className="header bg-blue-800 p-2 flex items-center flex-wrap justify-around">
@@ -53,28 +98,30 @@ const AttendanceSheet = () => {
             </div>
             <section className="m-2 flex gap-4 flex-col">
                 {Accepted.length > 0 && Accepted.map((i) => (
-                    <Student key={i.name} name={i.name} isPresent={i.isPresent} erno={i.erno} />
+                    <Student key={i.erno} name={i.name} isPresent={i.isPresent} erno={i.erno} />
                 ))}
             </section>
         </>
-    )
-}
+    );
+};
 
-const Student = ({ name, isPresent , erno}: { name: string, isPresent: boolean , erno:number }) => {
+const Student = ({ name, isPresent, erno }: { name: string, isPresent: boolean, erno: number }) => {
+    console.log(name , isPresent , erno);
+    
     return (
-        <>
-            <div className="box flex justify-between items-center p-4 bg-amber-400 rounded-lg">
-                <div className="left flex justify-around items-center gap-2">
-                    <div className="er_number border-r-2 border-zinc-900 p-2">{erno}</div>
-                    <div className="name">{name}</div>
-                </div>
-                <div className="right flex justify-between gap-2">
-                    {isPresent && <p className="text-green-600 font-bold border-2 border-green-500 p-2 rounded-md hover:bg-green-600 hover:text-white">Present</p>}
-                    {!isPresent && <p className="text-red-700 font-bold border-2 border-red-600 p-2 rounded-md hover:bg-red-700 hover:text-white">Absent</p>}
-                </div>
+        <div className="box flex justify-between items-center p-4 bg-amber-400 rounded-lg">
+            <div className="left flex justify-around items-center gap-2">
+                <div className="name border-r-2 border-zinc-900 p-2">{name}</div>
+                <div className="er_number ">{erno}</div>
             </div>
-        </>
-    )
-}
+            <div className="right flex justify-between gap-2">
+                {isPresent
+                    ? <p className="text-green-600 font-bold border-2 border-green-500 p-2 rounded-md hover:bg-green-600 hover:text-white">Present</p>
+                    : <p className="text-red-700 font-bold border-2 border-red-600 p-2 rounded-md hover:bg-red-700 hover:text-white">Absent</p>
+                }
+            </div>
+        </div>
+    );
+};
 
-export default AttendanceSheet
+export default AttendanceSheet;

@@ -1,4 +1,4 @@
-import React, { ChangeEvent, FormEvent } from 'react';
+import React, { ChangeEvent, FormEvent, useState } from 'react';
 import { Dialog, DialogTitle, DialogContent, DialogActions, TextField, Button } from '@mui/material';
 
 interface FormData {
@@ -13,7 +13,7 @@ interface FormData {
 interface CreateClassDialogProps {
   createClass: boolean;
   handleCloseDialog: () => void;
-  handleSubmitForm: (event: FormEvent) => void;
+  handleSubmitForm: (event: FormEvent, formData: FormData) => void;
   formData: FormData;
   handleInputChange: (event: ChangeEvent<HTMLInputElement>) => void;
   loadingLocation: boolean;
@@ -27,12 +27,38 @@ const CreateClassDialog: React.FC<CreateClassDialogProps> = ({
   handleInputChange,
   loadingLocation
 }) => {
+  
+  const [error, setError] = useState<string | null>(null);
+
+  const validateTime = (): boolean => {
+    const today = new Date().toISOString().split("T")[0]; // Get today's date
+
+    const startDate = new Date(`${today}T${formData.startingTime}`);
+    const endDate = new Date(`${today}T${formData.endingTime}`);
+
+    if (endDate <= startDate) {
+      setError("Ending time must be after starting time!");
+      return false;
+    }
+
+    setError(null);
+    return true;
+  };
+
+  const handleSubmit = (event: FormEvent) => {
+    event.preventDefault();
+
+    if (validateTime()) {
+      handleSubmitForm(event, formData);
+    }
+  };
+
   return (
     <Dialog open={createClass} onClose={handleCloseDialog} className="dialogforclass">
       <DialogTitle className="innerHeading">Create New Class</DialogTitle>
-      <form onSubmit={handleSubmitForm} className='innerClassDialog'>
+      <form onSubmit={handleSubmit} className='innerClassDialog'>
         <DialogContent>
-        <label>Subject Name</label>
+          <label>Subject Name</label>
           <TextField
             name="subjectName"
             value={formData.subjectName}
@@ -42,8 +68,7 @@ const CreateClassDialog: React.FC<CreateClassDialogProps> = ({
             margin="normal"
             placeholder='SubjectName'
           />
-          <label>StartingDate</label>
-
+          <label>Starting Time</label>
           <TextField
             name="startingTime"
             value={formData.startingTime}
@@ -53,7 +78,7 @@ const CreateClassDialog: React.FC<CreateClassDialogProps> = ({
             margin="normal"
             type="time"
           />
-          <label>EndingDate</label>
+          <label>Ending Time</label>
           <TextField
             name="endingTime"
             value={formData.endingTime}
@@ -63,8 +88,8 @@ const CreateClassDialog: React.FC<CreateClassDialogProps> = ({
             margin="normal"
             type="time"
           />
+          {error && <p style={{ color: "red" }}>{error}</p>}
           <label>Semester</label>
-
           <TextField
             name="semester"
             value={formData.semester}
@@ -73,10 +98,8 @@ const CreateClassDialog: React.FC<CreateClassDialogProps> = ({
             required
             margin="normal"
             placeholder='Semester*'
-
           />
           <label>Department</label>
-
           <TextField
             name="department"
             value={formData.department}
@@ -85,20 +108,16 @@ const CreateClassDialog: React.FC<CreateClassDialogProps> = ({
             required
             margin="normal"
             placeholder='Department*'
-
           />
           <label>Location</label>
-
           <TextField
             name="location"
-            value={`${formData.location.latitude } , ${ formData.location.longitude}`}
-            onChange={handleInputChange}
+            value={`${formData.location.latitude}, ${formData.location.longitude}`}
             fullWidth
             required
             margin="normal"
             placeholder='Location*'
             disabled
-            
           />
           {loadingLocation && <p>Loading location...</p>}
         </DialogContent>
@@ -106,7 +125,7 @@ const CreateClassDialog: React.FC<CreateClassDialogProps> = ({
           <Button onClick={handleCloseDialog} color="secondary">
             Cancel
           </Button>
-          <Button type="submit" >
+          <Button type="submit">
             Create Class
           </Button>
         </DialogActions>
