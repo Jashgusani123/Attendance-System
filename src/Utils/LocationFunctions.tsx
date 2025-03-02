@@ -1,7 +1,7 @@
 export function isStudentWithinDistance(
     studentLocation: { latitude: number; longitude: number },
     teacherLocation: { latitude: number; longitude: number },
-    maxDistanceMeters = 20000
+    maxDistanceMeters = 2000
   ): boolean {
     
     const R = 6371e3; // Earth's radius in meters
@@ -18,6 +18,7 @@ export function isStudentWithinDistance(
     const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
   
     const distance = R * c; // Distance in meters
+    console.log(distance);
     
     return distance <= maxDistanceMeters;
   }
