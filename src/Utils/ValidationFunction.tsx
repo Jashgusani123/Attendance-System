@@ -45,16 +45,16 @@ async function getIpAddress() {
 }
 
 // ✅ Approved Devices (Using Local Storage for Better Tracking)
-function getApprovedDevices(): Set<string> {
-    const savedDevices = localStorage.getItem("approvedDevices");
-    return savedDevices ? new Set(JSON.parse(savedDevices)) : new Set();
-}
+// function getApprovedDevices(): Set<string> {
+//     const savedDevices = localStorage.getItem("approvedDevices");
+//     return savedDevices ? new Set(JSON.parse(savedDevices)) : new Set();
+// }
 
-function saveApprovedDevice(deviceId: string) {
-    const approvedDevices = getApprovedDevices();
-    approvedDevices.add(deviceId);
-    localStorage.setItem("approvedDevices", JSON.stringify([...approvedDevices]));
-}
+// function saveApprovedDevice(deviceId: string) {
+//     const approvedDevices = getApprovedDevices();
+//     approvedDevices.add(deviceId);
+//     localStorage.setItem("approvedDevices", JSON.stringify([...approvedDevices]));
+// }
 
 // ✅ Get stored attendance records (per class)
 function getApprovedClasses(): Record<string, Set<string>> {

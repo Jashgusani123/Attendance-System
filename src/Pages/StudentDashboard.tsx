@@ -25,6 +25,7 @@ interface ClassDetail {
   endingTime?: string;
   starting?: string;
   ending?: string;
+  location: { latitude: number; longitude: number };
 }
 
 interface Location {
@@ -36,13 +37,10 @@ export default function StudentDashboard() {
   const { loading: studentLoading, student } = useSelector(
     (state: { student: StudentReducerInitialState }) => state.student
   );
-  const [showQRCode, setShowQRCode] = useState(false);
   const [classDetails, setClassDetails] = useState<ClassDetail[]>([]);
-  const [allClasses, setAllClasses] = useState<string[]>([]);
-  const [ActiveCode, setActiveCode] = useState("");
+  const [allClasses] = useState<string[]>([]);
   const [loadingLocation, setLoadingLocation] = useState(false);
   const [location, setLocation] = useState<Location | null>(null);
-  const [IsIncognito, setIsIncognito] = useState<boolean>(false)
 
   // Handle incoming classes via socket
   useEffect(() => {
@@ -147,14 +145,14 @@ export default function StudentDashboard() {
                       if (location) {
                         const isWithinRange = isStudentWithinDistance(
                           location,
-                          { latitude: 20.5937, longitude: 78.9629 }, // Replace with teacher's actual location
-                          1000 // Distance in meters
+                          cls.location, // Replace with teacher's actual location
+                          20000 // Distance in meters
                         );
 
                         if (isWithinRange) {
-                          setActiveCode(cls._id);
-                          await submitAttendance(student?.enrollmentNumber!, cls._id, setIsIncognito);
+                          await submitAttendance(student?.enrollmentNumber!, cls._id, () => {});
                         } else {
+                          setLocation(null)
                           alert("You are outside the allowed location range.");
                         }
                       } else {
