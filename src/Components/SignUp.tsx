@@ -13,6 +13,7 @@ const SignUp = () => {
 
   const [StudentSignup] = StudentSignupMution();
   const [TeacherSignup] = TeacherSignupMution();
+  const [loading, setloading] = useState(false)
 
   const [formData, setFormData] = useState<StudentRequest>({
     fullName: "",
@@ -27,6 +28,8 @@ const SignUp = () => {
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    setloading(true);
+
     try {
       let res;
       
@@ -47,6 +50,8 @@ const SignUp = () => {
       }
     } catch (error) {
       console.error("Signup Error:", error);
+    } finally{
+      setloading(false);
     }
   };
   
@@ -171,9 +176,9 @@ const SignUp = () => {
 
           <button
             type="submit"
-            className="w-full bg-blue-600 text-white p-2 rounded-md font-bold hover:bg-blue-700 transition"
+            className="w-full bg-blue-600 text-white p-2 rounded-md font-bold flex items-center justify-center hover:bg-blue-700 transition"
           >
-            Register
+            {loading ? <div className="loader"></div> : "Register"} 
           </button>
         </form>
       </div>

@@ -11,6 +11,7 @@ const LoginForm = () => {
   const [role, setRole] = useState("student");
   const [studentLogin] = StudentLoginMutation();
   const [teacherLogin] = TeacherLoginMutation();
+  const [loading, setloading] = useState(false)
 
   const [formData, setFormData] = useState<StudentRequestForLogin>({
     fullName: "",
@@ -20,7 +21,7 @@ const LoginForm = () => {
   });
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    
+    setloading(true);
     try {
       let res;
   
@@ -55,6 +56,8 @@ const LoginForm = () => {
   
     } catch (error) {
       console.error("Signup Error:", error);
+    } finally{
+      setloading(false);
     }
   };
   
@@ -66,7 +69,7 @@ const LoginForm = () => {
     }));
   };
 
-  return (
+  return  (
     <div className="flex items-center justify-center overflow-hidden p-6 h-full">
       <div className="bg-white p-8 rounded-xl shadow-xl w-full max-w-lg">
         <h2 className="text-2xl font-bold text-blue-600 text-center mb-6">Login Form</h2>
@@ -146,9 +149,9 @@ const LoginForm = () => {
           
           <button 
             type="submit" 
-            className="w-full bg-blue-600 text-white p-2 rounded-md font-bold hover:bg-blue-700 transition"
+            className="w-full bg-blue-600 text-white p-2 rounded-md font-bold flex items-center justify-center hover:bg-blue-700 transition"
           >
-            Login
+           {loading ? <div className="loader"></div> : "Login"} 
           </button>
         </form>
       </div>

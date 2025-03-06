@@ -78,6 +78,24 @@ export default function StudentDashboard() {
 
     AllFunc();
   }, []);
+  useEffect(() => {
+    let watchId: number | null = null;
+  
+    const fetchLocation = () => {
+      watchId = GetMyLocation(setLoadingLocation, setLocation);
+    };
+  
+    fetchLocation(); // Start tracking location on mount
+  
+    return () => {
+      if (watchId !== null) {
+        navigator.geolocation.clearWatch(watchId); // Cleanup watchPosition on unmount
+      }
+    };
+  }, []);
+  
+  
+  
 
   return studentLoading || loadingLocation ? <>Loding...</> : (
     <div className="min-h-screen bg-[#f8eee3] p-6 text-white font-sans">
@@ -146,7 +164,7 @@ export default function StudentDashboard() {
                         const isWithinRange = isStudentWithinDistance(
                           location,
                           cls.location, // Replace with teacher's actual location
-                          20000 // Distance in meters
+                          1000 // Distance in meters
                         );
 
                         if (isWithinRange) {

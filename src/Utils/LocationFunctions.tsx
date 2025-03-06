@@ -1,11 +1,11 @@
 export function isStudentWithinDistance(
     studentLocation: { latitude: number; longitude: number },
     teacherLocation: { latitude: number; longitude: number },
-    maxDistanceMeters = 2000
+    maxDistanceMeters = 1000
   ): boolean {
     
     const R = 6371e3; // Earth's radius in meters
-  
+    
     const lat1 = studentLocation.latitude * (Math.PI / 180);
     const lat2 = teacherLocation.latitude * (Math.PI / 180);
     const deltaLat = (teacherLocation.latitude - studentLocation.latitude) * (Math.PI / 180);
@@ -26,20 +26,35 @@ export function isStudentWithinDistance(
   export const GetMyLocation = (setLoadingLocation: Function, setLocation: Function) => {
     if (navigator.geolocation) {
       setLoadingLocation(true);
-      navigator.geolocation.getCurrentPosition(
+  
+      // Start watching position
+      const watchId = navigator.geolocation.watchPosition(
         (position) => {
           const { latitude, longitude } = position.coords;
-  
+          console.log("Updated Location:", latitude, longitude);
           setLoadingLocation(false);
-          setLocation({ latitude, longitude }); // ✅ Set location here
+          setLocation({ latitude, longitude });
         },
         (error) => {
-          console.error(error);
+          console.error("Geolocation Error:", error);
           setLoadingLocation(false);
+        },
+        {
+          enableHighAccuracy: true, // ✅ Get precise location
+          timeout: 10000, // ⏳ Max wait time for update
+          maximumAge: 0, // 🚀 No caching (forces fresh data)
         }
       );
+  
+      return watchId; // Return watchId to clear it later
     } else {
       alert("Geolocation is not supported by this browser.");
+      return null;
     }
   };
+  
+  
+  
+  
+  
   
