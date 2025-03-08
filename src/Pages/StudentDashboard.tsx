@@ -95,7 +95,7 @@ export default function StudentDashboard() {
     };
   }, []);
   
-  
+  const handleNotification = ()=>{}
   
 
   return studentLoading || loadingLocation ? <><LoadingLayer type={"Student"} /></> : (
@@ -109,7 +109,7 @@ export default function StudentDashboard() {
       <div className="flex justify-between items-center mb-6 bg-amber-400 p-4 rounded-2xl">
         <h1 className="text-3xl font-bold text-blue-900">Student Dashboard</h1>
         <div className="options flex gap-4">
-          <Bell className="text-blue-900 w-6 h-6 cursor-pointer" />
+          <Bell className="text-blue-900 w-6 h-6 cursor-pointer" onClick={handleNotification}/>
           <LogOut className="text-blue-900 w-6 h-6 cursor-pointer" />
         </div>
       </div>

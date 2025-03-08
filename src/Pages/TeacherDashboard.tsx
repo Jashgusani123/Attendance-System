@@ -215,6 +215,10 @@ export default function TeacherDashboard() {
     };
   }, [Classes]);
 
+  const handleNotification =()=>{
+
+  }
+
 
   return teacherLoading || loadingLocation ? <>
     <LoadingLayer type={"Teacher"}/>
@@ -234,7 +238,7 @@ export default function TeacherDashboard() {
               <Add className="text-blue-900 w-6 h-6 cursor-pointer border-2 border-blue-900 rounded-4xl" titleAccess="Create Class" />
             </span>
             <span>
-              <Bell className="text-blue-900 w-6 h-6 cursor-pointer" />
+              <Bell className="text-blue-900 w-6 h-6 cursor-pointer"  onClick={handleNotification} />
             </span>
           </div>
         </div>

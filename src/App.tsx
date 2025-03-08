@@ -1,18 +1,20 @@
-import { useEffect } from "react";
+import { lazy, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Route, Routes, useNavigate } from "react-router-dom";
 import "./App.css";
-import AttendanceSheet from "./Pages/AttendanceSheet";
-import Landing from "./Pages/Landing";
-import Setting from "./Pages/Setting";
-import StudentDashboard from "./Pages/StudentDashboard";
-import StudentLanding from "./Pages/StudentLanding";
-import TeacherDashboard from "./Pages/TeacherDashboard";
-import TeacherLanding from "./Pages/TeacherLanding";
-import { StudentReducerInitialState } from "./Types/API/StudentApiType";
-import { TeacherReducerInitialState } from "./Types/API/TeacherApiType";
 import { studentExits, studentNotExits } from "./Redux/slices/StudentSlices";
 import { teacherExits, teacherNotExits } from "./Redux/slices/TeacherSlice";
+import { StudentReducerInitialState } from "./Types/API/StudentApiType";
+import { TeacherReducerInitialState } from "./Types/API/TeacherApiType";
+
+const AttendanceSheet = lazy(() => import("./Pages/AttendanceSheet"));
+const Landing = lazy(() => import("./Pages/Landing"));
+const Setting = lazy(() => import("./Pages/Setting"));
+const StudentDashboard = lazy(() => import("./Pages/StudentDashboard"));
+const StudentLanding = lazy(() => import("./Pages/StudentLanding"));
+const TeacherDashboard = lazy(() => import("./Pages/TeacherDashboard"));
+const TeacherLanding = lazy(() => import("./Pages/TeacherLanding"));
+const Notificaiton = lazy(()=>import("./Pages/Notification"))
 
 function App() {
   const { loading: studentLoading, student } = useSelector(
@@ -28,6 +30,7 @@ function App() {
 
   const loading = studentLoading || teacherLoading ;
   const user = student ? "Student" : teacher ? "Teacher" : "";
+
   useEffect(() => {
     const fetchUser = async () => {
       try {
@@ -56,7 +59,6 @@ function App() {
   
     fetchUser();
   }, []);
-  
 
   useEffect(() => {
   
@@ -92,7 +94,7 @@ function App() {
               <Route path="/student" element={<StudentLanding />} />
               <Route path="/student/dashboard" element={<StudentDashboard />} />
               <Route path="/student/setting" element={<Setting />} />
-              
+              <Route path="/student/notification" element={<Notificaiton />} />
             </>
           )}
 
@@ -103,6 +105,7 @@ function App() {
               <Route path="/teacher/dashboard" element={<TeacherDashboard />} />
               <Route path="/teacher/setting" element={<Setting />} />
               <Route path="/attendance" element={<AttendanceSheet />} />
+              <Route path="/teacher/notification" element={<Notificaiton />} />
             </>
           )}
 
