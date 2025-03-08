@@ -18,6 +18,7 @@ import socket from "../Components/Socket";
 import { TeacherReducerInitialState } from "../Types/API/TeacherApiType";
 import moment from 'moment';
 import LoadingLayer from "../Components/LoadingLayer";
+import Notification from "./Notification";
 
 
 const attendanceGraphData = [
@@ -58,7 +59,6 @@ export default function TeacherDashboard() {
   const [createClass, setCreateClass] = useState(false);
   const [loadingLocation, setLoadingLocation] = useState(false);
   const [error, setError] = useState<string | null>(null);
-
   const [formData, setFormData] = useState<ClassFormData>({
     subjectName: "",
     startingTime: "",
@@ -67,6 +67,13 @@ export default function TeacherDashboard() {
     department: "",
     location: { latitude: 0, longitude: 0 },
   });
+  const [showNotifications, setShowNotifications] = useState(false);
+
+  const notifications = [
+    { id: 1, message: "Welcome to QuickAttend Website. Hello, Jash!!", details: "Enjoy a seamless experience with QuickAttend. Track attendance easily!" },
+    { id: 2, message: "Your Attendance Will be Approve ✅, For...", details: "Your Attendance Will be Approve ✅, For The Software Engineering :- 4340702\nTeacher :- Jash Gusani" },
+    { id: 3, message: "Your Attendance Will be Reject ❌, For...", details: "Your Attendance Will be Reject ❌, For The Web Development Subject :- 4340704\nTeacher :- Jash Gusani" },
+  ];
 
   const navigate = useNavigate();
 
@@ -154,9 +161,6 @@ export default function TeacherDashboard() {
     }
   };
 
-
-
-
   useEffect(() => {
     const fetchClasses = async () => {
       try {
@@ -215,13 +219,11 @@ export default function TeacherDashboard() {
     };
   }, [Classes]);
 
-  const handleNotification =()=>{
 
-  }
 
 
   return teacherLoading || loadingLocation ? <>
-    <LoadingLayer type={"Teacher"}/>
+    <LoadingLayer type={"Teacher"} />
   </> : (
     <>
       <div className="min-h-screen bg-[#f8eee3] p-6 text-white font-sans">
@@ -237,9 +239,20 @@ export default function TeacherDashboard() {
             <span onClick={handleCreateClass}>
               <Add className="text-blue-900 w-6 h-6 cursor-pointer border-2 border-blue-900 rounded-4xl" titleAccess="Create Class" />
             </span>
-            <span>
-              <Bell className="text-blue-900 w-6 h-6 cursor-pointer"  onClick={handleNotification} />
+            <span onClick={() => setShowNotifications(!showNotifications)} className="relative cursor-pointer">
+              <Bell className="text-blue-900 w-6 h-6" />
+              {notifications.length > 0 && (
+                <span className="absolute top-[-10px] right-[-8px] bg-red-500 text-white text-xs rounded-full px-1.5 py-0.5">
+                  {notifications.length}
+                </span>
+              )}
+              {showNotifications && (
+                <div className="absolute top-[-35px] right-0 z-50 bg-white shadow-lg rounded-lg">
+                  <Notification fun={setShowNotifications} />
+                </div>
+              )}
             </span>
+
           </div>
         </div>
 

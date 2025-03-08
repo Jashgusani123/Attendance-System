@@ -8,6 +8,7 @@ import { StudentReducerInitialState } from "../Types/API/StudentApiType";
 import { GetMyLocation, isStudentWithinDistance } from "../Utils/LocationFunctions";
 import { submitAttendance } from "../Utils/ValidationFunction";
 import LoadingLayer from "../Components/LoadingLayer";
+import Notification from "./Notification";
 
 const data = [
   { date: "Mon", totalClasses: 7, yourAttendance: 7 },
@@ -42,6 +43,12 @@ export default function StudentDashboard() {
   const [allClasses] = useState<string[]>([]);
   const [loadingLocation, setLoadingLocation] = useState(false);
   const [location, setLocation] = useState<Location | null>(null);
+  const [showNotifications, setShowNotifications] = useState(false);
+  const notifications = [
+    { id: 1, message: "Welcome to QuickAttend Website. Hello, Jash!!", details: "Enjoy a seamless experience with QuickAttend. Track attendance easily!" },
+    { id: 2, message: "Your Attendance Will be Approve ✅, For...", details: "Your Attendance Will be Approve ✅, For The Software Engineering :- 4340702\nTeacher :- Jash Gusani" },
+    { id: 3, message: "Your Attendance Will be Reject ❌, For...", details: "Your Attendance Will be Reject ❌, For The Web Development Subject :- 4340704\nTeacher :- Jash Gusani" },
+  ];
 
   // Handle incoming classes via socket
   useEffect(() => {
@@ -61,8 +68,6 @@ export default function StudentDashboard() {
     };
   }, [allClasses]); // Depend on `allClasses` to update filtering dynamically
 
-
-
   useEffect(() => {
     const AllFunc = async () => {
       GetMyLocation(setLoadingLocation, setLocation);
@@ -81,22 +86,21 @@ export default function StudentDashboard() {
   }, []);
   useEffect(() => {
     let watchId: number | null = null;
-  
+
     const fetchLocation = () => {
       watchId = GetMyLocation(setLoadingLocation, setLocation);
     };
-  
+
     fetchLocation(); // Start tracking location on mount
-  
+
     return () => {
       if (watchId !== null) {
         navigator.geolocation.clearWatch(watchId); // Cleanup watchPosition on unmount
       }
     };
   }, []);
-  
-  const handleNotification = ()=>{}
-  
+
+
 
   return studentLoading || loadingLocation ? <><LoadingLayer type={"Student"} /></> : (
     <div className="min-h-screen bg-[#f8eee3] p-6 text-white font-sans">
@@ -109,7 +113,20 @@ export default function StudentDashboard() {
       <div className="flex justify-between items-center mb-6 bg-amber-400 p-4 rounded-2xl">
         <h1 className="text-3xl font-bold text-blue-900">Student Dashboard</h1>
         <div className="options flex gap-4">
-          <Bell className="text-blue-900 w-6 h-6 cursor-pointer" onClick={handleNotification}/>
+          <span onClick={() => setShowNotifications(!showNotifications)} className="relative cursor-pointer">
+            <Bell className="text-blue-900 w-6 h-6" />
+            {notifications.length > 0 && (
+              <span className="absolute top-[-10px] right-[-8px] bg-red-500 text-white text-xs rounded-full px-1.5 py-0.5">
+                {notifications.length}
+              </span>
+            )}
+            {showNotifications && (
+              <div className="absolute top-[-35px] right-0 z-50 bg-white shadow-lg rounded-lg">
+                <Notification fun={setShowNotifications} />
+              </div>
+            )}
+          </span>
+
           <LogOut className="text-blue-900 w-6 h-6 cursor-pointer" />
         </div>
       </div>
@@ -169,7 +186,7 @@ export default function StudentDashboard() {
                         );
 
                         if (isWithinRange) {
-                          await submitAttendance(student?.enrollmentNumber!, cls._id, () => {});
+                          await submitAttendance(student?.enrollmentNumber!, cls._id, () => { });
                         } else {
                           setLocation(null)
                           alert("You are outside the allowed location range.");
