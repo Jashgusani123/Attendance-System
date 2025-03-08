@@ -14,7 +14,7 @@ const AttendanceSheet = () => {
     const Subject = location.state?.sub;
     const classID = location.state?.classID;
     const [Accepted, setAccepted] = useState<StudentAttendance[]>([]);
-    const [IsLoading] = useState(true);
+    const [IsLoading , setIsLoading] = useState(false);
     const navigate = useNavigate();
 
     // Live updates from socket
@@ -39,6 +39,7 @@ const AttendanceSheet = () => {
     // Fetch attendance from API
     useEffect(() => {
         const fetchAttendance = async () => {
+            setIsLoading(true);
             try {
                 const response = await fetch(`${import.meta.env.VITE_SERVER}/teacher/attendance`, {
                     method: "POST",
@@ -68,10 +69,14 @@ const AttendanceSheet = () => {
 
                         return merged;
                     });
+                }else{
+                    return navigate("/teacher");
                 }
             } catch (error) {
                 navigate("/teacher");
                 alert("Something in Server Wrong !! Try After some Time...")
+            } finally{
+                setIsLoading(false);
             }
         };
 
