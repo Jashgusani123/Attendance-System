@@ -4,11 +4,7 @@ import { useState } from "react";
 
 
 
-interface NotificationType {
-    _id: string;
-    upperHeadding: string;
-    description: string;
-  }
+
 const Notification = ({ fun , notifications}: { fun: any ,  notifications:any}) => {
     
 
