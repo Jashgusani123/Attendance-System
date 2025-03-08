@@ -5,13 +5,22 @@ import { useLoginMutation as TeacherLoginMutation } from "../Redux/API/Teacher";
 import { studentExits, studentNotExits } from "../Redux/slices/StudentSlices";
 import { teacherExits, teacherNotExits } from "../Redux/slices/TeacherSlice";
 import { StudentRequestForLogin } from "../Types/API/StudentApiType";
+import { FetchBaseQueryError } from "@reduxjs/toolkit/query";
 
 const LoginForm = () => {
   const dispatch = useDispatch();
   const [role, setRole] = useState("student");
   const [studentLogin] = StudentLoginMutation();
   const [teacherLogin] = TeacherLoginMutation();
-  const [loading, setloading] = useState(false)
+  const [loading, setloading] = useState(false);
+  const [IsError, setIsError] = useState(
+{    error: false,
+  message: ""
+}  );
+
+const isFetchBaseQueryError = (error: unknown): error is FetchBaseQueryError => {
+  return typeof error === "object" && error !== null && "data" in error;
+};
 
   const [formData, setFormData] = useState<StudentRequestForLogin>({
     fullName: "",
@@ -22,44 +31,53 @@ const LoginForm = () => {
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setloading(true);
+  
     try {
       let res;
-  
-      // Check role and call the respective login API
       if (role === "student") {
         res = await studentLogin(formData);
-        
         if (res && "data" in res && res.data?.success) {
-          // Dispatch action to store student info in Redux
-          dispatch(teacherNotExits())
-
+          dispatch(teacherNotExits());
           dispatch(studentExits(res.data?.user));
+          setIsError({ error: false, message: "" }); // Clear errors on success
         } else {
-          // Handle login failure
-          console.error("Login failed: ", res?.data?.message || "Unknown error");
+          setIsError({
+            error: true,
+            message: isFetchBaseQueryError(res.error) 
+              ? (res.error.data as { message?: string })?.message || "Login failed"
+              : "An unexpected error occurred",
+          });
         }
       } else if (role === "teacher") {
-        
-        res = await teacherLogin({fullName:formData.fullName , email:formData.email , password:formData.password });
-        // console.log(res.data , role);
-        
+        res = await teacherLogin({
+          fullName: formData.fullName,
+          email: formData.email,
+          password: formData.password,
+        });
+  
         if (res && "data" in res && res.data?.success) {
-          // Dispatch action to store teacher info in Redux
-          dispatch(studentNotExits())
+          dispatch(studentNotExits());
           dispatch(teacherExits(res.data?.user));
+          setIsError({ error: false, message: "" });
         } else {
-          // Handle login failure
-          console.error("Login failed: ", res?.data?.message || "Unknown error");
+          setIsError({
+            error: true,
+            message: isFetchBaseQueryError(res.error) 
+              ? (res.error.data as { message?: string })?.message || "Login failed"
+              : "An unexpected error occurred",
+          });
         }
       }
-      
-  
     } catch (error) {
-      console.error("Signup Error:", error);
-    } finally{
+      setIsError({
+        error: true,
+        message: "Something went wrong, please try again later!",
+      }); 
+    } finally {
       setloading(false);
     }
   };
+  
   
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
@@ -146,7 +164,7 @@ const LoginForm = () => {
               required 
             />
           )}
-          
+          {IsError.error && <p className="text-red-800 font-bold">{IsError.message}</p>}
           <button 
             type="submit" 
             className="w-full bg-blue-600 text-white p-2 rounded-md font-bold flex items-center justify-center hover:bg-blue-700 transition"

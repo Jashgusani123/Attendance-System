@@ -1,6 +1,8 @@
 import { useEffect, useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import socket from "../Components/Socket";
+import { Box, Skeleton } from "@mui/material";
+import LoadingLayer from "../Components/LoadingLayer";
 
 interface StudentAttendance {
     name: string;
@@ -13,14 +15,15 @@ const AttendanceSheet = () => {
     const Subject = location.state?.sub;
     const classID = location.state?.classID;
     const [Accepted, setAccepted] = useState<StudentAttendance[]>([]);
+    const [IsLoading, setIsLoading] = useState(true);
 
     // Live updates from socket
     useEffect(() => {
         console.log("Socket Connected?", socket.connected);
-    
+
         socket.on("approval", (data: StudentAttendance) => {
             console.log("Socket Data Received:", data);
-    
+
             setAccepted((prev) => {
                 const isAlreadyPresent = prev.some(student => student.erno === data.erno);
                 if (!isAlreadyPresent) {
@@ -29,13 +32,13 @@ const AttendanceSheet = () => {
                 return prev;
             });
         });
-    
+
         return () => {
             console.log("Socket Disconnected");
             socket.off("approval"); // Cleanup listener
         };
     }, []);
-    
+
     // Fetch attendance from API
     useEffect(() => {
         const fetchAttendance = async () => {
@@ -53,7 +56,7 @@ const AttendanceSheet = () => {
                 if (data.success) {
                     const formattedData = data.allAttendance.map((item: any) => ({
                         erno: item.erno,
-                        isPresent: item.isPresent ,
+                        isPresent: item.isPresent,
                         name: item.id
                     }));
 
@@ -77,9 +80,21 @@ const AttendanceSheet = () => {
 
         fetchAttendance();
     }, [classID]); // Re-fetch when classID changes
-    console.log(Accepted);
-    
-    return (
+
+    return IsLoading ? <>
+        <Box sx={{ width: "100%" , height:"100%"}}>
+            <Skeleton height={"10%"}/>
+            <Skeleton animation="wave" height={"10%"} />
+            <Skeleton animation={false} height={"10%"} />
+            <Skeleton height={"10%"}/>
+            <Skeleton animation="wave" height={"10%"}/>
+            <Skeleton animation={false} height={"10%"}/>
+            <Skeleton height={"10%"}/>
+            <Skeleton animation="wave" height={"10%"}/>
+            <Skeleton animation={false} height={"10%"}/>
+            <Skeleton height={"10%"}/>
+        </Box>
+    </> : (
         <>
             <div className="header bg-blue-800 p-2 flex items-center flex-wrap justify-around">
                 <div className="left">
@@ -106,8 +121,7 @@ const AttendanceSheet = () => {
 };
 
 const Student = ({ name, isPresent, erno }: { name: string, isPresent: boolean, erno: number }) => {
-    console.log(name , isPresent , erno);
-    
+
     return (
         <div className="box flex justify-between items-center p-4 bg-amber-400 rounded-lg">
             <div className="left flex justify-around items-center gap-2">
