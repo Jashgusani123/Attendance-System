@@ -34,6 +34,11 @@ interface Location {
   latitude: number;
   longitude: number;
 }
+interface NotificationType {
+  _id: string;
+  upperHeadding: string;
+  description: string;
+}
 
 export default function StudentDashboard() {
   const { loading: studentLoading, student } = useSelector(
@@ -44,11 +49,9 @@ export default function StudentDashboard() {
   const [loadingLocation, setLoadingLocation] = useState(false);
   const [location, setLocation] = useState<Location | null>(null);
   const [showNotifications, setShowNotifications] = useState(false);
-  const notifications = [
-    { id: 1, message: "Welcome to QuickAttend Website. Hello, Jash!!", details: "Enjoy a seamless experience with QuickAttend. Track attendance easily!" },
-    { id: 2, message: "Your Attendance Will be Approve ✅, For...", details: "Your Attendance Will be Approve ✅, For The Software Engineering :- 4340702\nTeacher :- Jash Gusani" },
-    { id: 3, message: "Your Attendance Will be Reject ❌, For...", details: "Your Attendance Will be Reject ❌, For The Web Development Subject :- 4340704\nTeacher :- Jash Gusani" },
-  ];
+  const [notifications, setNotifications] = useState<NotificationType[]>([]);
+
+
 
   // Handle incoming classes via socket
   useEffect(() => {
@@ -81,6 +84,26 @@ export default function StudentDashboard() {
       const data = await response.json();
       setClassDetails(data.upcomingClasses);
     };
+    const getAllNotifications = async () => {
+      try {
+        const response = await fetch(`${import.meta.env.VITE_SERVER}/notification/get`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          credentials: "include",
+          body: JSON.stringify({ erno: student?.enrollmentNumber }), // Pass any required body data
+        });
+        const data = await response.json();
+        if (data.success) {
+          setNotifications(data.notifications);
+        } else {
+          alert("Failed to fetch notifications");
+        }
+      } catch (error) {
+        console.error("Error fetching notifications:", error);
+      }
+    };
+
+    getAllNotifications();
 
     AllFunc();
   }, []);
@@ -122,7 +145,7 @@ export default function StudentDashboard() {
             )}
             {showNotifications && (
               <div className="absolute top-[-35px] right-0 z-50 bg-white shadow-lg rounded-lg">
-                <Notification fun={setShowNotifications} />
+                <Notification fun={setShowNotifications} notifications={notifications} />
               </div>
             )}
           </span>

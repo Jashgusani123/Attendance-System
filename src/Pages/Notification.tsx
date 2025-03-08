@@ -1,26 +1,32 @@
+import { motion } from "framer-motion";
 import { ChevronDown, X } from "lucide-react";
 import { useState } from "react";
-import { motion } from "framer-motion"; // Import motion
 
-const Notification = ({ fun }: { fun: any }) => {
-    const [expandedNotification, setExpandedNotification] = useState<number | null>(null);
 
-    const notifications = [
-        { id: 1, message: "Welcome to QuickAttend Website. Hello, Jash!!", details: "Enjoy a seamless experience with QuickAttend. Track attendance easily!" },
-        { id: 2, message: "Your Attendance Will be Approve ✅, For...", details: "Your Attendance Will be Approve ✅, For The Software Engineering :- 4340702\nTeacher :- Jash Gusani" },
-        { id: 3, message: "Your Attendance Will be Reject ❌, For...", details: "Your Attendance Will be Reject ❌, For The Web Development Subject :- 4340704\nTeacher :- Jash Gusani" },
-    ];
 
-    const toggleDetails = (id: number) => {
+interface NotificationType {
+    _id: string;
+    upperHeadding: string;
+    description: string;
+  }
+const Notification = ({ fun , notifications}: { fun: any ,  notifications:any}) => {
+    
+
+    const [expandedNotification, setExpandedNotification] = useState<string | null>(null);
+
+
+
+    const toggledescription = (id: string) => {
         setExpandedNotification((prev) => (prev === id ? null : id));
     };
 
+
     return (
         <motion.div
-            initial={{ x: 300, opacity: 0 }}  // Start position (off-screen)
-            animate={{ x: 0, opacity: 1 }}    // Final position (on-screen)
-            exit={{ x: 300, opacity: 0 }}     // Exit position (off-screen)
-            transition={{ type: "spring", stiffness: 100 }} // Smooth animation
+            initial={{ x: 300, opacity: 0 }}
+            animate={{ x: 0, opacity: 1 }}
+            exit={{ x: 300, opacity: 0 }}
+            transition={{ type: "spring", stiffness: 100 }}
             className="absolute top-16 right-4 bg-white text-blue-900 shadow-xl rounded-lg w-96 p-4 z-50"
         >
             <div className="flex justify-between items-center border-b pb-2">
@@ -28,25 +34,25 @@ const Notification = ({ fun }: { fun: any }) => {
                 <X className="cursor-pointer" onClick={() => fun(false)} />
             </div>
             <ul className="mt-2 space-y-2">
-                {notifications.map((notification) => (
-                    <li key={notification.id} className="bg-gray-100 p-2 rounded-md text-sm shadow-sm">
+                {notifications.map((notification:any) => (
+                    <li key={notification._id} className="bg-gray-100 p-2 rounded-md text-sm shadow-sm">
                         <div className="flex justify-between items-center">
-                            <span>{notification.message}</span>
-                            {notification.details && (
+                            <span>{notification.upperHeadding}</span>
+                            {notification.description && (
                                 <ChevronDown
                                     className={`w-5 h-5 cursor-pointer transition-transform ${
-                                        expandedNotification === notification.id ? "rotate-180" : ""
+                                        expandedNotification === notification._id ? "rotate-180" : ""
                                     }`}
                                     onClick={(e) => {
                                         e.stopPropagation();
-                                        toggleDetails(notification.id);
+                                        toggledescription(notification._id);
                                     }}
                                 />
                             )}
                         </div>
-                        {expandedNotification === notification.id && (
+                        {expandedNotification === notification._id && (
                             <p className="mt-2 text-gray-700 text-xs bg-white p-2 rounded-md shadow-sm">
-                                {notification.details.split("\n").map((line, index) => (
+                                {notification.description.split("\n").map((line:any, index:any) => (
                                     <span key={index}>{line}<br /></span>
                                 ))}
                             </p>

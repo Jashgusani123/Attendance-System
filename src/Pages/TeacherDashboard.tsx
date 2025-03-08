@@ -50,11 +50,17 @@ interface ClassType {
   startingTime?: string;  // Optional fallback fields
   endingTime?: string;
 }
+interface NotificationType {
+  _id: string;
+  upperHeadding: string;
+  description: string;
+}
 
 export default function TeacherDashboard() {
   const { loading: teacherLoading, teacher } = useSelector(
     (state: { teacher: TeacherReducerInitialState }) => state.teacher
   );
+
   const [Classes, setClasses] = useState<ClassType[]>([]);
   const [createClass, setCreateClass] = useState(false);
   const [loadingLocation, setLoadingLocation] = useState(false);
@@ -68,12 +74,10 @@ export default function TeacherDashboard() {
     location: { latitude: 0, longitude: 0 },
   });
   const [showNotifications, setShowNotifications] = useState(false);
+  const [notifications, setNotifications] = useState<NotificationType[]>([]);
 
-  const notifications = [
-    { id: 1, message: "Welcome to QuickAttend Website. Hello, Jash!!", details: "Enjoy a seamless experience with QuickAttend. Track attendance easily!" },
-    { id: 2, message: "Your Attendance Will be Approve ✅, For...", details: "Your Attendance Will be Approve ✅, For The Software Engineering :- 4340702\nTeacher :- Jash Gusani" },
-    { id: 3, message: "Your Attendance Will be Reject ❌, For...", details: "Your Attendance Will be Reject ❌, For The Web Development Subject :- 4340704\nTeacher :- Jash Gusani" },
-  ];
+
+
 
   const navigate = useNavigate();
 
@@ -199,7 +203,26 @@ export default function TeacherDashboard() {
       alert("Geolocation is not supported by this browser.");
     }
     socket.emit("register-teacher", teacher?.fullName);
+    const getAllNotifications = async () => {
+      try {
+          const response = await fetch(`${import.meta.env.VITE_SERVER}/notification/get`, {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              credentials: "include",
+              body: JSON.stringify({ id:teacher?._id}), // Pass any required body data
+          });
+          const data = await response.json();
+          if (data.success) {
+              setNotifications(data.notifications);
+          } else {
+              alert("Failed to fetch notifications");
+          }
+      } catch (error) {
+          console.error("Error fetching notifications:", error);
+      }
+  };
 
+  getAllNotifications();
     fetchClasses();
   }, [])
 
@@ -218,8 +241,6 @@ export default function TeacherDashboard() {
       socket.off("class-live");
     };
   }, [Classes]);
-
-
 
 
   return teacherLoading || loadingLocation ? <>
@@ -248,7 +269,7 @@ export default function TeacherDashboard() {
               )}
               {showNotifications && (
                 <div className="absolute top-[-35px] right-0 z-50 bg-white shadow-lg rounded-lg">
-                  <Notification fun={setShowNotifications} />
+                  <Notification fun={setShowNotifications} notifications={notifications}/>
                 </div>
               )}
             </span>

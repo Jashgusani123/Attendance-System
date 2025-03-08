@@ -14,7 +14,6 @@ const StudentDashboard = lazy(() => import("./Pages/StudentDashboard"));
 const StudentLanding = lazy(() => import("./Pages/StudentLanding"));
 const TeacherDashboard = lazy(() => import("./Pages/TeacherDashboard"));
 const TeacherLanding = lazy(() => import("./Pages/TeacherLanding"));
-const Notificaiton = lazy(()=>import("./Pages/Notification"))
 
 function App() {
   const { loading: studentLoading, student } = useSelector(
@@ -94,7 +93,6 @@ function App() {
               <Route path="/student" element={<StudentLanding />} />
               <Route path="/student/dashboard" element={<StudentDashboard />} />
               <Route path="/student/setting" element={<Setting />} />
-              <Route path="/student/notification" element={<Notificaiton />} />
             </>
           )}
 
@@ -105,7 +103,6 @@ function App() {
               <Route path="/teacher/dashboard" element={<TeacherDashboard />} />
               <Route path="/teacher/setting" element={<Setting />} />
               <Route path="/attendance" element={<AttendanceSheet />} />
-              <Route path="/teacher/notification" element={<Notificaiton />} />
             </>
           )}
 

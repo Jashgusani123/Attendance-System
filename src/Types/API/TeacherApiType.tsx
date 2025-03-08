@@ -3,7 +3,8 @@ export interface TeacherRequest {
     "email":string,
     "password":string,
     "departmentName":string, 
-    "collegeName":string
+    "collegeName":string,
+    "_id"?:string
 }
 
 export interface TeacherRequestForLogin {
