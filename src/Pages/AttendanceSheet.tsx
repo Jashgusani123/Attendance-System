@@ -1,8 +1,7 @@
 import { useEffect, useState } from "react";
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import socket from "../Components/Socket";
 import { Box, Skeleton } from "@mui/material";
-import LoadingLayer from "../Components/LoadingLayer";
 
 interface StudentAttendance {
     name: string;
@@ -15,14 +14,13 @@ const AttendanceSheet = () => {
     const Subject = location.state?.sub;
     const classID = location.state?.classID;
     const [Accepted, setAccepted] = useState<StudentAttendance[]>([]);
-    const [IsLoading, setIsLoading] = useState(true);
+    const [IsLoading] = useState(true);
+    const navigate = useNavigate();
 
     // Live updates from socket
     useEffect(() => {
-        console.log("Socket Connected?", socket.connected);
 
         socket.on("approval", (data: StudentAttendance) => {
-            console.log("Socket Data Received:", data);
 
             setAccepted((prev) => {
                 const isAlreadyPresent = prev.some(student => student.erno === data.erno);
@@ -34,7 +32,6 @@ const AttendanceSheet = () => {
         });
 
         return () => {
-            console.log("Socket Disconnected");
             socket.off("approval"); // Cleanup listener
         };
     }, []);
@@ -51,7 +48,6 @@ const AttendanceSheet = () => {
                 });
 
                 const data = await response.json();
-                console.log("API Data:", data);
 
                 if (data.success) {
                     const formattedData = data.allAttendance.map((item: any) => ({
@@ -74,7 +70,8 @@ const AttendanceSheet = () => {
                     });
                 }
             } catch (error) {
-                console.error("Error fetching attendance:", error);
+                navigate("/teacher");
+                alert("Something in Server Wrong !! Try After some Time...")
             }
         };
 
@@ -82,17 +79,14 @@ const AttendanceSheet = () => {
     }, [classID]); // Re-fetch when classID changes
 
     return IsLoading ? <>
-        <Box sx={{ width: "100%" , height:"100%"}}>
-            <Skeleton height={"10%"}/>
+        <Box sx={{ width: "100%" , height:"100%" , padding:"0px "}} >
+            <Skeleton height={"200px"}/>
             <Skeleton animation="wave" height={"10%"} />
-            <Skeleton animation={false} height={"10%"} />
             <Skeleton height={"10%"}/>
             <Skeleton animation="wave" height={"10%"}/>
-            <Skeleton animation={false} height={"10%"}/>
             <Skeleton height={"10%"}/>
             <Skeleton animation="wave" height={"10%"}/>
-            <Skeleton animation={false} height={"10%"}/>
-            <Skeleton height={"10%"}/>
+            <Skeleton height={"10%"}/>  
         </Box>
     </> : (
         <>

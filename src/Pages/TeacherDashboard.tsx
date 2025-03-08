@@ -17,6 +17,7 @@ import CreateClassDialog from "../Components/Dialog";
 import socket from "../Components/Socket";
 import { TeacherReducerInitialState } from "../Types/API/TeacherApiType";
 import moment from 'moment';
+import LoadingLayer from "../Components/LoadingLayer";
 
 
 const attendanceGraphData = [
@@ -69,8 +70,8 @@ export default function TeacherDashboard() {
 
   const navigate = useNavigate();
 
-  const attendancesheet = ({ sub , classID }: { sub: string , classID:string}) => {
-    navigate("/attendance", { state: { sub  , classID } });
+  const attendancesheet = ({ sub, classID }: { sub: string, classID: string }) => {
+    navigate("/attendance", { state: { sub, classID } });
   };
 
   const handleCreateClass = () => {
@@ -91,17 +92,17 @@ export default function TeacherDashboard() {
 
   const handleSubmitForm = async (e: React.FormEvent) => {
     e.preventDefault();
-  
+
     // Validate time
     const today = new Date().toISOString().split("T")[0];
     const startDate = new Date(`${today}T${formData.startingTime}`);
     const endDate = new Date(`${today}T${formData.endingTime}`);
-  
+
     if (endDate <= startDate) {
       console.error("Error: Ending time must be after starting time!");
       return; // Stop execution if validation fails
     }
-  
+
     try {
       const response = await fetch(`${import.meta.env.VITE_SERVER}/class/create`, {
         method: "POST",
@@ -121,21 +122,21 @@ export default function TeacherDashboard() {
           },
           teacherName: teacher?.fullName,
         }),
-        
+
       });
-  
+
       if (!response.ok) {
         const errorMessage = await response.text(); // Get error message
         throw new Error(`HTTP error! Status: ${response.status}, Message: ${errorMessage}`);
       }
-  
+
       const data = await response.json();
-  
+
       // Emit event only if data is valid
       if (data?.newClass) {
         socket.connect();
         socket.emit("start-class", data.newClass.allStudent, formData, data.newClass._id);
-        
+
         // Reset form
         setFormData({
           subjectName: "",
@@ -145,16 +146,16 @@ export default function TeacherDashboard() {
           department: "",
           location: { latitude: 0, longitude: 0 },
         });
-  
+
         setCreateClass(false); // ✅ Close the dialog after successful submission
       }
     } catch (error) {
       console.error("Error creating class:", error);
     }
   };
-  
 
-  
+
+
 
   useEffect(() => {
     const fetchClasses = async () => {
@@ -163,15 +164,15 @@ export default function TeacherDashboard() {
           method: "GET",
           credentials: "include",
         });
-        
+
         if (!response.ok) throw new Error("Failed to fetch classes");
-      
+
         const data = await response.json();
         setClasses(data.upcomingClasses);
       } catch (error) {
         setError("Could not load classes.");
       }
-      
+
     };
     if (navigator.geolocation) {
       setLoadingLocation(true);
@@ -181,7 +182,7 @@ export default function TeacherDashboard() {
           // You can use an API like reverse geocoding to convert latitude and longitude to an address
           setFormData((prevState) => ({
             ...prevState,
-            location: {latitude , longitude},
+            location: { latitude, longitude },
           }));
           setLoadingLocation(false);
         },
@@ -193,14 +194,14 @@ export default function TeacherDashboard() {
     } else {
       alert("Geolocation is not supported by this browser.");
     }
-    socket.emit("register-teacher" , teacher?.fullName);
+    socket.emit("register-teacher", teacher?.fullName);
 
     fetchClasses();
   }, [])
-  
+
   useEffect(() => {
     socket.on("class-live", (receivedClassDetails) => {
-      
+
       // Check if the received class _id is in the list
       if (!Classes.includes(receivedClassDetails._id)) {
         setClasses((prevDetails) => [...prevDetails, receivedClassDetails]);
@@ -215,7 +216,9 @@ export default function TeacherDashboard() {
   }, [Classes]);
 
 
-  return teacherLoading || loadingLocation?<>Loading....</>:(
+  return teacherLoading || loadingLocation ? <>
+    <LoadingLayer />
+  </> : (
     <>
       <div className="min-h-screen bg-[#f8eee3] p-6 text-white font-sans">
         {/* Logo */}
@@ -285,11 +288,11 @@ export default function TeacherDashboard() {
                   <li
                     key={i._id}
                     className="flex justify-between items-center bg-[#183687] p-3 rounded-lg shadow-md"
-                    onClick={() => attendancesheet({ sub: i.subjectName , classID:i._id})}
+                    onClick={() => attendancesheet({ sub: i.subjectName, classID: i._id })}
                   >
                     <div>
                       <p className="text-base font-medium text-white">{i.subjectName}</p>
-                      <p className="text-sm text-gray-400">{i.starting?i.starting:i.startingTime} - {i.ending?i.ending:i.endingTime}</p>
+                      <p className="text-sm text-gray-400">{i.starting ? i.starting : i.startingTime} - {i.ending ? i.ending : i.endingTime}</p>
                     </div>
                     <p className="text-sm font-semibold text-blue-500 cursor-pointer">View Details</p>
                   </li>
@@ -308,7 +311,7 @@ export default function TeacherDashboard() {
               <ul className="space-y-3">
                 <li
                   className="flex justify-between items-center bg-[#183687] p-3 rounded-lg shadow-md"
-                  onClick={() => attendancesheet({ sub: "WebDevelopment" ,classID:"67c2a48dc286005439bd4e64" })}
+                  onClick={() => attendancesheet({ sub: "WebDevelopment", classID: "67c2a48dc286005439bd4e64" })}
                 >
                   <div>
                     <p className="text-base font-medium text-white">Web Development</p>
@@ -318,7 +321,7 @@ export default function TeacherDashboard() {
                 </li>
                 <li
                   className="flex justify-between items-center bg-[#183687] p-3 rounded-lg shadow-md"
-                  onClick={() => attendancesheet({ sub: "Java" , classID:"67c2a48dc286005439bd4e64" })}
+                  onClick={() => attendancesheet({ sub: "Java", classID: "67c2a48dc286005439bd4e64" })}
                 >
                   <div>
                     <p className="text-base font-medium text-white">Java</p>
