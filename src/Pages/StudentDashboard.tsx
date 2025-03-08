@@ -7,6 +7,7 @@ import socket from "../Components/Socket";
 import { StudentReducerInitialState } from "../Types/API/StudentApiType";
 import { GetMyLocation, isStudentWithinDistance } from "../Utils/LocationFunctions";
 import { submitAttendance } from "../Utils/ValidationFunction";
+import LoadingLayer from "../Components/LoadingLayer";
 
 const data = [
   { date: "Mon", totalClasses: 7, yourAttendance: 7 },
@@ -97,7 +98,7 @@ export default function StudentDashboard() {
   
   
 
-  return studentLoading || loadingLocation ? <>Loding...</> : (
+  return studentLoading || loadingLocation ? <><LoadingLayer type={"Student"} /></> : (
     <div className="min-h-screen bg-[#f8eee3] p-6 text-white font-sans">
       {/* Logo Section */}
       <div className="logo_with_dashboard rounded-bl-2xl rounded-br-2xl bg-[#c0bfbf] w-fit p-2">

@@ -217,7 +217,7 @@ export default function TeacherDashboard() {
 
 
   return teacherLoading || loadingLocation ? <>
-    <LoadingLayer />
+    <LoadingLayer type={"Teacher"}/>
   </> : (
     <>
       <div className="min-h-screen bg-[#f8eee3] p-6 text-white font-sans">
