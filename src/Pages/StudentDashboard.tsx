@@ -108,16 +108,13 @@ export default function StudentDashboard() {
   useEffect(() => {
     const watchId = navigator.geolocation.watchPosition(
       (position) => {
-        console.log("Position Retrieved:", position.coords);
         setLocation({
           latitude: position.coords.latitude,
           longitude: position.coords.longitude,
         });
         setLoadingLocation(false);
       },
-      (error) => {
-        console.error("Geolocation Error:", error);
-        alert("Error fetching location. Please enable location services.");
+      () => {
         setLoadingLocation(false);
       },
       {
@@ -130,8 +127,8 @@ export default function StudentDashboard() {
     return () => navigator.geolocation.clearWatch(watchId);
   }, []);
 
-  
-  
+
+
   return studentLoading || loadingLocation ? <><LoadingLayer type={"Student"} /></> : (
     <div className="min-h-screen bg-[#f8eee3] p-6 text-white font-sans">
       {/* Logo Section */}
