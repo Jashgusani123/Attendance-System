@@ -224,7 +224,6 @@ export default function TeacherDashboard() {
   useEffect(() => {
     const watchId = navigator.geolocation.watchPosition(
       (position) => {
-        console.log("Position Retrieved:", position.coords);
         setFormData((prev) => ({
           ...prev,
           location: {
@@ -235,9 +234,7 @@ export default function TeacherDashboard() {
         
         setLoadingLocation(false);
       },
-      (error) => {
-        console.error("Geolocation Error:", error);
-        alert("Error fetching location. Please enable location services.");
+      () => {
         setLoadingLocation(false);
       },
       { 
@@ -248,7 +245,7 @@ export default function TeacherDashboard() {
     );
   
     return () => navigator.geolocation.clearWatch(watchId);
-  }, []);
+  }, [window.onload]);
   
   
   return teacherLoading || loadingLocation ? <>
