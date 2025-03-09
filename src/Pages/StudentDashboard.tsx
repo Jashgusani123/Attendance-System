@@ -130,6 +130,8 @@ export default function StudentDashboard() {
     return () => navigator.geolocation.clearWatch(watchId);
   }, []);
 
+  
+  
   return studentLoading || loadingLocation ? <><LoadingLayer type={"Student"} /></> : (
     <div className="min-h-screen bg-[#f8eee3] p-6 text-white font-sans">
       {/* Logo Section */}
