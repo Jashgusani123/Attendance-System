@@ -1,6 +1,7 @@
 import { Add } from "@mui/icons-material";
 import { Avatar, Button, Card } from "@mui/material";
 import { Bell, Calendar, FileText } from "lucide-react";
+import moment from 'moment';
 import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
@@ -14,10 +15,9 @@ import {
   YAxis,
 } from "recharts";
 import CreateClassDialog from "../Components/Dialog";
+import LoadingLayer from "../Components/LoadingLayer";
 import socket from "../Components/Socket";
 import { TeacherReducerInitialState } from "../Types/API/TeacherApiType";
-import moment from 'moment';
-import LoadingLayer from "../Components/LoadingLayer";
 import Notification from "./Notification";
 
 
@@ -78,7 +78,6 @@ export default function TeacherDashboard() {
 
 
 
-
   const navigate = useNavigate();
 
   const attendancesheet = ({ sub, classID }: { sub: string, classID: string }) => {
@@ -128,8 +127,8 @@ export default function TeacherDashboard() {
           semester: formData.semester,
           departmentName: formData.department,
           location: {
-            latitude: formData.location.latitude.toFixed(7),
-            longitude: formData.location.longitude.toFixed(7),
+            latitude: formData.location.latitude.toFixed(4),
+            longitude: formData.location.longitude.toFixed(4),
           },
           teacherName: teacher?.fullName,
         }),
@@ -182,26 +181,6 @@ export default function TeacherDashboard() {
       }
 
     };
-    if (navigator.geolocation) {
-      setLoadingLocation(true);
-      navigator.geolocation.getCurrentPosition(
-        (position) => {
-          const { latitude, longitude } = position.coords;
-          // You can use an API like reverse geocoding to convert latitude and longitude to an address
-          setFormData((prevState) => ({
-            ...prevState,
-            location: { latitude, longitude },
-          }));
-          setLoadingLocation(false);
-        },
-        (error) => {
-          console.error(error);
-          setLoadingLocation(false);
-        }
-      );
-    } else {
-      alert("Geolocation is not supported by this browser.");
-    }
     socket.emit("register-teacher", teacher?.fullName);
     const getAllNotifications = async () => {
       try {
@@ -242,7 +221,36 @@ export default function TeacherDashboard() {
     };
   }, [Classes]);
 
-
+  useEffect(() => {
+    const watchId = navigator.geolocation.watchPosition(
+      (position) => {
+        console.log("Position Retrieved:", position.coords);
+        setFormData((prev) => ({
+          ...prev,
+          location: {
+            latitude: position.coords.latitude,
+            longitude: position.coords.longitude,
+          },
+        }));
+        
+        setLoadingLocation(false);
+      },
+      (error) => {
+        console.error("Geolocation Error:", error);
+        alert("Error fetching location. Please enable location services.");
+        setLoadingLocation(false);
+      },
+      { 
+        enableHighAccuracy: true, 
+        timeout: 5000, 
+        maximumAge: 0 // Force real-time location update
+      }
+    );
+  
+    return () => navigator.geolocation.clearWatch(watchId);
+  }, []);
+  
+  
   return teacherLoading || loadingLocation ? <>
     <LoadingLayer type={"Teacher"} />
   </> : (

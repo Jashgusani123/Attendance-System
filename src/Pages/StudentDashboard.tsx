@@ -3,11 +3,11 @@ import { Bell, Calendar, LogOut } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { CartesianGrid, LineChart, Line as RechartLine, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
+import LoadingLayer from "../Components/LoadingLayer";
 import socket from "../Components/Socket";
 import { StudentReducerInitialState } from "../Types/API/StudentApiType";
-import { GetMyLocation, isStudentWithinDistance } from "../Utils/LocationFunctions";
+import { haversineDistance } from "../Utils/LocationFunctions";
 import { submitAttendance } from "../Utils/ValidationFunction";
-import LoadingLayer from "../Components/LoadingLayer";
 import Notification from "./Notification";
 
 const data = [
@@ -51,8 +51,6 @@ export default function StudentDashboard() {
   const [showNotifications, setShowNotifications] = useState(false);
   const [notifications, setNotifications] = useState<NotificationType[]>([]);
 
-
-
   // Handle incoming classes via socket
   useEffect(() => {
     socket.on("class-live", (receivedClassDetails) => {
@@ -73,7 +71,6 @@ export default function StudentDashboard() {
 
   useEffect(() => {
     const AllFunc = async () => {
-      GetMyLocation(setLoadingLocation, setLocation);
       // Add any other async operations here
       const response = await fetch(`${import.meta.env.VITE_SERVER}/student/getclasses`, {
         method: "GET",
@@ -107,23 +104,31 @@ export default function StudentDashboard() {
 
     AllFunc();
   }, []);
+
   useEffect(() => {
-    let watchId: number | null = null;
-
-    const fetchLocation = () => {
-      watchId = GetMyLocation(setLoadingLocation, setLocation);
-    };
-
-    fetchLocation(); // Start tracking location on mount
-
-    return () => {
-      if (watchId !== null) {
-        navigator.geolocation.clearWatch(watchId); // Cleanup watchPosition on unmount
+    const watchId = navigator.geolocation.watchPosition(
+      (position) => {
+        console.log("Position Retrieved:", position.coords);
+        setLocation({
+          latitude: position.coords.latitude,
+          longitude: position.coords.longitude,
+        });
+        setLoadingLocation(false);
+      },
+      (error) => {
+        console.error("Geolocation Error:", error);
+        alert("Error fetching location. Please enable location services.");
+        setLoadingLocation(false);
+      },
+      {
+        enableHighAccuracy: true,
+        timeout: 5000,
+        maximumAge: 0 // Force real-time location update
       }
-    };
+    );
+
+    return () => navigator.geolocation.clearWatch(watchId);
   }, []);
-
-
 
   return studentLoading || loadingLocation ? <><LoadingLayer type={"Student"} /></> : (
     <div className="min-h-screen bg-[#f8eee3] p-6 text-white font-sans">
@@ -199,13 +204,11 @@ export default function StudentDashboard() {
                     className="bg-green-500 text-white px-4 py-2 rounded-lg"
                     onClick={async () => {
                       setLoadingLocation(true);
-                      GetMyLocation(setLoadingLocation, setLocation);
 
                       if (location) {
-                        const isWithinRange = isStudentWithinDistance(
+                        const isWithinRange = haversineDistance(
                           location,
                           cls.location, // Replace with teacher's actual location
-                          2000 // Distance in meters
                         );
 
                         if (isWithinRange) {
