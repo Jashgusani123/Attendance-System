@@ -205,7 +205,7 @@ export default function StudentDashboard() {
                         const isWithinRange = isStudentWithinDistance(
                           location,
                           cls.location, // Replace with teacher's actual location
-                          1336 // Distance in meters
+                          2000 // Distance in meters
                         );
 
                         if (isWithinRange) {
