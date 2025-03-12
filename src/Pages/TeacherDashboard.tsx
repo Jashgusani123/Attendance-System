@@ -1,6 +1,6 @@
 import { Add } from "@mui/icons-material";
 import { Avatar, Button, Card } from "@mui/material";
-import { Bell, Calendar, FileText } from "lucide-react";
+import { Bell, Calendar, FileText, Settings } from "lucide-react";
 import moment from 'moment';
 import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
@@ -21,15 +21,6 @@ import { TeacherReducerInitialState } from "../Types/API/TeacherApiType";
 import Notification from "./Notification";
 
 
-const attendanceGraphData = [
-  { date: "Mon", totalStudents: 70, studentsAttended: 60 },
-  { date: "Tue", totalStudents: 70, studentsAttended: 50 },
-  { date: "Wed", totalStudents: 70, studentsAttended: 65 },
-  { date: "Thu", totalStudents: 70, studentsAttended: 68 },
-  { date: "Fri", totalStudents: 70, studentsAttended: 63 },
-  { date: "Sat", totalStudents: 70, studentsAttended: 62 },
-  { date: "Sun", totalStudents: 70, studentsAttended: 55 },
-];
 
 interface ClassFormData {
   subjectName: string;
@@ -75,10 +66,10 @@ export default function TeacherDashboard() {
   });
   const [showNotifications, setShowNotifications] = useState(false);
   const [notifications, setNotifications] = useState<NotificationType[]>([]);
-
-
-
+  const [attendanceGraphData, setattendanceGraphData] = useState();
+  const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
+  const [lastClasses, setlastClasses] = useState<ClassType[]>()
 
   const attendancesheet = ({ sub, classID }: { sub: string, classID: string }) => {
     navigate("/attendance", { state: { sub, classID } });
@@ -165,44 +156,79 @@ export default function TeacherDashboard() {
   };
 
   useEffect(() => {
-    const fetchClasses = async () => {
+    const fetchData = async () => {
       try {
-        const response = await fetch(`${import.meta.env.VITE_SERVER}/teacher/getclasses`, {
-          method: "GET",
-          credentials: "include",
-        });
+        const fetchClasses = async () => {
+          try {
+            const response = await fetch(`${import.meta.env.VITE_SERVER}/teacher/getclasses`, {
+              method: "GET",
+              credentials: "include",
+            });
 
-        if (!response.ok) throw new Error("Failed to fetch classes");
+            if (!response.ok) throw new Error("Failed to fetch classes");
 
-        const data = await response.json();
-        setClasses(data.upcomingClasses);
-      } catch (error) {
-        setError("Could not load classes.");
-      }
+            const data = await response.json();
+            setClasses(data.upcomingClasses);
+          } catch (error) {
+            setError("Could not load classes.");
+          }
 
-    };
-    socket.emit("register-teacher", teacher?.fullName);
-    const getAllNotifications = async () => {
-      try {
-          const response = await fetch(`${import.meta.env.VITE_SERVER}/notification/get`, {
+        };
+        const getAllNotifications = async () => {
+          try {
+            const response = await fetch(`${import.meta.env.VITE_SERVER}/notification/get`, {
               method: "POST",
               headers: { "Content-Type": "application/json" },
               credentials: "include",
-              body: JSON.stringify({ id:teacher?._id}), // Pass any required body data
+              body: JSON.stringify({ id: teacher?._id }), // Pass any required body data
+            });
+            const data = await response.json();
+            if (data.success) {
+              setNotifications(data.notifications);
+            } else {
+              alert("Failed to fetch notifications");
+            }
+          } catch (error) {
+            console.error("Error fetching notifications:", error);
+          }
+        };
+        const GetOverview = async () => {
+          const response = await fetch(`${import.meta.env.VITE_SERVER}/teacher/overview`, {
+            method: "GET",
+            credentials: "include",
           });
           const data = await response.json();
           if (data.success) {
-              setNotifications(data.notifications);
+            setattendanceGraphData(data.last7DaysData);
           } else {
-              alert("Failed to fetch notifications");
+            console.log(data);
           }
-      } catch (error) {
-          console.error("Error fetching notifications:", error);
+        };
+        const GetLastClasses = async () => {
+          const response = await fetch(`${import.meta.env.VITE_SERVER}/teacher/lastclasses`, {
+            method: "GET",
+            credentials: "include",
+          });
+          const data = await response.json();
+          if (data.success) {
+            setlastClasses(data.allClasses);
+          } else {
+            console.log(data);
+          }
+        };
+        await Promise.all([getAllNotifications(),
+        fetchClasses(), GetOverview() , GetLastClasses()])
       }
-  };
+      catch (err) {
+        console.log(err);
 
-  getAllNotifications();
-    fetchClasses();
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    socket.emit("register-teacher", teacher?.fullName);
+    fetchData();
   }, [])
 
   useEffect(() => {
@@ -231,24 +257,27 @@ export default function TeacherDashboard() {
             longitude: position.coords.longitude,
           },
         }));
-        
+
         setLoadingLocation(false);
       },
       () => {
         setLoadingLocation(false);
       },
-      { 
-        enableHighAccuracy: true, 
-        timeout: 5000, 
+      {
+        enableHighAccuracy: true,
+        timeout: 5000,
         maximumAge: 0 // Force real-time location update
       }
     );
-  
+
     return () => navigator.geolocation.clearWatch(watchId);
   }, [window.onload]);
-  
-  
-  return teacherLoading || loadingLocation ? <>
+
+  const handleSetting = () => {
+        navigate("/teacher/setting", { state: { type:"Teacher" } });
+};
+
+  return teacherLoading || loadingLocation || loading ? <>
     <LoadingLayer type={"Teacher"} />
   </> : (
     <>
@@ -261,7 +290,13 @@ export default function TeacherDashboard() {
         {/* Header */}
         <div className="flex justify-between items-center mb-6 bg-amber-400 p-4 rounded-2xl shadow-xl">
           <h1 className="text-3xl font-bold text-blue-900">Teacher Dashboard</h1>
-          <div className="optionss flex flex-wrap gap-3 items-center">
+          <div className="optionss flex flex-wrap gap-3 items-end">
+            <span
+              onClick={handleSetting}
+              className="text-blue-900 rounded-md  cursor-pointer"
+            >
+              <Settings className="setting-icon" />
+            </span>
             <span onClick={handleCreateClass}>
               <Add className="text-blue-900 w-6 h-6 cursor-pointer border-2 border-blue-900 rounded-4xl" titleAccess="Create Class" />
             </span>
@@ -274,7 +309,7 @@ export default function TeacherDashboard() {
               )}
               {showNotifications && (
                 <div className="absolute top-[-35px] right-0 z-50 bg-white shadow-lg rounded-lg">
-                  <Notification fun={setShowNotifications} notifications={notifications}/>
+                  <Notification fun={setShowNotifications} notifications={notifications} />
                 </div>
               )}
             </span>
@@ -311,6 +346,7 @@ export default function TeacherDashboard() {
                   <XAxis dataKey="date" stroke="#1e3a8a" />
                   <YAxis stroke="#1e3a8a" />
                   <Tooltip contentStyle={{ backgroundColor: "#f8eee3", color: "black" }} />
+                  <Line type="monotone" dataKey="totalClass" stroke="red" strokeWidth={3} dot={false} />
                   <Line type="monotone" dataKey="totalStudents" stroke="#FF6347" strokeWidth={3} dot={false} />
                   <Line type="monotone" dataKey="studentsAttended" stroke="#1e3a8a" strokeWidth={3} dot={false} />
                 </LineChart>
@@ -345,32 +381,27 @@ export default function TeacherDashboard() {
             </Card>
           </div>
 
-          {/* Upcoming Classes */}
+          {/* Last Classes */}
           <div className="w-[100%] lg:w-full">
             <Card className="bg-blue-900 text-white p-6 rounded-2xl shadow-lg">
               <h2 className="text-lg font-bold mb-4 flex items-center bg-amber-400 p-2 rounded-2xl w-fit">
-                <Calendar className="mr-2" /> Upcoming Classes
+                <Calendar className="mr-2" /> Last Classes
               </h2>
               <ul className="space-y-3">
-                <li
-                  className="flex justify-between items-center bg-[#183687] p-3 rounded-lg shadow-md"
-                  onClick={() => attendancesheet({ sub: "WebDevelopment", classID: "67c2a48dc286005439bd4e64" })}
-                >
-                  <div>
-                    <p className="text-base font-medium text-white">Web Development</p>
-                    <p className="text-sm text-gray-400">9:00 AM</p>
-                  </div>
-                  <p className="text-sm font-semibold text-blue-500 cursor-pointer">View Details</p>
-                </li>
-                <li
-                  className="flex justify-between items-center bg-[#183687] p-3 rounded-lg shadow-md"
-                  onClick={() => attendancesheet({ sub: "Java", classID: "67c2a48dc286005439bd4e64" })}
-                >
-                  <div>
-                    <p className="text-base font-medium text-white">Java</p>
-                    <p className="text-sm text-gray-400">10:00 AM</p>
-                  </div>
-                </li>
+              {lastClasses?.map((i) => (
+                  <li
+                    key={i._id}
+                    className="flex justify-between items-center bg-[#183687] p-3 rounded-lg shadow-md"
+                    onClick={() => attendancesheet({ sub: i.subjectName, classID: i._id })}
+                  >
+                    <div>
+                      <p className="text-base font-medium text-white">{i.subjectName}</p>
+                      <p className="text-sm text-gray-400">{i.starting ? i.starting : i.startingTime} - {i.ending ? i.ending : i.endingTime}</p>
+                    </div>
+                    <p className="text-sm font-semibold text-blue-500 cursor-pointer">View Details</p>
+                  </li>
+                ))}
+                
               </ul>
             </Card>
           </div>

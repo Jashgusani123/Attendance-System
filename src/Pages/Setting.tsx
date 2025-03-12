@@ -17,11 +17,13 @@ import { studentNotExits } from "../Redux/slices/StudentSlices";
 import { teacherNotExits } from "../Redux/slices/TeacherSlice";
 import { StudentReducerInitialState } from "../Types/API/StudentApiType";
 import LoadingLayer from "../Components/LoadingLayer";
+import { TeacherReducerInitialState } from "../Types/API/TeacherApiType";
 
 const Setting = () => {
     const { loading: studentLoading, student } = useSelector(
         (state: { student: StudentReducerInitialState }) => state.student
     );
+    const {loading:teacherLoading , teacher} = useSelector((state:{teacher:TeacherReducerInitialState})=>state.teacher);
     const location = useLocation();
     const [StudentLogout] = StudentLogoutMutation();
     const [TeacherLogout] = TeacherLogoutMutation();
@@ -58,24 +60,27 @@ const Setting = () => {
     }
 
     useEffect(() => {
-        const datew = new Date(student?.collegeJoiningDate!).toISOString().split("T")[0];
-        setdate(datew);
+        if(type == "Student"){
+            const datew = new Date(student?.collegeJoiningDate!).toISOString().split("T")[0];
+            setdate(datew);
+        }
     }, []);
+    const userType = student ? student : teacher
 
-    return studentLoading ? <><LoadingLayer type={type} /></> : (
+    return studentLoading || teacherLoading? <><LoadingLayer type={type} /></> : (
         <>
             {type == "Student" ? <LandingNav path="/student/dashboard" home="/student" /> : <LandingNav path="/teacher/dashboard" home="/teacher" />}
             <section className="flex justify-around flex-col gap-5 items-center mt-5 w-full">
                 <Fields icon={AccountCircleIcon} Name="Profile" handleClick={() => toggleSection("profile")} isOpen={openSection === "profile"} />
                 {openSection === "profile" && (
-                    <SectionCard title="Change Name" value={student?.fullName} name="fullName" />
+                    <SectionCard title="Change Name" value={userType?.fullName} name="fullName" />
                 )}
 
                 <Fields icon={AccountCircleIcon} Name="Account & Security" handleClick={() => toggleSection("security")} isOpen={openSection === "security"} />
                 {openSection === "security" && (
                     <>
-                        <SectionCard title="Change Email" value={student?.email} name="email" />
-                        <SectionCard title="Change Password" value={student?.password} type="password" name="password" />
+                        <SectionCard title="Change Email" value={userType?.email} name="email" />
+                        <SectionCard title="Change Password" value={userType?.password} type="password" name="password" />
                     </>
                 )}
 
@@ -98,7 +103,7 @@ const Setting = () => {
                             <SectionCard title="Department" value={student?.departmentName} name="departmentName" />
                         </>
                     ) : (
-                        <SectionCard title="Department" value="" />
+                        <SectionCard title="Department" value={teacher?.departmentName} />
                     )
                 )}
 

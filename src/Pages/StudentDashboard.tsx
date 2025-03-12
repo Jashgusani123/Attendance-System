@@ -128,7 +128,6 @@ export default function StudentDashboard() {
   
     fetchData();
   }, []);
-  
 
   useEffect(() => {
     const watchId = navigator.geolocation.watchPosition(
