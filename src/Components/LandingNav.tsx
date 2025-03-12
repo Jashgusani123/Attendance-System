@@ -28,7 +28,7 @@ const LandingNav = ({
             handleClickToDashBord(); // Execute the provided function
         }
         if (path) {
-            navigate(path); // Navigate to the dashboard
+            navigate(path , {state:{type}}); // Navigate to the dashboard
         }
     };
 

@@ -1,7 +1,7 @@
 import { Avatar, Card } from "@mui/material";
 import { Bell, Calendar, LogOut } from "lucide-react";
 import { useEffect, useState } from "react";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { CartesianGrid, LineChart, Line as RechartLine, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 import LoadingLayer from "../Components/LoadingLayer";
 import socket from "../Components/Socket";
@@ -9,16 +9,12 @@ import { StudentReducerInitialState } from "../Types/API/StudentApiType";
 import { haversineDistance } from "../Utils/LocationFunctions";
 import { submitAttendance } from "../Utils/ValidationFunction";
 import Notification from "./Notification";
+import { teacherNotExits } from "../Redux/slices/TeacherSlice";
+import { studentNotExits } from "../Redux/slices/StudentSlices";
+import { useLogoutMutation as StudentLogoutMutation } from "../Redux/API/Student";
+import { useLogoutMutation as TeacherLogoutMutation } from "../Redux/API/Teacher";
+import { useLocation } from "react-router-dom";
 
-const data = [
-  { date: "Mon", totalClasses: 7, yourAttendance: 7 },
-  { date: "Tue", totalClasses: 7, yourAttendance: 5 },
-  { date: "Wed", totalClasses: 7, yourAttendance: 6 },
-  { date: "Thu", totalClasses: 7, yourAttendance: 7 },
-  { date: "Fri", totalClasses: 7, yourAttendance: 6 },
-  { date: "Sat", totalClasses: 7, yourAttendance: 4 },
-  { date: "Sun", totalClasses: 7, yourAttendance: 0 },
-];
 
 interface ClassDetail {
   _id: string;
@@ -50,6 +46,14 @@ export default function StudentDashboard() {
   const [location, setLocation] = useState<Location | null>(null);
   const [showNotifications, setShowNotifications] = useState(false);
   const [notifications, setNotifications] = useState<NotificationType[]>([]);
+  const [data, setDate] = useState()
+  const [StudentLogout] = StudentLogoutMutation();
+  const [TeacherLogout] = TeacherLogoutMutation();
+  const [loading, setLoading] = useState(true);
+
+  const dispatch = useDispatch();
+  const locationHook = useLocation();
+  const type = locationHook.state?.type;
 
   // Handle incoming classes via socket
   useEffect(() => {
@@ -70,40 +74,61 @@ export default function StudentDashboard() {
   }, [allClasses]); // Depend on `allClasses` to update filtering dynamically
 
   useEffect(() => {
-    const AllFunc = async () => {
-      // Add any other async operations here
-      const response = await fetch(`${import.meta.env.VITE_SERVER}/student/getclasses`, {
-        method: "GET",
-        credentials: "include",
-      });
-      if (!response.ok) throw new Error("Failed to fetch classes");
-
-      const data = await response.json();
-      setClassDetails(data.upcomingClasses);
-    };
-    const getAllNotifications = async () => {
+    const fetchData = async () => {
       try {
-        const response = await fetch(`${import.meta.env.VITE_SERVER}/notification/get`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          credentials: "include",
-          body: JSON.stringify({ erno: student?.enrollmentNumber }), // Pass any required body data
-        });
-        const data = await response.json();
-        if (data.success) {
-          setNotifications(data.notifications);
-        } else {
-          alert("Failed to fetch notifications");
-        }
+        setLoading(true);
+  
+        const GetAllClass = async () => {
+          const response = await fetch(`${import.meta.env.VITE_SERVER}/student/getclasses`, {
+            method: "GET",
+            credentials: "include",
+          });
+          if (!response.ok) throw new Error("Failed to fetch classes");
+  
+          const data = await response.json();
+          setClassDetails(data.upcomingClasses);
+        };
+  
+        const getAllNotifications = async () => {
+          const response = await fetch(`${import.meta.env.VITE_SERVER}/notification/get`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            credentials: "include",
+            body: JSON.stringify({ erno: student?.enrollmentNumber }),
+          });
+          const data = await response.json();
+          if (data.success) {
+            setNotifications(data.notifications);
+          } else {
+            alert("Failed to fetch notifications");
+          }
+        };
+  
+        const GetLastesData = async () => {
+          const response = await fetch(`${import.meta.env.VITE_SERVER}/student/getlastdata`, {
+            method: "GET",
+            credentials: "include",
+          });
+          const data = await response.json();
+          if (data.success) {
+            setDate(data.last7DaysData);
+          } else {
+            console.log(data);
+          }
+        };
+  
+        // Run all fetch functions
+        await Promise.all([GetLastesData(), GetAllClass(), getAllNotifications()]);
       } catch (error) {
-        console.error("Error fetching notifications:", error);
+        console.error("Error fetching data:", error);
+      } finally {
+        setLoading(false);
       }
     };
-
-    getAllNotifications();
-
-    AllFunc();
+  
+    fetchData();
   }, []);
+  
 
   useEffect(() => {
     const watchId = navigator.geolocation.watchPosition(
@@ -127,9 +152,25 @@ export default function StudentDashboard() {
     return () => navigator.geolocation.clearWatch(watchId);
   }, []);
 
+  const handleLogout = async () => {
+    
+    if (type === "Student") {
+      const res = await StudentLogout(null);
+      if (res.data?.success) {
+        dispatch(studentNotExits());
+      }
+    } else if (type === "Teacher") {
+      // console.log("etew");
+      const res = await TeacherLogout(null);
+      if (res.data?.success) {
+        dispatch(teacherNotExits());
 
+      }
 
-  return studentLoading || loadingLocation ? <><LoadingLayer type={"Student"} /></> : (
+    }
+  }
+
+  return studentLoading || loadingLocation || loading ? <><LoadingLayer type={"Student"} /></> : (
     <div className="min-h-screen bg-[#f8eee3] p-6 text-white font-sans">
       {/* Logo Section */}
       <div className="logo_with_dashboard rounded-bl-2xl rounded-br-2xl bg-[#c0bfbf] w-fit p-2">
@@ -139,14 +180,21 @@ export default function StudentDashboard() {
       {/* Dashboard Header */}
       <div className="flex justify-between items-center mb-6 bg-amber-400 p-4 rounded-2xl">
         <h1 className="text-3xl font-bold text-blue-900">Student Dashboard</h1>
-        <div className="options flex gap-4">
+
+        {/* Ensure this is relative so absolute positioning inside works correctly */}
+        <div className="options flex gap-4 relative">
+          {/* Bell Icon with Notifications */}
           <span onClick={() => setShowNotifications(!showNotifications)} className="relative cursor-pointer">
             <Bell className="text-blue-900 w-6 h-6" />
+
             {notifications.length > 0 && (
-              <span className="absolute top-[-10px] right-[-8px] bg-red-500 text-white text-xs rounded-full px-1.5 py-0.5">
+              <span
+                className="absolute top-[-10px] right-[-8px] bg-red-500 text-white text-xs rounded-full px-1.5 py-0.5 pointer-events-none"
+              >
                 {notifications.length}
               </span>
             )}
+
             {showNotifications && (
               <div className="absolute top-[-35px] right-0 z-50 bg-white shadow-lg rounded-lg">
                 <Notification fun={setShowNotifications} notifications={notifications} />
@@ -154,9 +202,11 @@ export default function StudentDashboard() {
             )}
           </span>
 
-          <LogOut className="text-blue-900 w-6 h-6 cursor-pointer" />
+          {/* LogOut Button */}
+          <LogOut className="text-blue-900 w-6 h-6 cursor-pointer z-90" onClick={handleLogout} />
         </div>
       </div>
+
 
       {/* Student Info */}
       <Card className="bg-blue-900 text-white p-6 rounded-2xl flex items-center shadow-lg">
@@ -211,7 +261,9 @@ export default function StudentDashboard() {
                         );
 
                         if (isWithinRange) {
-                          await submitAttendance(student?.enrollmentNumber!, cls._id, () => { });
+                          await submitAttendance(student?.enrollmentNumber!, cls._id, (er) => {
+                            console.log(er)
+                          });
                         } else {
                           setLocation(null)
                           alert("You are outside the allowed location range.");

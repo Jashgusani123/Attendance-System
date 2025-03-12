@@ -5,95 +5,81 @@ import {
     NotificationAddRounded
 } from "@mui/icons-material";
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
-import { Avatar, Box, Button, Card, Stack, SvgIconTypeMap, Switch, TextField, Typography } from "@mui/material";
+import { Alert, Avatar, Box, Button, Card, Dialog, DialogContent, Stack, SvgIconTypeMap, Switch, TextField, Typography } from "@mui/material";
 import { OverridableComponent } from "@mui/material/OverridableComponent";
-import { MouseEventHandler, useState } from "react";
-import { useDispatch } from "react-redux";
+import { MouseEventHandler, useEffect, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import { useLocation } from "react-router-dom";
 import LandingNav from "../Components/LandingNav";
 import { useLogoutMutation as StudentLogoutMutation } from "../Redux/API/Student";
 import { useLogoutMutation as TeacherLogoutMutation } from "../Redux/API/Teacher";
 import { studentNotExits } from "../Redux/slices/StudentSlices";
 import { teacherNotExits } from "../Redux/slices/TeacherSlice";
+import { StudentReducerInitialState } from "../Types/API/StudentApiType";
+import LoadingLayer from "../Components/LoadingLayer";
 
 const Setting = () => {
+    const { loading: studentLoading, student } = useSelector(
+        (state: { student: StudentReducerInitialState }) => state.student
+    );
     const location = useLocation();
-    const [StudentLogout ] = StudentLogoutMutation();
+    const [StudentLogout] = StudentLogoutMutation();
     const [TeacherLogout] = TeacherLogoutMutation();
-    const type = location.state?.type ; 
+    const type = location.state?.type;
     const dispatch = useDispatch();
-
+    const [open, setOpen] = useState(false);
     const [openSection, setOpenSection] = useState<string | null>(null);
-
+    const [date, setdate] = useState<string>();
     const toggleSection = (section: string) => {
         setOpenSection(openSection === section ? null : section);
     };
-    const handelLogout = async()=>{
-        if(type === "Student" ){
-        const res = await StudentLogout(null);
-            if(res.data?.success){
+    const handelLogout = async () => {
+        if (type === "Student") {
+            const res = await StudentLogout(null);
+            if (res.data?.success) {
                 dispatch(studentNotExits());
             }
-        }else if(type === "Teacher" ){
+        } else if (type === "Teacher") {
             // console.log("etew");
             const res = await TeacherLogout(null);
-            if(res.data?.success){
+            if (res.data?.success) {
                 dispatch(teacherNotExits());
 
             }
-            
+
         }
     }
-    const handelDelete = ()=>{}
+    const handleDelete = () => {
+        setOpen(true); // Open the confirmation dialog
+    };
+    const confirmDelete = () => {
+        setOpen(false)
+        handelLogout();
+    }
 
-    return (
+    useEffect(() => {
+        const datew = new Date(student?.collegeJoiningDate!).toISOString().split("T")[0];
+        setdate(datew);
+    }, []);
+
+    return studentLoading ? <><LoadingLayer type={type} /></> : (
         <>
-           {type == "Student" ?  <LandingNav path="/student/dashboard" home="/student"/> :  <LandingNav path="/teacher/dashboard" home="/teacher"/>}
-
+            {type == "Student" ? <LandingNav path="/student/dashboard" home="/student" /> : <LandingNav path="/teacher/dashboard" home="/teacher" />}
             <section className="flex justify-around flex-col gap-5 items-center mt-5 w-full">
-                {/* Profile Section */}
-                <Fields 
-                    icon={AccountCircleIcon} 
-                    Name="Profile" 
-                    handleClick={() => toggleSection("profile")}
-                    isOpen={openSection === "profile"} 
-                />
+                <Fields icon={AccountCircleIcon} Name="Profile" handleClick={() => toggleSection("profile")} isOpen={openSection === "profile"} />
                 {openSection === "profile" && (
-                    <Box className="w-[85%] bg-white p-4 rounded-lg shadow-md">
-                        <Stack spacing={2}>
-                            <Typography variant="subtitle1">Change Name</Typography>
-                            <TextField fullWidth variant="outlined" placeholder="Enter your name" />
-                            <Button variant="contained" color="primary">Save</Button>
-                        </Stack>
-                    </Box>
+                    <SectionCard title="Change Name" value={student?.fullName} name="fullName" />
                 )}
 
-                {/* Account & Security Section */}
-                <Fields 
-                    icon={AccountCircleIcon} 
-                    Name="Account & Security" 
-                    handleClick={() => toggleSection("security")}
-                    isOpen={openSection === "security"} 
-                />
+                <Fields icon={AccountCircleIcon} Name="Account & Security" handleClick={() => toggleSection("security")} isOpen={openSection === "security"} />
                 {openSection === "security" && (
-                    <Box className="w-[85%] bg-white p-4 rounded-lg shadow-md">
-                        <Stack spacing={2}>
-                            <Typography variant="subtitle1">Change Email</Typography>
-                            <TextField fullWidth variant="outlined" placeholder="Enter new email" />
-                            <Typography variant="subtitle1">Change Password</Typography>
-                            <TextField fullWidth type="password" variant="outlined" placeholder="Enter new password" />
-                            <Button variant="contained" color="primary">Save</Button>
-                        </Stack>
-                    </Box>
+                    <>
+                        <SectionCard title="Change Email" value={student?.email} name="email" />
+                        <SectionCard title="Change Password" value={student?.password} type="password" name="password" />
+                    </>
                 )}
 
-                {/* Notification Settings */}
-                <Fields 
-                    icon={NotificationAddRounded} 
-                    Name="Notifications" 
-                    handleClick={() => toggleSection("notifications")}
-                    isOpen={openSection === "notifications"} 
-                />
+                <Fields icon={NotificationAddRounded} Name="Notifications" handleClick={() => toggleSection("notifications")} isOpen={openSection === "notifications"} />
                 {openSection === "notifications" && (
                     <Box className="w-[85%] bg-white p-4 rounded-lg shadow-md flex items-center">
                         <Typography className="mr-2">Enable Notifications</Typography>
@@ -101,56 +87,66 @@ const Setting = () => {
                     </Box>
                 )}
 
-                {/* Academic Details */}
-                <Fields 
-                    icon={Class} 
-                    Name="Academic" 
-                    handleClick={() => toggleSection("academic")}
-                    isOpen={openSection === "academic"} 
-                />
+                <Fields icon={Class} Name="Academic" handleClick={() => toggleSection("academic")} isOpen={openSection === "academic"} />
                 {openSection === "academic" && (
-                    type === "Student" ? <>
-                    <Box className="w-[85%] bg-white p-4 rounded-lg shadow-md">
-                        <Stack spacing={2}>
-                            <Typography variant="subtitle1">Enrollment Number</Typography>
-                            <TextField fullWidth variant="outlined" placeholder="Enter enrollment number" />
-                            <Typography variant="subtitle1">College Name</Typography>
-                            <TextField fullWidth variant="outlined" placeholder="Enter college name" />
-                            <Typography variant="subtitle1">Semester</Typography>
-                            <TextField fullWidth variant="outlined" placeholder="Enter semester" />
-                            <Typography variant="subtitle1">College Joining Date</Typography>
-                            <TextField fullWidth type="date" InputLabelProps={{ shrink: true }} variant="outlined" />
-                            <Typography variant="subtitle1">Department</Typography>
-                            <TextField fullWidth variant="outlined" placeholder="Enter department" />
-                            <Button variant="contained" color="primary">Save</Button>
-                        </Stack>
-                    </Box>
-                    </> : 
-                    <>
-                    <Box className="w-[85%] bg-white p-4 rounded-lg shadow-md">
-                        <Stack spacing={2}>
-                            <Typography variant="subtitle1">Department</Typography>
-                            <TextField fullWidth variant="outlined" placeholder="Enter department" />
-                            <Button variant="contained" color="primary">Save</Button>
-                        </Stack>
-                    </Box>
-                    </>
-                    
+                    type === "Student" ? (
+                        <>
+                            <SectionCard title="Enrollment Number" value={student?.enrollmentNumber} name="enrollmentNumber" />
+                            <SectionCard title="College Name" value={student?.collegeName} name="collegeName" />
+                            <SectionCard title="Semester" value={student?.semester} name="semester" />
+                            <SectionCard title="College Joining Date" value={date} type="date" name="collegeJoiningDate" />
+                            <SectionCard title="Department" value={student?.departmentName} name="departmentName" />
+                        </>
+                    ) : (
+                        <SectionCard title="Department" value="" />
+                    )
                 )}
 
-                {/* Logout & Delete Account */}
                 <Box className="w-[85%] flex justify-between mt-4">
                     <Button variant="contained" color="primary" onClick={handelLogout}>Logout</Button>
-                    <Button variant="contained" color="error" onClick={handelDelete}>Delete Account</Button>
+                    <Button variant="contained" color="error" onClick={handleDelete}>Delete Account</Button>
                 </Box>
+                <Dialog open={open} onClose={() => setOpen(false)}>
+                    <DialogContent>
+                        <Alert severity="error">
+                            You really want to delete this account? <br />
+                            This will delete your whole data, so you can't use this website.
+                        </Alert>
+                        <Box className="flex justify-end mt-4">
+                            <Button onClick={() => setOpen(false)} color="primary">
+                                Cancel
+                            </Button>
+                            <Button onClick={confirmDelete} color="error" variant="contained">
+                                Confirm Delete
+                            </Button>
+                        </Box>
+                    </DialogContent>
+                </Dialog>
             </section>
         </>
     );
 };
 
-const Fields = ({ icon: Icon, Name, handleClick, isOpen }: { 
-    icon: OverridableComponent<SvgIconTypeMap<{}, "svg">>, 
-    Name: string, 
+const SectionCard = ({ title, value, type = "text", name }: { title: string, value?: string | number, type?: string, name?: string }) => {
+
+    return (
+        <Box className="w-[85%] bg-white p-4 rounded-lg shadow-md">
+            <Stack spacing={2}>
+                <div className="containerOfFildes flex justify-between">
+                    <div className="innercon flex w-full flex-col items-center" >
+                        <Typography variant="subtitle1" className="w-full" >{title}</Typography>
+                        <TextField fullWidth variant="outlined" className="w-full" placeholder={`Enter ${title.toLowerCase()}`} value={value} type={type} name={name} disabled />
+                    </div>
+
+                </div>
+            </Stack>
+        </Box>
+    );
+};
+
+const Fields = ({ icon: Icon, Name, handleClick, isOpen }: {
+    icon: OverridableComponent<SvgIconTypeMap<{}, "svg">>,
+    Name: string,
     handleClick: MouseEventHandler<HTMLDivElement>,
     isOpen: boolean
 }) => {
