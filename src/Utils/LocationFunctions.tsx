@@ -2,7 +2,7 @@
   export function haversineDistance(
     location1: { latitude: number; longitude: number },
     location2: { latitude: number; longitude: number }
-  ): number {
+  ): boolean {
     const R = 6371e3; // Earth's radius in meters
     const lat1 = location1.latitude * (Math.PI / 180);
     const lat2 = location2.latitude * (Math.PI / 180);
@@ -16,7 +16,12 @@
     const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
   
     
-    return R * c; // Distance in meters
+    const distance =  R * c; // Distance in meters
+    if (distance <= 1000) {
+      return true
+    }else{
+      return false
+    }
   }
 
   
