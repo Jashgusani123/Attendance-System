@@ -136,9 +136,17 @@ export default function TeacherDashboard() {
 
       // Emit event only if data is valid
       if (data?.newClass) {
+        
         socket.connect();
-        socket.emit("start-class", data.newClass.allStudent, formData, data.newClass._id);
-
+        const obj = {
+          _id:data.newClass._id,
+          subjectName:data.newClass.subjectName,
+          starting:data.newClass.starting,
+          ending:data.newClass.ending,
+          location:data.newClass.location
+        }
+        socket.emit("start-class", data.newClass.allStudent,obj , data.newClass._id);
+        
         // Reset form
         setFormData({
           subjectName: "",
@@ -233,20 +241,25 @@ export default function TeacherDashboard() {
   }, [])
 
   useEffect(() => {
+  
     socket.on("class-live", (receivedClassDetails) => {
-
-      // Check if the received class _id is in the list
-      if (!Classes.includes(receivedClassDetails._id)) {
-        setClasses((prevDetails) => [...prevDetails, receivedClassDetails]);
-      } else {
-        console.log(`Class ${receivedClassDetails._id} already exists, not adding.`);
-      }
+      setClasses((prevDetails) => {
+        // Check if the class already exists by comparing `_id`
+        const isDuplicate = prevDetails.some((cls) => cls._id === receivedClassDetails._id);
+  
+        if (!isDuplicate) {
+          return [...prevDetails, receivedClassDetails];
+        } else {
+          return prevDetails; // Return previous state to prevent re-render
+        }
+      });
     });
-
+  
     return () => {
       socket.off("class-live");
     };
-  }, [Classes]);
+  }, [handleSubmitForm]);
+  
 
   useEffect(() => {
     const watchId = navigator.geolocation.watchPosition(

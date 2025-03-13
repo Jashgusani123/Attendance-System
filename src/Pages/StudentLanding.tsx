@@ -4,7 +4,6 @@ import DashBordImage from "../assets/DashBordImage.jpg";
 import { useSelector } from "react-redux";
 import { StudentReducerInitialState } from "../Types/API/StudentApiType";
 import socket from "../Components/Socket";
-// import LocationComponent from "../Components/Location";
 
 const StudentLanding = () => {
   const { loading: studentLoading, student } = useSelector(
@@ -18,7 +17,6 @@ const StudentLanding = () => {
   return studentLoading ? <>Loading .....</> : (
     <>
       <div className="DashbordLanding_Container h-screen w-full relative overflow-hidden">
-        {/* <LocationComponent /> */}
 
         {/* Navbar */}
         <LandingNav path={"/student/dashboard"} setting={"/student/setting"} type="Student" home="/student" handleClickToDashBord={handleClickToDashBord}/>

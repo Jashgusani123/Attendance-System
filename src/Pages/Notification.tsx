@@ -12,6 +12,8 @@ const Notification = ({ fun, notifications }: { fun: any, notifications: any }) 
         setExpandedNotification((prev) => (prev === id ? null : id));
     };
 
+    
+
     return (
         <motion.div
             initial={{ x: 300, opacity: 0 }}

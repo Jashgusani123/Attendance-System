@@ -31,7 +31,7 @@ interface Location {
   longitude: number;
 }
 interface NotificationType {
-  _id: string;
+  _id?: string;
   upperHeadding: string;
   description: string;
 }
@@ -41,12 +41,11 @@ export default function StudentDashboard() {
     (state: { student: StudentReducerInitialState }) => state.student
   );
   const [classDetails, setClassDetails] = useState<ClassDetail[]>([]);
-  const [allClasses] = useState<string[]>([]);
   const [loadingLocation, setLoadingLocation] = useState(false);
   const [location, setLocation] = useState<Location | null>(null);
   const [showNotifications, setShowNotifications] = useState(false);
   const [notifications, setNotifications] = useState<NotificationType[]>([]);
-  const [data, setDate] = useState()
+  const [data, setData] = useState()
   const [StudentLogout] = StudentLogoutMutation();
   const [TeacherLogout] = TeacherLogoutMutation();
   const [loading, setLoading] = useState(false);
@@ -61,7 +60,7 @@ export default function StudentDashboard() {
       console.log("Received class details:", receivedClassDetails);
 
       // Check if the received class _id is in the list
-      if (!allClasses.includes(receivedClassDetails._id)) {
+      if (!classDetails.includes(receivedClassDetails._id)) {
         setClassDetails((prevDetails) => [...prevDetails, receivedClassDetails]);
       } else {
         console.log(`Class ${receivedClassDetails._id} already exists, not adding.`);
@@ -71,7 +70,7 @@ export default function StudentDashboard() {
     return () => {
       socket.off("class-live");
     };
-  }, [allClasses]); // Depend on `allClasses` to update filtering dynamically
+  }, [classDetails]); // Depend on `allClasses` to update filtering dynamically
 
   useEffect(() => {
     const fetchData = async () => {
@@ -111,7 +110,7 @@ export default function StudentDashboard() {
           });
           const data = await response.json();
           if (data.success) {
-            setDate(data.last7DaysData);
+            setData(data.last7DaysData);
           } else {
             console.log(data);
           }
@@ -125,10 +124,10 @@ export default function StudentDashboard() {
         setLoading(false);
       }
     };
-
+    
     fetchData();
   }, []);
-
+  
   useEffect(() => {
     const watchId = navigator.geolocation.watchPosition(
       (position) => {
@@ -151,6 +150,18 @@ export default function StudentDashboard() {
     return () => navigator.geolocation.clearWatch(watchId);
   }, []);
 
+  useEffect(() => {
+    const handleNotification = (upperHeadding:string, description:string) => {
+      setNotifications((prev) => [...prev, { upperHeadding, description }]);
+    };
+  
+    socket.on("Notification_of_attendance", handleNotification);
+  
+    return () => {
+      socket.off("Notification_of_attendance", handleNotification);
+    };
+  }, []);
+
   const handleLogout = async () => {
 
     if (type === "Student") {
@@ -171,8 +182,7 @@ export default function StudentDashboard() {
   const handleSetting = () => {
     navigate("/student/setting", { state: { type: "Student" } });
   };
-  console.log("Fist :- ", location);
-
+  
   return studentLoading || loadingLocation || loading ? <><LoadingLayer type={"Student"} /></> : (
     <div className="min-h-screen bg-[#f8eee3] p-6 text-white font-sans">
       {/* Logo Section */}
@@ -233,7 +243,7 @@ export default function StudentDashboard() {
             Attendance Overview
           </h2>
           <div className="w-full flex justify-start items-center">
-            <ResponsiveContainer width="100%" height={200} className="max-w-[400px]">
+            <ResponsiveContainer width="100%" height={200} className="max-w-[500px]">
               <LineChart data={data}>
                 <CartesianGrid strokeDasharray="3 3" stroke="#1e3a8a" />
                 <XAxis dataKey="date" stroke="#1e3a8a" />
@@ -274,7 +284,6 @@ export default function StudentDashboard() {
                           cls.location, // Replace with teacher's actual location
                         );
 
-                        console.log(isWithinRange, "MyLocation:- ", location, "Teacher Location:- ", cls.location);
                         if (isWithinRange) {
 
                           await submitAttendance(student?.enrollmentNumber!, cls._id, (er) => {

@@ -18,9 +18,8 @@
     
     const distance =  R * c; // Distance in meters
     
-    console.log(distance);
     
-    if (distance < 5) {
+    if (distance < 100) {
       return true
     }else{
       return false

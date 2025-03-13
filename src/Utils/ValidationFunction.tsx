@@ -1,4 +1,5 @@
 import FingerprintJS from "@fingerprintjs/fingerprintjs";
+import socket from "../Components/Socket";
 
 //Detect Incognito Mode
 async function isIncognito(): Promise<boolean> {
@@ -107,7 +108,7 @@ export async function submitAttendance(
     })
     const data = await response.json();
     if(data.success){
-        console.log(`✅ Attendance approved for Student ID: ${studentId}, Class ID: ${classId}, Device: ${deviceId}`);
+        socket.emit("attendance_approved" , `Your Attendance Will be ${data.data.isPresent ? "Approve ✅" : "Reject ❌"}, For...` ,`Your Attendance Will be ${data.data.isPresent ? "Approve ✅" : "Reject ❌"}, For The ${data.data.subjectName} Class \n Teacher :- ${data.data.teacherName}`)
     }else{
         alert(data.message)
     }
