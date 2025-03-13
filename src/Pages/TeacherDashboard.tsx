@@ -70,6 +70,7 @@ export default function TeacherDashboard() {
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
   const [lastClasses, setlastClasses] = useState<ClassType[]>()
+  const [Download, setDownload] = useState(false);
 
   const attendancesheet = ({ sub, classID }: { sub: string, classID: string }) => {
     navigate("/attendance", { state: { sub, classID } });
@@ -217,7 +218,7 @@ export default function TeacherDashboard() {
           }
         };
         await Promise.all([getAllNotifications(),
-        fetchClasses(), GetOverview() , GetLastClasses()])
+        fetchClasses(), GetOverview(), GetLastClasses()])
       }
       catch (err) {
         console.log(err);
@@ -273,9 +274,59 @@ export default function TeacherDashboard() {
     return () => navigator.geolocation.clearWatch(watchId);
   }, [window.onload]);
 
+  const handleGenerateReport = async () => {
+    try {
+      const response = await fetch(`${import.meta.env.VITE_SERVER}/teacher/excelsheet`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify({ sheetName: "Sheet1", fileName: "Attendance" }),
+      });
+  
+      const data = await response.json();
+  
+      if (data.success) {
+        alert(data.message);
+        setDownload(true); // ✅ Enable download button
+      } else {
+        console.log(data.error);
+      }
+    } catch (error) {
+      console.error("Error generating report:", error);
+    }
+  };
+  
+
+  const handleDownload = async () => {
+    try {
+      const response = await fetch("http://localhost:4000/teacher/download-sheet");
+  
+      if (!response.ok) {
+        throw new Error("Failed to download file");
+      }
+  
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+  
+      // Create a temporary link element
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = "attendance.xlsx"; // Set filename
+      document.body.appendChild(a);
+      a.click();
+  
+      // Clean up
+      document.body.removeChild(a);
+      window.URL.revokeObjectURL(url);
+    } catch (error) {
+      console.error("Error downloading the file:", error);
+    }
+  };
+  
+
   const handleSetting = () => {
-        navigate("/teacher/setting", { state: { type:"Teacher" } });
-};
+    navigate("/teacher/setting", { state: { type: "Teacher" } });
+  };
 
   return teacherLoading || loadingLocation || loading ? <>
     <LoadingLayer type={"Teacher"} />
@@ -388,7 +439,7 @@ export default function TeacherDashboard() {
                 <Calendar className="mr-2" /> Last Classes
               </h2>
               <ul className="space-y-3">
-              {lastClasses?.map((i) => (
+                {lastClasses?.map((i) => (
                   <li
                     key={i._id}
                     className="flex justify-between items-center bg-[#183687] p-3 rounded-lg shadow-md"
@@ -401,7 +452,7 @@ export default function TeacherDashboard() {
                     <p className="text-sm font-semibold text-blue-500 cursor-pointer">View Details</p>
                   </li>
                 ))}
-                
+
               </ul>
             </Card>
           </div>
@@ -409,9 +460,9 @@ export default function TeacherDashboard() {
 
         {/* Additional Actions */}
         <div className="flex justify-between gap-4 mt-6">
-          <Button variant="contained" color="secondary" startIcon={<FileText />}>
+          {!Download ? <Button variant="contained" color="secondary" startIcon={<FileText />} onClick={handleGenerateReport}>
             Generate Report
-          </Button>
+          </Button>:<Button onClick={handleDownload} variant="contained" color="secondary" startIcon={<FileText />}>Download</Button>}
         </div>
       </div>
     </>

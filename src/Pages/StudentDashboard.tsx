@@ -1,5 +1,5 @@
 import { Avatar, Card } from "@mui/material";
-import { Bell, Calendar, LogOut } from "lucide-react";
+import { Bell, Calendar, LogOut, Settings } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { CartesianGrid, LineChart, Line as RechartLine, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
@@ -13,7 +13,7 @@ import { teacherNotExits } from "../Redux/slices/TeacherSlice";
 import { studentNotExits } from "../Redux/slices/StudentSlices";
 import { useLogoutMutation as StudentLogoutMutation } from "../Redux/API/Student";
 import { useLogoutMutation as TeacherLogoutMutation } from "../Redux/API/Teacher";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 
 
 interface ClassDetail {
@@ -54,7 +54,7 @@ export default function StudentDashboard() {
   const dispatch = useDispatch();
   const locationHook = useLocation();
   const type = locationHook.state?.type;
-
+  const navigate = useNavigate();
   // Handle incoming classes via socket
   useEffect(() => {
     socket.on("class-live", (receivedClassDetails) => {
@@ -77,18 +77,18 @@ export default function StudentDashboard() {
     const fetchData = async () => {
       try {
         setLoading(true);
-  
+
         const GetAllClass = async () => {
           const response = await fetch(`${import.meta.env.VITE_SERVER}/student/getclasses`, {
             method: "GET",
             credentials: "include",
           });
           if (!response.ok) throw new Error("Failed to fetch classes");
-  
+
           const data = await response.json();
           setClassDetails(data.upcomingClasses);
         };
-  
+
         const getAllNotifications = async () => {
           const response = await fetch(`${import.meta.env.VITE_SERVER}/notification/get`, {
             method: "POST",
@@ -103,7 +103,7 @@ export default function StudentDashboard() {
             alert("Failed to fetch notifications");
           }
         };
-  
+
         const GetLastesData = async () => {
           const response = await fetch(`${import.meta.env.VITE_SERVER}/student/getlastdata`, {
             method: "GET",
@@ -116,7 +116,7 @@ export default function StudentDashboard() {
             console.log(data);
           }
         };
-  
+
         // Run all fetch functions
         await Promise.all([GetLastesData(), GetAllClass(), getAllNotifications()]);
       } catch (error) {
@@ -125,7 +125,7 @@ export default function StudentDashboard() {
         setLoading(false);
       }
     };
-  
+
     fetchData();
   }, []);
 
@@ -152,7 +152,7 @@ export default function StudentDashboard() {
   }, []);
 
   const handleLogout = async () => {
-    
+
     if (type === "Student") {
       const res = await StudentLogout(null);
       if (res.data?.success) {
@@ -168,6 +168,9 @@ export default function StudentDashboard() {
 
     }
   }
+  const handleSetting = () => {
+    navigate("/student/setting", { state: { type: "Student" } });
+  };
 
   return studentLoading || loadingLocation || loading ? <><LoadingLayer type={"Student"} /></> : (
     <div className="min-h-screen bg-[#f8eee3] p-6 text-white font-sans">
@@ -181,8 +184,14 @@ export default function StudentDashboard() {
         <h1 className="text-3xl font-bold text-blue-900">Student Dashboard</h1>
 
         {/* Ensure this is relative so absolute positioning inside works correctly */}
-        <div className="options flex gap-4 relative">
+        <div className="options flex flex-wrap gap-3 items-end relative">
           {/* Bell Icon with Notifications */}
+          <span
+            onClick={handleSetting}
+            className="text-blue-900 rounded-md  cursor-pointer"
+          >
+            <Settings className="setting-icon" />
+          </span>
           <span onClick={() => setShowNotifications(!showNotifications)} className="relative cursor-pointer">
             <Bell className="text-blue-900 w-6 h-6" />
 

@@ -26,7 +26,7 @@ const LoadingLayer = ({ type }: { type: String }) => {
           animation="wave"
         />
         <Box sx={{ display: "flex", justifyContent: "space-around", flexWrap: "wrap", gap: "3px" }}>
-
+          <Skeleton width={50} height={50} animation="wave" variant="circular" sx={{ mt: 1 }} />
           <Skeleton width={50} height={50} animation="wave" variant="circular" sx={{ mt: 1 }} />
           <Skeleton width={50} height={50} animation="wave" variant="circular" sx={{ mt: 1 }} />
         </Box>
