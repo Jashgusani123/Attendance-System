@@ -299,7 +299,7 @@ export default function TeacherDashboard() {
 
   const handleDownload = async () => {
     try {
-      const response = await fetch("http://localhost:4000/teacher/download-sheet");
+      const response = await fetch(`${import.meta.env.VITE_SERVER}/teacher/download-sheet`);
   
       if (!response.ok) {
         throw new Error("Failed to download file");
@@ -341,16 +341,14 @@ export default function TeacherDashboard() {
         {/* Header */}
         <div className="flex justify-between items-center mb-6 bg-amber-400 p-4 rounded-2xl shadow-xl">
           <h1 className="text-3xl font-bold text-blue-900">Teacher Dashboard</h1>
-          <div className="optionss flex flex-wrap gap-3 items-end">
+          <div className="optionss flex justify-center flex-wrap gap-3 items-end">
             <span
               onClick={handleSetting}
               className="text-blue-900 rounded-md  cursor-pointer"
             >
               <Settings className="setting-icon" />
             </span>
-            <span onClick={handleCreateClass}>
-              <Add className="text-blue-900 w-6 h-6 cursor-pointer border-2 border-blue-900 rounded-4xl" titleAccess="Create Class" />
-            </span>
+            
             <span onClick={() => setShowNotifications(!showNotifications)} className="relative cursor-pointer">
               <Bell className="text-blue-900 w-6 h-6" />
               {notifications.length > 0 && (
@@ -364,7 +362,9 @@ export default function TeacherDashboard() {
                 </div>
               )}
             </span>
-
+            <span onClick={handleCreateClass}>
+              <Add className="text-blue-900 w-6 h-6 cursor-pointer border-2 border-blue-900 rounded-4xl" titleAccess="Create Class" />
+            </span>
           </div>
         </div>
 

@@ -25,7 +25,7 @@ const LoadingLayer = ({ type }: { type: String }) => {
           sx={{ bgcolor: "#1c398e", p: 1, width: "fit-content", mr: 2, borderRadius: "10px" }}
           animation="wave"
         />
-        <Box sx={{ display: "flex", justifyContent: "space-around", flexWrap: "wrap", gap: "3px" }}>
+        <Box sx={{ display: "flex", justifyContent: "center", flexWrap: "wrap", gap: "3px" }}>
           <Skeleton width={50} height={50} animation="wave" variant="circular" sx={{ mt: 1 }} />
           <Skeleton width={50} height={50} animation="wave" variant="circular" sx={{ mt: 1 }} />
           <Skeleton width={50} height={50} animation="wave" variant="circular" sx={{ mt: 1 }} />
@@ -61,7 +61,7 @@ const LoadingLayer = ({ type }: { type: String }) => {
         </Box>
       </Box>
 
-      <Box className="main_Container flex justify-between gap-6 mt-6">
+      <Box className="main_Container flex justify-between gap-6 mt-6 flex-wrap">
         {/* Left Section - Student Attendance Overview */}
         <Box className="w-[100%] lg:w-full bg-[#1c398eed] text-white p-6 rounded-2xl shadow-lg">
           <Skeleton

@@ -49,7 +49,7 @@ export default function StudentDashboard() {
   const [data, setDate] = useState()
   const [StudentLogout] = StudentLogoutMutation();
   const [TeacherLogout] = TeacherLogoutMutation();
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
 
   const dispatch = useDispatch();
   const locationHook = useLocation();
@@ -171,6 +171,7 @@ export default function StudentDashboard() {
   const handleSetting = () => {
     navigate("/student/setting", { state: { type: "Student" } });
   };
+  console.log("Fist :- ", location);
 
   return studentLoading || loadingLocation || loading ? <><LoadingLayer type={"Student"} /></> : (
     <div className="min-h-screen bg-[#f8eee3] p-6 text-white font-sans">
@@ -184,7 +185,7 @@ export default function StudentDashboard() {
         <h1 className="text-3xl font-bold text-blue-900">Student Dashboard</h1>
 
         {/* Ensure this is relative so absolute positioning inside works correctly */}
-        <div className="options flex flex-wrap gap-3 items-end relative">
+        <div className="options flex flex-wrap gap-3 justify-center items-end relative ">
           {/* Bell Icon with Notifications */}
           <span
             onClick={handleSetting}
@@ -227,19 +228,24 @@ export default function StudentDashboard() {
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
         {/* Attendance Overview */}
-        <Card className="bg-blue-900 text-white p-6 rounded-2xl shadow-lg">
-          <h2 className="text-lg font-bold mb-4 bg-amber-400 rounded-2xl w-fit p-2">Attendance Overview</h2>
-          <ResponsiveContainer width="100%" height={200}>
-            <LineChart data={data}>
-              <CartesianGrid strokeDasharray="3 3" stroke="#1e3a8a" />
-              <XAxis dataKey="date" stroke="#1e3a8a" />
-              <YAxis stroke="#1e3a8a" />
-              <Tooltip contentStyle={{ backgroundColor: "#f8eee3", color: "black" }} />
-              <RechartLine type="monotone" dataKey="totalClasses" stroke="#FF6347" strokeWidth={3} dot={false} />
-              <RechartLine type="monotone" dataKey="yourAttendance" stroke="#1e3a8a" strokeWidth={3} dot={false} />
-            </LineChart>
-          </ResponsiveContainer>
+        <Card className="bg-blue-900 text-white p-6 rounded-2xl shadow-lg flex flex-col items-start">
+          <h2 className="text-lg font-bold mb-4 bg-amber-400 rounded-2xl w-fit p-1">
+            Attendance Overview
+          </h2>
+          <div className="w-full flex justify-start items-center">
+            <ResponsiveContainer width="100%" height={200} className="max-w-[400px]">
+              <LineChart data={data}>
+                <CartesianGrid strokeDasharray="3 3" stroke="#1e3a8a" />
+                <XAxis dataKey="date" stroke="#1e3a8a" />
+                <YAxis stroke="#1e3a8a" />
+                <Tooltip contentStyle={{ backgroundColor: "#f8eee3", color: "black" }} />
+                <RechartLine type="monotone" dataKey="totalClasses" stroke="#FF6347" strokeWidth={3} dot={false} />
+                <RechartLine type="monotone" dataKey="yourAttendance" stroke="#1e3a8a" strokeWidth={3} dot={false} />
+              </LineChart>
+            </ResponsiveContainer>
+          </div>
         </Card>
+
 
         {/* Today's Classes */}
         <Card className="bg-blue-900 text-white p-6 rounded-2xl shadow-lg">
@@ -268,9 +274,9 @@ export default function StudentDashboard() {
                           cls.location, // Replace with teacher's actual location
                         );
 
-                        console.log(isWithinRange ,"MyLocation:- " ,  location ,"Teacher Location:- ", cls,location);
+                        console.log(isWithinRange, "MyLocation:- ", location, "Teacher Location:- ", cls.location);
                         if (isWithinRange) {
-                          
+
                           await submitAttendance(student?.enrollmentNumber!, cls._id, (er) => {
                             console.log(er)
                           });
