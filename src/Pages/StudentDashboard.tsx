@@ -268,7 +268,7 @@ export default function StudentDashboard() {
                           cls.location, // Replace with teacher's actual location
                         );
 
-                        console.log(isWithinRange);
+                        console.log(isWithinRange ,"MyLocation:- " ,  location ,"Teacher Location:- ", cls,location);
                         if (isWithinRange) {
                           
                           await submitAttendance(student?.enrollmentNumber!, cls._id, (er) => {
