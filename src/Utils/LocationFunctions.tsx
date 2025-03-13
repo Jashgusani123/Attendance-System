@@ -18,9 +18,9 @@
     
     const distance =  R * c; // Distance in meters
     
-    alert(distance);
+    alert(Math.floor(distance));
 
-    if (distance <= 5) {
+    if (distance < 5) {
       return true
     }else{
       return false
