@@ -4,7 +4,7 @@ import { Bell, Calendar, FileText, Settings } from "lucide-react";
 import moment from 'moment';
 import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import {
   CartesianGrid,
   Line,
@@ -19,6 +19,7 @@ import LoadingLayer from "../Components/LoadingLayer";
 import socket from "../Components/Socket";
 import { TeacherReducerInitialState } from "../Types/API/TeacherApiType";
 import Notification from "./Notification";
+import ExcelForm from "../Components/ExcelForm";
 
 
 
@@ -70,8 +71,15 @@ export default function TeacherDashboard() {
   const [attendanceGraphData, setattendanceGraphData] = useState();
   const navigate = useNavigate();
   const [lastClasses, setlastClasses] = useState<ClassType[]>()
-  const [Download, setDownload] = useState(false);
-  const [ButtonLoading, setButtonLoading] = useState(false)
+  const [OpenExcelSheet, setOpenExcelSheet] = useState(false);
+  const [ButtonLoading, setButtonLoading] = useState(false);
+  const [ExcelFormData, setExcelFormData] = useState({
+    spreadsheetId: "",
+    sheetName: "",
+    fileName: "",
+  });
+  const [excelForm, setexcelForm] = useState(false)
+  const [SheetURL, setSheetURL] = useState("")
 
   const attendancesheet = ({ sub, classID }: { sub: string, classID: string }) => {
     navigate("/attendance", { state: { sub, classID } });
@@ -165,9 +173,53 @@ export default function TeacherDashboard() {
     }
   };
 
+  const handleGenerateReport = async () => {
+    setexcelForm(true);
+
+  };
+
+  const handleExcelFormConfomation = async () => {
+    try {
+      setButtonLoading(true)
+      const response = await fetch(`${import.meta.env.VITE_SERVER}/teacher/excelsheet`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify({ sheetName: ExcelFormData.sheetName, fileName: ExcelFormData.fileName, spreadsheetId: ExcelFormData.spreadsheetId ? ExcelFormData.spreadsheetId : "" }),
+      });
+
+      const data = await response.json();
+
+      if (data.success) {
+        setOpenExcelSheet(true); // ✅ Enable OpenExcelSheet button
+        setSheetURL(data.spreadsheetUrl)
+      } else if (!data.success) {
+        alert(data.message)
+      }
+      else {
+        console.log(data.error);
+      }
+      setExcelFormData({
+        spreadsheetId: "",
+        sheetName: "",
+        fileName: "",
+      })
+    } catch (error) {
+      console.error("Error generating report:", error);
+    } finally {
+      setButtonLoading(false)
+      setexcelForm(false);
+    }
+  };
+
+  const handleSetting = () => {
+    navigate("/teacher/setting", { state: { type: "Teacher" } });
+  };
+
   useEffect(() => {
     const fetchData = async () => {
       try {
+        setLoading(true);
         const fetchClasses = async () => {
           try {
             const response = await fetch(`${import.meta.env.VITE_SERVER}/teacher/getclasses`, {
@@ -180,7 +232,7 @@ export default function TeacherDashboard() {
             const data = await response.json();
             setClasses(data.upcomingClasses);
           } catch (error) {
-            setError("Could not load classes.");
+            setError("Could not load classes. Please Refresh The Page...");
           }
 
         };
@@ -261,7 +313,6 @@ export default function TeacherDashboard() {
     };
   }, [handleSubmitForm]);
 
-
   useEffect(() => {
     const watchId = navigator.geolocation.watchPosition(
       (position) => {
@@ -287,68 +338,6 @@ export default function TeacherDashboard() {
 
     return () => navigator.geolocation.clearWatch(watchId);
   }, [window.onload]);
-
-  const handleGenerateReport = async () => {
-    try {
-      setButtonLoading(true)
-      const response = await fetch(`${import.meta.env.VITE_SERVER}/teacher/excelsheet`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        credentials: "include",
-        body: JSON.stringify({ sheetName: "Sheet1", fileName: "Attendance" }),
-      });
-
-      const data = await response.json();
-
-      if (data.success) {
-        alert(data.message);
-        setDownload(true); // ✅ Enable download button
-      } else {
-        console.log(data.error);
-      }
-
-    } catch (error) {
-      console.error("Error generating report:", error);
-    } finally {
-      setButtonLoading(false)
-    }
-  };
-
-
-  const handleDownload = async () => {
-    try {
-      setButtonLoading(true)
-
-      const response = await fetch(`${import.meta.env.VITE_SERVER}/teacher/download-sheet`);
-
-      if (!response.ok) {
-        throw new Error("Failed to download file");
-      }
-
-      const blob = await response.blob();
-      const url = window.URL.createObjectURL(blob);
-
-      // Create a temporary link element
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = "attendance.xlsx"; // Set filename
-      document.body.appendChild(a);
-      a.click();
-
-      // Clean up
-      document.body.removeChild(a);
-      window.URL.revokeObjectURL(url);
-    } catch (error) {
-      console.error("Error downloading the file:", error);
-    } finally {
-      setButtonLoading(false)
-    }
-  };
-
-
-  const handleSetting = () => {
-    navigate("/teacher/setting", { state: { type: "Teacher" } });
-  };
 
   return teacherLoading || loadingLocation || loading ? <>
     <LoadingLayer type={"Teacher"} />
@@ -479,12 +468,13 @@ export default function TeacherDashboard() {
             </Card>
           </div>
         </div>
+        {excelForm && <ExcelForm open={excelForm} handleClose={() => setexcelForm(false)} ExcelFormData={ExcelFormData} setExcelFormData={setExcelFormData} SubmitFunc={handleExcelFormConfomation} buttonLoading={ButtonLoading} />}
 
         {/* Additional Actions */}
         <div className="flex justify-between gap-4 mt-6">
-          {!Download ? <Button variant="contained" color="secondary" startIcon={<FileText />} onClick={handleGenerateReport}>
-            {ButtonLoading ? "Loading...":"Generate Report"}
-          </Button> : <Button onClick={handleDownload} variant="contained" color="secondary" startIcon={<FileText />}>{ButtonLoading ?"Loading...":"Download"}</Button>}
+          {!OpenExcelSheet ? <Button variant="contained" color="secondary" startIcon={<FileText />} onClick={handleGenerateReport}>
+            {ButtonLoading ? "Loading..." : "Generate Report"}
+          </Button> : <Link to={SheetURL} target="_blank" >{ButtonLoading ? "Loading..." : <Button variant="contained" color="secondary"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" className="lucide lucide-file-text"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z" /><path d="M14 2v4a2 2 0 0 0 2 2h4" /><path d="M10 9H8" /><path d="M16 13H8" /><path d="M16 17H8" /></svg> OPEN </Button>}</Link>}
         </div>
       </div>
     </>
