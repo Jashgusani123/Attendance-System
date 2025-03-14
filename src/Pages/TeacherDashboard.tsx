@@ -55,6 +55,7 @@ export default function TeacherDashboard() {
   const [Classes, setClasses] = useState<ClassType[]>([]);
   const [createClass, setCreateClass] = useState(false);
   const [loadingLocation, setLoadingLocation] = useState(false);
+  const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [formData, setFormData] = useState<ClassFormData>({
     subjectName: "",
@@ -67,10 +68,10 @@ export default function TeacherDashboard() {
   const [showNotifications, setShowNotifications] = useState(false);
   const [notifications, setNotifications] = useState<NotificationType[]>([]);
   const [attendanceGraphData, setattendanceGraphData] = useState();
-  const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
   const [lastClasses, setlastClasses] = useState<ClassType[]>()
   const [Download, setDownload] = useState(false);
+  const [ButtonLoading, setButtonLoading] = useState(false)
 
   const attendancesheet = ({ sub, classID }: { sub: string, classID: string }) => {
     navigate("/attendance", { state: { sub, classID } });
@@ -136,17 +137,17 @@ export default function TeacherDashboard() {
 
       // Emit event only if data is valid
       if (data?.newClass) {
-        
+
         socket.connect();
         const obj = {
-          _id:data.newClass._id,
-          subjectName:data.newClass.subjectName,
-          starting:data.newClass.starting,
-          ending:data.newClass.ending,
-          location:data.newClass.location
+          _id: data.newClass._id,
+          subjectName: data.newClass.subjectName,
+          starting: data.newClass.starting,
+          ending: data.newClass.ending,
+          location: data.newClass.location
         }
-        socket.emit("start-class", data.newClass.allStudent,obj , data.newClass._id);
-        
+        socket.emit("start-class", data.newClass.allStudent, obj, data.newClass._id);
+
         // Reset form
         setFormData({
           subjectName: "",
@@ -241,12 +242,12 @@ export default function TeacherDashboard() {
   }, [])
 
   useEffect(() => {
-  
+
     socket.on("class-live", (receivedClassDetails) => {
       setClasses((prevDetails) => {
         // Check if the class already exists by comparing `_id`
         const isDuplicate = prevDetails.some((cls) => cls._id === receivedClassDetails._id);
-  
+
         if (!isDuplicate) {
           return [...prevDetails, receivedClassDetails];
         } else {
@@ -254,12 +255,12 @@ export default function TeacherDashboard() {
         }
       });
     });
-  
+
     return () => {
       socket.off("class-live");
     };
   }, [handleSubmitForm]);
-  
+
 
   useEffect(() => {
     const watchId = navigator.geolocation.watchPosition(
@@ -289,53 +290,61 @@ export default function TeacherDashboard() {
 
   const handleGenerateReport = async () => {
     try {
+      setButtonLoading(true)
       const response = await fetch(`${import.meta.env.VITE_SERVER}/teacher/excelsheet`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         credentials: "include",
         body: JSON.stringify({ sheetName: "Sheet1", fileName: "Attendance" }),
       });
-  
+
       const data = await response.json();
-  
+
       if (data.success) {
         alert(data.message);
         setDownload(true); // ✅ Enable download button
       } else {
         console.log(data.error);
       }
+
     } catch (error) {
       console.error("Error generating report:", error);
+    } finally {
+      setButtonLoading(false)
     }
   };
-  
+
 
   const handleDownload = async () => {
     try {
+      setButtonLoading(true)
+
       const response = await fetch(`${import.meta.env.VITE_SERVER}/teacher/download-sheet`);
-  
+
       if (!response.ok) {
         throw new Error("Failed to download file");
       }
-  
+
       const blob = await response.blob();
       const url = window.URL.createObjectURL(blob);
-  
+
       // Create a temporary link element
       const a = document.createElement("a");
       a.href = url;
       a.download = "attendance.xlsx"; // Set filename
       document.body.appendChild(a);
       a.click();
-  
+
       // Clean up
       document.body.removeChild(a);
       window.URL.revokeObjectURL(url);
     } catch (error) {
       console.error("Error downloading the file:", error);
+    } finally {
+      setButtonLoading(false)
     }
   };
-  
+
 
   const handleSetting = () => {
     navigate("/teacher/setting", { state: { type: "Teacher" } });
@@ -361,7 +370,7 @@ export default function TeacherDashboard() {
             >
               <Settings className="setting-icon" />
             </span>
-            
+
             <span onClick={() => setShowNotifications(!showNotifications)} className="relative cursor-pointer">
               <Bell className="text-blue-900 w-6 h-6" />
               {notifications.length > 0 && (
@@ -426,7 +435,7 @@ export default function TeacherDashboard() {
               <h2 className="text-lg font-bold mb-4 flex items-center bg-amber-400 p-2 rounded-2xl w-fit">
                 <Calendar className="mr-2" /> Live Classes
               </h2>
-              <ul className="space-y-3">
+              {Classes.length > 0 ? <ul className="space-y-3">
                 {Classes.map((i) => (
                   <li
                     key={i._id}
@@ -441,7 +450,7 @@ export default function TeacherDashboard() {
                   </li>
                 ))}
 
-              </ul>
+              </ul> : <p className="text-gray-500 w-full justify-center flex flex-wrap">No Classes Availbles . .</p>}
             </Card>
           </div>
 
@@ -451,7 +460,7 @@ export default function TeacherDashboard() {
               <h2 className="text-lg font-bold mb-4 flex items-center bg-amber-400 p-2 rounded-2xl w-fit">
                 <Calendar className="mr-2" /> Last Classes
               </h2>
-              <ul className="space-y-3">
+              {lastClasses?.length! > 0 ? <ul className="space-y-3">
                 {lastClasses?.map((i) => (
                   <li
                     key={i._id}
@@ -466,7 +475,7 @@ export default function TeacherDashboard() {
                   </li>
                 ))}
 
-              </ul>
+              </ul> : <p className="text-gray-500 w-full justify-center flex flex-wrap">No Classes Availbles . .</p>}
             </Card>
           </div>
         </div>
@@ -474,8 +483,8 @@ export default function TeacherDashboard() {
         {/* Additional Actions */}
         <div className="flex justify-between gap-4 mt-6">
           {!Download ? <Button variant="contained" color="secondary" startIcon={<FileText />} onClick={handleGenerateReport}>
-            Generate Report
-          </Button>:<Button onClick={handleDownload} variant="contained" color="secondary" startIcon={<FileText />}>Download</Button>}
+            {ButtonLoading ? "Loading...":"Generate Report"}
+          </Button> : <Button onClick={handleDownload} variant="contained" color="secondary" startIcon={<FileText />}>{ButtonLoading ?"Loading...":"Download"}</Button>}
         </div>
       </div>
     </>
