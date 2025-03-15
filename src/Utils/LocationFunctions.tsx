@@ -17,13 +17,8 @@
   
     
     const distance =  R * c; // Distance in meters
-    console.log("Student " ,location1);
-    console.log("Teacher " , location2);
     
-    console.log(distance);
-    
-    
-    if (distance < 100) {
+    if (distance < 1000) {
       return true
     }else{
       return false
