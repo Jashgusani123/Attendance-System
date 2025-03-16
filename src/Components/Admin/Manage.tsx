@@ -2,6 +2,7 @@ import { Avatar, Button, Tooltip } from "@mui/material"
 import { Bell } from "lucide-react"
 import { Link, useNavigate } from "react-router-dom"
 import TeacherTimeTable from "./TeacherTimeTable";
+import MiniChat from "./TeacherChat";
 
 const Manage = () => {
   const navigate = useNavigate();
@@ -57,8 +58,9 @@ const Manage = () => {
       <div className="timetable_container w-[70%]">
         <TeacherTimeTable />
       </div>
-      <div className="functionality_container w-[30%]">
+      <div className="functionality_container flex justify-between flex-col items-center w-[30%]">
         <Button>Edit TimeTable</Button>
+        <MiniChat />
       </div>
       </div>
       
