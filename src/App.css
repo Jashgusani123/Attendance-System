@@ -341,3 +341,49 @@ body, html {
 @keyframes l24 {
   100% {transform: rotate(1turn)}
 }
+.WavingStudent{
+  height: 200px;
+  animation: comeHello 1s ease-in;
+}
+@keyframes comeHello {
+  0%{
+    opacity: 0;
+  }
+  100%{
+    opacity: 1;
+  }
+}
+.intro_Images {
+  height:89vh;
+  position: absolute;
+  left: 75%;
+  top: 55.5%;
+  transform: translate(-50%, -50%);
+  z-index: 0;
+  animation: popUp 0.8s ease-in, Updown 2s ease-in-out infinite;
+}
+
+@keyframes popUp {
+  0% {
+    transform: translate(-50%, -50%) scale(0);
+    opacity: 0;
+  }
+  100% {
+    transform: translate(-50%, -50%) scale(1);
+    opacity: 1;
+  }
+}
+
+@keyframes Updown {
+  0%, 100% {
+    transform: translate(-50%, -50%);
+  }
+  50% {
+    transform: translate(-50%, calc(-50% - 10px));
+  }
+}
+
+.teacher_info{
+  border-top-left-radius: 20px;
+  border-bottom-left-radius: 20px;
+}

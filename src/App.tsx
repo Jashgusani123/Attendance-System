@@ -6,6 +6,9 @@ import { studentExits, studentNotExits } from "./Redux/slices/StudentSlices";
 import { teacherExits, teacherNotExits } from "./Redux/slices/TeacherSlice";
 import { StudentReducerInitialState } from "./Types/API/StudentApiType";
 import { TeacherReducerInitialState } from "./Types/API/TeacherApiType";
+import CountChartContainer from "./Pages/ViewPage";
+import BigCalendar from "./Components/Admin/Manage";
+
 
 const AttendanceSheet = lazy(() => import("./Pages/AttendanceSheet"));
 const Landing = lazy(() => import("./Pages/Landing"));
@@ -14,6 +17,7 @@ const StudentDashboard = lazy(() => import("./Pages/StudentDashboard"));
 const StudentLanding = lazy(() => import("./Pages/StudentLanding"));
 const TeacherDashboard = lazy(() => import("./Pages/TeacherDashboard"));
 const TeacherLanding = lazy(() => import("./Pages/TeacherLanding"));
+const AdminDashboard = lazy(() => import("./Pages/AdminDashboard"));
 
 function App() {
   const { loading: studentLoading, student } = useSelector(
@@ -65,8 +69,13 @@ function App() {
         navigate("/student", { replace: true });
       } else if (user === "Teacher" && window.location.pathname !== "/teacher") {
         navigate("/teacher", { replace: true });
-      } else if (!user && !["/login", "/register"].includes(window.location.pathname)) {
-        navigate("/", { replace: true });
+      } 
+      // else if (!user && !["/login", "/register"].includes(window.location.pathname)) {
+      //   navigate("/admin", { replace: true });
+      // }
+      else{
+        console.log("No");
+        
       }
   
   }, [user]);  // ✅ Run whenever `user` updates
@@ -84,9 +93,11 @@ function App() {
               <Route path="/" element={<Landing login={false} register={false} />} />
               <Route path="/login" element={<Landing login={true} register={false} />} />
               <Route path="/register" element={<Landing register={true} login={false} />} />
+              <Route path="/admin" element={<AdminDashboard />} />
+              <Route path="/admin/manage" element={<BigCalendar />} />
+              <Route path="/admin/view" element={<CountChartContainer />} />
             </>
           )}
-
           {/* Student Routes */}
           {user === "Student" && (
             <>
