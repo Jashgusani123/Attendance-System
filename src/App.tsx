@@ -7,7 +7,8 @@ import { teacherExits, teacherNotExits } from "./Redux/slices/TeacherSlice";
 import { StudentReducerInitialState } from "./Types/API/StudentApiType";
 import { TeacherReducerInitialState } from "./Types/API/TeacherApiType";
 import CountChartContainer from "./Pages/ViewPage";
-import BigCalendar from "./Components/Admin/Manage";
+import BigCalendar from "./Pages/Manage";
+import Analysis from "./Pages/Analysis";
 
 
 const AttendanceSheet = lazy(() => import("./Pages/AttendanceSheet"));
@@ -96,6 +97,7 @@ function App() {
               <Route path="/admin" element={<AdminDashboard />} />
               <Route path="/admin/manage" element={<BigCalendar />} />
               <Route path="/admin/view" element={<CountChartContainer />} />
+              <Route path="/admin/analysis" element={<Analysis />} />
             </>
           )}
           {/* Student Routes */}
