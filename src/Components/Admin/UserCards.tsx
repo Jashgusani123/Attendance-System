@@ -1,5 +1,5 @@
 import moreDark from '../../assets/moreDark.png'
-const UserCard = ({ type , count , bgcolor}: { type: "admin" | "teacher" | "student" | "parent" , count:number , bgcolor: "bg-[#C3EBFA]" | "bg-amber-400"}) => {
+const UserCard = ({ type , count , bgcolor}: { type: "admin" | "teacher" | "student" | "parent" | "Student Present In each Class" | "Student Absent In each Class" | string , count:number|string , bgcolor: "bg-[#C3EBFA]" | "bg-amber-400"}) => {
   return (
     <div className={`rounded-2xl ${bgcolor} p-4 flex-1 min-w-[130px]`}>
       <div className="flex justify-between items-center">

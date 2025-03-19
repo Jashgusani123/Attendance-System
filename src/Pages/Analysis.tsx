@@ -1,6 +1,8 @@
 import { Tooltip } from "@mui/material"
 import { Bell } from "lucide-react"
 import { Link, useNavigate } from "react-router-dom"
+import UserCard from "../Components/Admin/UserCards";
+import StudentRatio from "../Components/Admin/StudentRatio";
 
 const Analysis = () => {
     const navigate = useNavigate();
@@ -32,7 +34,21 @@ const Analysis = () => {
                             </div>
                         </nav>
                     </div>
+                    <div className="studentRatio h-[350px] w-full bg-white shadow-lg rounded-2xl flex items-center justify-center">
+                    <StudentRatio title="Present & Absent in Last 7 Days" other={true} />
                 </div>
+                </div>
+                
+                <div className="flex flex-col w-[70%] mt-2 gap-4">
+
+                    <div className="right_Cards grid grid-cols-2 md:grid-cols-4 gap-4">
+                        <UserCard count={"58%"} type="Student Present In each Class" bgcolor="bg-[#C3EBFA]" />
+                        <UserCard count={"58%"} type="Student Absent In each Class" bgcolor="bg-amber-400" />
+                        <UserCard count={"68%"} type="Teacher Take Class in last 7 days" bgcolor="bg-[#C3EBFA]" />
+                        <UserCard count={"48%"} type="Teacher don't Take Class in last 7 days" bgcolor="bg-amber-400" />
+                    </div>
+                </div>
+
             </div>
         </>
     )
