@@ -3,6 +3,7 @@ import { Bell } from "lucide-react"
 import { Link, useNavigate } from "react-router-dom"
 import UserCard from "../Components/Admin/UserCards";
 import StudentRatio from "../Components/Admin/StudentRatio";
+import AttendanceChart from "../Components/Admin/TotalAttedanceChart";
 
 const Analysis = () => {
     const navigate = useNavigate();
@@ -35,10 +36,10 @@ const Analysis = () => {
                         </nav>
                     </div>
                     <div className="studentRatio h-[350px] w-full bg-white shadow-lg rounded-2xl flex items-center justify-center">
-                    <StudentRatio title="Present & Absent in Last 7 Days" other={true} />
+                        <StudentRatio title="Present & Absent in Last 7 Days" other={true} />
+                    </div>
                 </div>
-                </div>
-                
+
                 <div className="flex flex-col w-[70%] mt-2 gap-4">
 
                     <div className="right_Cards grid grid-cols-2 md:grid-cols-4 gap-4">
@@ -47,8 +48,13 @@ const Analysis = () => {
                         <UserCard count={"68%"} type="Teacher Take Class in last 7 days" bgcolor="bg-[#C3EBFA]" />
                         <UserCard count={"48%"} type="Teacher don't Take Class in last 7 days" bgcolor="bg-amber-400" />
                     </div>
+                    {/* Attendance Chart (Properly Positioned) */}
+                <div className="bg-white shadow-lg rounded-2xl p-4">
+                    <h2 className="text-lg font-semibold mb-4">Attendance Overview (Total Class)</h2>
+                    <AttendanceChart isOther={true} />
                 </div>
-
+                </div>
+                
             </div>
         </>
     )
