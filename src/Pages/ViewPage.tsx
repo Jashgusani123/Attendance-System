@@ -4,9 +4,30 @@ import { Link, useNavigate } from "react-router-dom";
 import StudentRatio from "../Components/Admin/StudentRatio";
 import UserCard from "../Components/Admin/UserCards";
 import AttendanceChart from "../Components/Admin/TotalAttedanceChart";
+import { useEffect, useState } from "react";
+import Notification from "./Notification";
+
+interface NotificationType {
+    _id: string;
+    upperHeadding: string;
+    description: string;
+}
+const data = [
+    {_id:"1",
+      upperHeadding:"Hello",
+      description:"Hii"
+    }
+  ]
 
 const ViewPage = () => {
     const navigate = useNavigate();
+
+    const [notifications, setNotifications] = useState<NotificationType[]>([]);
+    const [showNotifications, setShowNotifications] = useState(false);
+
+    useEffect(()=>{
+        setNotifications(data);
+      },[])
 
     return (
         <div className="flex w-full h-screen px-4 gap-4">
@@ -29,11 +50,21 @@ const ViewPage = () => {
                                     Home
                                 </span>
                             </Tooltip>
-                            <Tooltip title="Notification">
-                                <span className="text-blue-900 rounded-full flex items-center justify-center w-10 h-10 cursor-pointer bg-white shadow-md">
+                            <span onClick={() => setShowNotifications(!showNotifications)} className="text-blue-900 relative rounded-full flex items-center justify-center w-10 h-10 cursor-pointer bg-white shadow-md">
+                                <Tooltip title="Notification">
                                     <Bell size={24} />
-                                </span>
-                            </Tooltip>
+                                </Tooltip>
+                                {notifications.length > 0 && (
+                                    <span className="absolute top-[-8px] right-[0px] bg-red-500 text-white text-xs rounded-full px-1.5 py-0.5">
+                                        {notifications.length}
+                                    </span>
+                                )}
+                                {showNotifications && (
+                                    <div className="absolute top-[0px]  right-[-40px] z-50 bg-white shadow-lg rounded-lg">
+                                        <Notification fun={setShowNotifications} notifications={notifications} />
+                                    </div>
+                                )}
+                            </span>
                         </div>
                     </nav>
                 </div>
@@ -46,6 +77,7 @@ const ViewPage = () => {
 
             {/* Right Section - Cards + Attendance Chart */}
             <div className="flex flex-col w-[70%] mt-2 gap-4">
+                {/* Cards with Overview */}
                 <div className="right_Cards grid grid-cols-2 md:grid-cols-4 gap-4">
                     <UserCard type="student" count={23} bgcolor="bg-[#C3EBFA]" />
                     <UserCard type="admin" count={1} bgcolor="bg-amber-400" />

@@ -1,8 +1,10 @@
 import { Button, Card, CardContent, Paper, Stack, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Tooltip, Typography } from "@mui/material";
 import { motion } from "framer-motion";
 import { Bell } from "lucide-react";
+import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Typewriter } from "react-simple-typewriter";
+import Notification from "./Notification";
 
 
 const studentsData = [
@@ -31,9 +33,25 @@ const studentsData = [
     absentPercentage: 25,
   },
 ];
-
+interface NotificationType {
+  _id: string;
+  upperHeadding: string;
+  description: string;
+}
+const data = [
+  {_id:"1",
+    upperHeadding:"Hello",
+    description:"Hii"
+  }
+]
 const AdminDashboard = () => {
   const navigate = useNavigate();
+  const [notifications, setNotifications] = useState<NotificationType[]>([]);
+  const [showNotifications, setShowNotifications] = useState(false);
+
+useEffect(()=>{
+  setNotifications(data);
+},[])
   return (
     <>
       {/* Navbar */}
@@ -48,11 +66,22 @@ const AdminDashboard = () => {
           <Tooltip title="GraphView">
               <span className="text-blue-900 rounded-full flex items-center justify-center text-xl w-10 h-10 cursor-pointer" onClick={()=>navigate("/admin/view")}>View</span>
             </Tooltip>
+              <span onClick={() => setShowNotifications(!showNotifications)} className="text-blue-900 rounded-full flex items-center justify-center w-10 h-10 cursor-pointer bg-white shadow-md relative">
             <Tooltip title="Notification">
-              <span className="text-blue-900 rounded-full flex items-center justify-center w-10 h-10 cursor-pointer bg-white shadow-md">
                 <Bell size={24} />
-              </span>
             </Tooltip>
+
+                {notifications.length > 0 && (
+                <span className="absolute top-[-5px] right-[-8px] bg-red-500 text-white text-xs rounded-full px-1.5 py-0.5">
+                  {notifications.length}
+                </span>
+              )}
+              {showNotifications && (
+                <div className="absolute top-[-35px] right-0 z-50 bg-white shadow-lg rounded-lg">
+                  <Notification fun={setShowNotifications} notifications={notifications} />
+                </div>
+              )}
+              </span>
           </div>
         </nav>
       </div>
