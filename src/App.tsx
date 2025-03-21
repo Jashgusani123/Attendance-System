@@ -9,6 +9,7 @@ import { TeacherReducerInitialState } from "./Types/API/TeacherApiType";
 import CountChartContainer from "./Pages/ViewPage";
 import BigCalendar from "./Pages/Manage";
 import Analysis from "./Pages/Analysis";
+import PandingRequst from "./Pages/PandingRequst";
 
 
 const AttendanceSheet = lazy(() => import("./Pages/AttendanceSheet"));
@@ -121,6 +122,7 @@ function App() {
 
           {/* 404 Page */}
           <Route path="*" element={<>Sorry, page not found</>} />
+          <Route path="/requstsend" element={<PandingRequst />} />
         </Routes>
       )}
     </>

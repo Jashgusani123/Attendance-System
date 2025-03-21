@@ -5,16 +5,20 @@ import { useSignupMutation as TeacherSignupMution } from "../Redux/API/Teacher";
 import { studentExits } from "../Redux/slices/StudentSlices";
 import { teacherExits } from "../Redux/slices/TeacherSlice";
 import { StudentRequest } from "../Types/API/StudentApiType";
+import { FetchBaseQueryError } from "@reduxjs/toolkit/query";
 
 const SignUp = () => {
   const dispatch = useDispatch();
-  
-  const [role, setRole] = useState("student");
 
+  const [role, setRole] = useState("student");
   const [StudentSignup] = StudentSignupMution();
   const [TeacherSignup] = TeacherSignupMution();
   const [loading, setloading] = useState(false)
-
+  const [IsError, setIsError] = useState(
+    {
+      error: false,
+      message: ""
+    });
   const [formData, setFormData] = useState<StudentRequest>({
     fullName: "",
     collegeJoiningDate: "", // Changed to empty string for proper handling
@@ -32,30 +36,52 @@ const SignUp = () => {
 
     try {
       let res;
-      
+
       if (role === "student") {
         res = await StudentSignup(formData);
         if (res && "data" in res && res.data?.success) {
           const userData = res.data?.user;
           dispatch(studentExits(userData));
+          setIsError({ error: false, message: "" });
+        } else {
+          if ("error" in res && res.error && "data" in res.error) {
+            const errorData = res.error as FetchBaseQueryError;
+            setIsError({ error: true, message: (errorData.data as { message?: string })?.message || "An unexpected error occurred." });
+          } else {
+            setIsError({ error: true, message: "An unexpected error occurred." });
+          }
         }
-       
+
       } else {
-        res = await TeacherSignup(formData);
+        const obj = {
+          fullName: formData.fullName,
+          email: formData.email,
+          password: formData.password,
+          collegeName: formData.collegeName,
+          departmentName: formData.departmentName
+        }
+        res = await TeacherSignup(obj);
         if (res && "data" in res && res.data?.success) {
           const userData = res.data?.user;
           dispatch(teacherExits(userData));
+        } else {
+          if ("error" in res && res.error && "data" in res.error) {
+            const errorData = res.error as FetchBaseQueryError;
+            setIsError({ error: true, message: (errorData.data as { message?: string })?.message || "An unexpected error occurred." });
+          } else {
+            setIsError({ error: true, message: "An unexpected error occurred." });
+          }
         }
 
       }
     } catch (error) {
       console.error("Signup Error:", error);
-    } finally{
+    } finally {
       setloading(false);
     }
   };
-  
-  
+
+
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
@@ -64,7 +90,7 @@ const SignUp = () => {
       [name]: value,
     }));
   };
-  
+
   return (
     <div className="flex items-center justify-center p-6">
       <div className="bg-white p-8 rounded-xl shadow-xl w-full max-w-lg">
@@ -108,18 +134,18 @@ const SignUp = () => {
             onChange={handleChange}
           />
           <input
-                type="text"
-                placeholder="College Name"
-                className="w-full p-2 border rounded-md"
-                required
-                name="collegeName"
-                onChange={handleChange}
-              />
+            type="text"
+            placeholder="College Name"
+            className="w-full p-2 border rounded-md"
+            required
+            name="collegeName"
+            onChange={handleChange}
+          />
 
           {/* Student Fields */}
           {role === "student" && (
             <>
-              
+
               <input
                 type="text"
                 placeholder="Enrollment Number"
@@ -173,12 +199,12 @@ const SignUp = () => {
               </select>
             </>
           )}
-
+          {IsError.error && <p className="text-red-800 font-bold">{IsError.message}</p>}
           <button
             type="submit"
             className="w-full bg-blue-600 text-white p-2 rounded-md font-bold flex items-center justify-center hover:bg-blue-700 transition"
           >
-            {loading ? <div className="loader"></div> : "Register"} 
+            {loading ? <div className="loader"></div> : "Register"}
           </button>
         </form>
       </div>

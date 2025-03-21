@@ -9,7 +9,7 @@ import { Alert, Avatar, Box, Button, Card, Dialog, DialogContent, Stack, SvgIcon
 import { OverridableComponent } from "@mui/material/OverridableComponent";
 import { MouseEventHandler, useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import LandingNav from "../Components/LandingNav";
 import { useLogoutMutation as StudentLogoutMutation } from "../Redux/API/Student";
 import { useLogoutMutation as TeacherLogoutMutation } from "../Redux/API/Teacher";
@@ -32,6 +32,8 @@ const Setting = () => {
     const [open, setOpen] = useState(false);
     const [openSection, setOpenSection] = useState<string | null>(null);
     const [date, setdate] = useState<string>();
+    const navigate = useNavigate();
+    
     const toggleSection = (section: string) => {
         setOpenSection(openSection === section ? null : section);
     };
@@ -40,13 +42,18 @@ const Setting = () => {
             const res = await StudentLogout(null);
             if (res.data?.success) {
                 dispatch(studentNotExits());
+                navigate("/")
+            }else{
+                alert(res.error)
             }
+
         } else if (type === "Teacher") {
-            // console.log("etew");
             const res = await TeacherLogout(null);
             if (res.data?.success) {
                 dispatch(teacherNotExits());
-
+                navigate("/")
+            }else{
+                alert(res.error)
             }
 
         }
