@@ -50,7 +50,7 @@ const TeacherTimeTable = () => {
   const [view, setView] = useState<any>("week");
 
   return (
-    <div className="calendar_container bg-[#C3EBFA] p-2 rounded-2xl w-full m-4">
+    <div className="calendar_container bg-[#C3EBFA] p-2 rounded-2xl m-4">
       <Calendar
         localizer={localizer}
         events={sampleData}
@@ -59,7 +59,7 @@ const TeacherTimeTable = () => {
         views={["agenda", "day", "week"]}
         view={view}
         onView={setView}
-        style={{ height: "100%", width: "100%", margin: 20, padding:"10px", backgroundColor: "white" }} // ✅ Reduced height
+        style={{ height: "100%", margin: 20, padding:"10px", backgroundColor: "white" }} // ✅ Reduced height
         eventPropGetter={eventStyleGetter}
       />
     </div>

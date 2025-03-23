@@ -30,7 +30,7 @@ const Manage = () => {
   return (
     <>
       {/* Navbar with Teacher Information */}
-      <div className="flex w-full flex-col sm:flex-row sm:p-0 p-2 gap-4">
+      <div className="flex w-full flex-col sm:flex-row sm:p-0 p-4 gap-4">
         {/* Navbar */}
         <div className="flex flex-col ml-4 sm:w-[30%]  gap-4">
           <div className="landing_navbar sticky top-2 h-14 z-50">
@@ -69,7 +69,7 @@ const Manage = () => {
           </div>
         </div>
         {/* Side Navbar with Teacher Information */}
-        <div className="teacher_info  flex justify-start  items-center mt-2 p-2 bg-[#C3EBFA] sm:w-[70%] h-14 ">
+        <div className="teacher_info  flex justify-start items-center mt-2 p-2 bg-[#C3EBFA] sm:w-[70%] h-14 ">
           <div className="avatar">
             <Avatar
               src={`https://ui-avatars.com/api/?name=JG`}
@@ -89,18 +89,18 @@ const Manage = () => {
         </div>
       </div>
       {/* Timetable and Chat */}
-      <div className="info_of_manage flex w-full flex-col flex-wrap justify-around items-center ">
+      <div className="info_of_manage flex w-full sm:flex-row flex-col justify-around items-center ">
         {/* Timetable */}
         <div className="timetable_container sm:w-[70%] w-[90%] ">
           <TeacherTimeTable />
         </div>
         {/* Chat */}
-        <div className="functionality_container flex justify-between bg-amber-300 p-4 h-[450px] rounded-2xl flex-col gap-8 items-center w-[28%]">
+        <div className="functionality_container flex justify-between bg-amber-300 p-4 h-[450px] rounded-2xl flex-col gap-8 items-center sm:w-[28%]">
           <MiniChat />
         </div>
       </div>
-      {/* Timetable */}
-      <div className="timeTable_Edite_btn flex w-[30%]">
+      {/* Timetable Button*/}
+      <div className="timeTable_Edite_btn flex mt-2 w-[30%]">
         <button className="bg-[#ffc800] ml-5 p-1 rounded-xl font-bold  text-xl flex items-center gap-2"><svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#ff"><path d="M200-200h57l391-391-57-57-391 391v57Zm-80 80v-170l528-527q12-11 26.5-17t30.5-6q16 0 31 6t26 18l55 56q12 11 17.5 26t5.5 30q0 16-5.5 30.5T817-647L290-120H120Zm640-584-56-56 56 56Zm-141 85-28-29 57 57-29-28Z" /></svg> TimeTable</button>
       </div>
     </>
