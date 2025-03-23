@@ -1,7 +1,7 @@
+import { Box, Skeleton } from "@mui/material";
 import { useEffect, useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import socket from "../Components/Socket";
-import { Box, Skeleton } from "@mui/material";
+import socket from "../../Components/Socket";
 
 interface StudentAttendance {
     name: string;

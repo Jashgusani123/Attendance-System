@@ -1,11 +1,11 @@
 import { Tooltip } from "@mui/material";
 import { Bell } from "lucide-react";
-import { Link, useNavigate } from "react-router-dom";
-import StudentRatio from "../Components/Admin/StudentRatio";
-import UserCard from "../Components/Admin/UserCards";
-import AttendanceChart from "../Components/Admin/TotalAttedanceChart";
 import { useEffect, useState } from "react";
-import Notification from "./Notification";
+import { Link, useNavigate } from "react-router-dom";
+import StudentRatio from "../../Components/Admin/StudentRatio";
+import AttendanceChart from "../../Components/Admin/TotalAttedanceChart";
+import UserCard from "../../Components/Admin/UserCards";
+import Notification from "../Notification";
 
 interface NotificationType {
     _id: string;
@@ -30,9 +30,9 @@ const ViewPage = () => {
       },[])
 
     return (
-        <div className="flex w-full h-screen px-4 gap-4">
+        <div className="flex w-full flex-col sm:flex-row h-screen px-4 gap-4">
             {/* Left Sidebar (Navbar + StudentRatio) */}
-            <div className="flex flex-col w-[30%] gap-4">
+            <div className="flex flex-col flex-wrap  sm:w-[30%] w-full gap-4">
                 {/* Navbar */}
                 <div className="landing_navbar sticky top-2 h-14 z-50">
                     <nav className="flex justify-between items-center p-4 w-full h-full bg-amber-400 rounded-2xl shadow-lg">
@@ -76,7 +76,7 @@ const ViewPage = () => {
             </div>
 
             {/* Right Section - Cards + Attendance Chart */}
-            <div className="flex flex-col w-[70%] mt-2 gap-4">
+            <div className="flex flex-col sm:w-[70%]  mt-2 gap-4">
                 {/* Cards with Overview */}
                 <div className="right_Cards grid grid-cols-2 md:grid-cols-4 gap-4">
                     <UserCard type="student" count={23} bgcolor="bg-[#C3EBFA]" />

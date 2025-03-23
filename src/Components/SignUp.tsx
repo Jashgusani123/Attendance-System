@@ -2,10 +2,12 @@ import { useState } from "react";
 import { useDispatch } from "react-redux";
 import { useSignupMutation as StudentSignupMution } from "../Redux/API/Student";
 import { useSignupMutation as TeacherSignupMution } from "../Redux/API/Teacher";
+import {useSignupMutation as AdminSignupMution} from '../Redux/API/Admin'
 import { studentExits } from "../Redux/slices/StudentSlices";
 import { teacherExits } from "../Redux/slices/TeacherSlice";
 import { StudentRequest } from "../Types/API/StudentApiType";
 import { FetchBaseQueryError } from "@reduxjs/toolkit/query";
+import { adminExits } from "../Redux/slices/AdminSlices";
 
 const SignUp = () => {
   const dispatch = useDispatch();
@@ -13,6 +15,7 @@ const SignUp = () => {
   const [role, setRole] = useState("student");
   const [StudentSignup] = StudentSignupMution();
   const [TeacherSignup] = TeacherSignupMution();
+  const [AdminSignup] = AdminSignupMution();
   const [loading, setloading] = useState(false)
   const [IsError, setIsError] = useState(
     {
@@ -52,7 +55,7 @@ const SignUp = () => {
           }
         }
 
-      } else {
+      } else if(role == "teacher") {
         const obj = {
           fullName: formData.fullName,
           email: formData.email,
@@ -64,6 +67,7 @@ const SignUp = () => {
         if (res && "data" in res && res.data?.success) {
           const userData = res.data?.user;
           dispatch(teacherExits(userData));
+          setIsError({ error: false, message: "" });
         } else {
           if ("error" in res && res.error && "data" in res.error) {
             const errorData = res.error as FetchBaseQueryError;
@@ -73,6 +77,27 @@ const SignUp = () => {
           }
         }
 
+      }else{
+        const obj = {
+          fullName:formData.fullName,
+          email:formData.email,
+          collegeName:formData.collegeName,
+          password:formData.password,
+          departmentName:formData.departmentName
+        }
+        res = await AdminSignup(obj);
+        if(res && "data" in res && res.data?.success){
+          const userData = res.data?.user;
+          dispatch(adminExits(userData));
+          setIsError({ error: false, message: "" });
+        }else{
+          if("error" in res && res.error && "data" in res.error){
+            const errorData = res.error as FetchBaseQueryError;
+            setIsError({ error: true, message: (errorData.data as { message?: string })?.message || "An unexpected error occurred." });
+          } else {
+            setIsError({ error: true, message: "An unexpected error occurred." });
+          }
+        }
       }
     } catch (error) {
       console.error("Signup Error:", error);
@@ -141,7 +166,17 @@ const SignUp = () => {
             name="collegeName"
             onChange={handleChange}
           />
-
+          <label className="block font-semibold text-gray-700">Department:</label>
+              <select
+                className="w-full p-2 border rounded-md text-blue-700 font-semibold"
+                name="departmentName"
+                onChange={handleChange}
+              >
+                <option value="civil">Civil</option>
+                <option value="computer">Computer</option>
+                <option value="mechanical">Mechanical</option>
+                <option value="electrical">Electrical</option>
+              </select>
           {/* Student Fields */}
           {role === "student" && (
             <>
@@ -154,14 +189,7 @@ const SignUp = () => {
                 name="enrollmentNumber"
                 onChange={handleChange}
               />
-              <input
-                type="text"
-                placeholder="Department Name"
-                className="w-full p-2 border rounded-md"
-                required
-                name="departmentName"
-                onChange={handleChange}
-              />
+
               <input
                 type="number"
                 placeholder="Semester"
@@ -186,17 +214,7 @@ const SignUp = () => {
           {/* Teacher Fields */}
           {role === "teacher" && (
             <>
-              <label className="block font-semibold text-gray-700">Department:</label>
-              <select
-                className="w-full p-2 border rounded-md text-blue-700 font-semibold"
-                name="departmentName"
-                onChange={handleChange}
-              >
-                <option value="civil">Civil</option>
-                <option value="computer">Computer</option>
-                <option value="mechanical">Mechanical</option>
-                <option value="electrical">Electrical</option>
-              </select>
+              
             </>
           )}
           {IsError.error && <p className="text-red-800 font-bold">{IsError.message}</p>}

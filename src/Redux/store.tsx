@@ -1,9 +1,10 @@
 import { configureStore } from "@reduxjs/toolkit";
 import { StudentAPI } from '../Redux/API/Student';
-// import { StudentAPI } from '../Redux/API/Teacher\';
 import StudentReducer from './slices/StudentSlices'
 import TeacherReducer from './slices/TeacherSlice'
+import AdminReducer from './slices/AdminSlices'
 import { TeacherAPI } from "./API/Teacher";
+import { AdminAPI } from "./API/Admin";
 
 const store = configureStore({
   reducer: {
@@ -11,11 +12,12 @@ const store = configureStore({
     student:StudentReducer,
     [TeacherAPI.reducerPath]: TeacherAPI.reducer,
     teacher:TeacherReducer,
-
+    [AdminAPI.reducerPath]: AdminAPI.reducer,
+    admin:AdminReducer,
   
   },
   middleware: (getDefaultMiddleware) =>
-    getDefaultMiddleware().concat(StudentAPI.middleware).concat(TeacherAPI.middleware),
+    getDefaultMiddleware().concat(StudentAPI.middleware).concat(TeacherAPI.middleware).concat(AdminAPI.middleware),
 });
 
 export default store;

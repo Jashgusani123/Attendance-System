@@ -1,10 +1,11 @@
+import { Settings } from "@mui/icons-material";
 import { Button, Card, CardContent, Paper, Stack, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Tooltip, Typography } from "@mui/material";
 import { motion } from "framer-motion";
 import { Bell } from "lucide-react";
 import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Typewriter } from "react-simple-typewriter";
-import Notification from "./Notification";
+import Notification from "../Notification";
 
 
 const studentsData = [
@@ -39,9 +40,10 @@ interface NotificationType {
   description: string;
 }
 const data = [
-  {_id:"1",
-    upperHeadding:"Hello",
-    description:"Hii"
+  {
+    _id: "1",
+    upperHeadding: "Hello",
+    description: "Hii"
   }
 ]
 const AdminDashboard = () => {
@@ -49,9 +51,13 @@ const AdminDashboard = () => {
   const [notifications, setNotifications] = useState<NotificationType[]>([]);
   const [showNotifications, setShowNotifications] = useState(false);
 
-useEffect(()=>{
-  setNotifications(data);
-},[])
+  useEffect(() => {
+    setNotifications(data);
+  }, [])
+
+  const handleSetting = () => {
+    navigate("/admin/setting", { state: { type: "Admin" } });
+  };
   return (
     <>
       {/* Navbar */}
@@ -62,16 +68,21 @@ useEffect(()=>{
               QuickAttend
             </Link>
           </div>
-          <div className="flex justify-between items-center w-24 ">
-          <Tooltip title="GraphView">
-              <span className="text-blue-900 rounded-full flex items-center justify-center text-xl w-10 h-10 cursor-pointer" onClick={()=>navigate("/admin/view")}>View</span>
+          <div className="flex justify-between items-center w-36 ">
+            <Tooltip title="GraphView">
+              <span className="text-blue-900 rounded-full flex items-center justify-center text-xl w-10 h-10 cursor-pointer" onClick={() => navigate("/admin/view")}>View</span>
             </Tooltip>
-              <span onClick={() => setShowNotifications(!showNotifications)} className="text-blue-900 rounded-full flex items-center justify-center w-10 h-10 cursor-pointer bg-white shadow-md relative">
-            <Tooltip title="Notification">
+            <span onClick={handleSetting} className="text-blue-900 rounded-full flex items-center justify-center w-10 h-10 cursor-pointer bg-white shadow-md relative">
+              <Tooltip title="Setting">
+                <Settings />
+              </Tooltip>
+            </span>
+            <span onClick={() => setShowNotifications(!showNotifications)} className="text-blue-900 rounded-full flex items-center justify-center w-10 h-10 cursor-pointer bg-white shadow-md relative">
+              <Tooltip title="Notification">
                 <Bell size={24} />
-            </Tooltip>
+              </Tooltip>
 
-                {notifications.length > 0 && (
+              {notifications.length > 0 && (
                 <span className="absolute top-[-5px] right-[-8px] bg-red-500 text-white text-xs rounded-full px-1.5 py-0.5">
                   {notifications.length}
                 </span>
@@ -81,22 +92,22 @@ useEffect(()=>{
                   <Notification fun={setShowNotifications} notifications={notifications} />
                 </div>
               )}
-              </span>
+            </span>
           </div>
         </nav>
       </div>
 
       {/* Background Images and Motion */}
-      <div className="relative w-full h-[89vh] overflow-hidden">
+      <div className="relative w-full sm:h-[89vh] h-[70%] overflow-hidden">
         <img
           src="https://i.pinimg.com/originals/97/b5/22/97b52219da79ce6bf303cc93c9b352e4.gif"
           alt="Waving Student"
-          className="WavingStudent absolute top-1 left-2"
+          className="WavingStudent absolute top-1 left-2 "
         />
         <img
           src="https://i.pinimg.com/originals/ac/14/0a/ac140a627af854f14c7f653efd7d53ae.gif"
           alt="Intro"
-          className="intro_Images"
+          className="intro_Images z-30 sm:flex hidden"
         />
 
         {/* Animated Welcome Section */}
@@ -104,9 +115,9 @@ useEffect(()=>{
           initial={{ x: "-100%", opacity: 0, rotate: -15, scale: 0.8 }}
           animate={{ x: 0, opacity: 1, rotate: 0, scale: 1 }}
           transition={{ duration: 1, ease: "easeOut" }}
-          className="absolute top-[30%] left-[0%] z-40 p-6"
+          className="absolute sm:top-[30%] sm:left-[0%] top-[25%] left-[0%] z-40 p-6"
         >
-          <div className="bg-[#0e578c] p-6 rounded-lg shadow-lg w-[600px]">
+          <div className="bg-[#0e578c] sm:p-6 p-4 rounded-lg shadow-lg w-[100%] sm:w-[600px] h-fit ">
             <p className="text-zinc-800 text-xl font-extrabold">Admin Dashboard</p>
             <p className="lg:text-[30px] font-bold text-white text-2xl">
               <span className="text-amber-400">
@@ -176,42 +187,42 @@ useEffect(()=>{
         </div>
       </div>
       <div className="relative z-50 p-6">
-      {/* Sticky Header */}
-      <Typography
-        variant="h5"
-        className="p-4 sticky top-2 bg-amber-400 rounded-2xl shadow-lg text-blue-900 font-bold uppercase text-start z-50"
-      >
-        Students
-      </Typography>
+        {/* Sticky Header */}
+        <Typography
+          variant="h5"
+          className="p-4 sticky top-2 bg-amber-400 rounded-2xl shadow-lg text-blue-900 font-bold uppercase text-start z-50"
+        >
+          Students
+        </Typography>
 
-      {/* Table Container */}
-      <TableContainer component={Paper} className="mt-5 shadow-lg">
-        <Table>
-          <TableHead>
-            <TableRow className="bg-gray-200">
-              <TableCell className="font-bold text-lg">Student Name</TableCell>
-              <TableCell className="font-bold text-lg">Semester</TableCell>
-              <TableCell className="font-bold text-lg">Department</TableCell>
-              <TableCell className="font-bold text-lg">Enrollment No</TableCell>
-              <TableCell className="font-bold text-lg">Present %</TableCell>
-              <TableCell className="font-bold text-lg">Absent %</TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {studentsData.map((student, index) => (
-              <TableRow key={index} className="hover:bg-gray-100">
-                <TableCell>{student.name}</TableCell>
-                <TableCell>{student.semester}</TableCell>
-                <TableCell>{student.department}</TableCell>
-                <TableCell>{student.erNumber}</TableCell>
-                <TableCell className="text-green-600 font-bold">{student.presentPercentage}%</TableCell>
-                <TableCell className="text-red-600 font-bold">{student.absentPercentage}%</TableCell>
+        {/* Table Container */}
+        <TableContainer component={Paper} className="mt-5 shadow-lg">
+          <Table>
+            <TableHead>
+              <TableRow className="bg-gray-200">
+                <TableCell className="font-bold text-lg">Student Name</TableCell>
+                <TableCell className="font-bold text-lg">Semester</TableCell>
+                <TableCell className="font-bold text-lg">Department</TableCell>
+                <TableCell className="font-bold text-lg">Enrollment No</TableCell>
+                <TableCell className="font-bold text-lg">Present %</TableCell>
+                <TableCell className="font-bold text-lg">Absent %</TableCell>
               </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-      </TableContainer>
-    </div>
+            </TableHead>
+            <TableBody>
+              {studentsData.map((student, index) => (
+                <TableRow key={index} className="hover:bg-gray-100">
+                  <TableCell>{student.name}</TableCell>
+                  <TableCell>{student.semester}</TableCell>
+                  <TableCell>{student.department}</TableCell>
+                  <TableCell>{student.erNumber}</TableCell>
+                  <TableCell className="text-green-600 font-bold">{student.presentPercentage}%</TableCell>
+                  <TableCell className="text-red-600 font-bold">{student.absentPercentage}%</TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </TableContainer>
+      </div>
     </>
   );
 };

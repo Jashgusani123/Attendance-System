@@ -14,12 +14,12 @@ import {
   XAxis,
   YAxis,
 } from "recharts";
-import CreateClassDialog from "../Components/Dialog";
-import LoadingLayer from "../Components/LoadingLayer";
-import socket from "../Components/Socket";
-import { TeacherReducerInitialState } from "../Types/API/TeacherApiType";
-import Notification from "./Notification";
-import ExcelForm from "../Components/ExcelForm";
+import CreateClassDialog from "../../Components/Dialog";
+import ExcelForm from "../../Components/ExcelForm";
+import LoadingLayer from "../../Components/LoadingLayer";
+import socket from "../../Components/Socket";
+import { TeacherReducerInitialState } from "../../Types/API/TeacherApiType";
+import Notification from "../Notification";
 
 
 

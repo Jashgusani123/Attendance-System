@@ -3,16 +3,16 @@ import { Bell, Calendar, LogOut, Settings } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { CartesianGrid, LineChart, Line as RechartLine, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
-import LoadingLayer from "../Components/LoadingLayer";
-import socket from "../Components/Socket";
-import { StudentReducerInitialState } from "../Types/API/StudentApiType";
-import { haversineDistance } from "../Utils/LocationFunctions";
-import { submitAttendance } from "../Utils/ValidationFunction";
-import Notification from "./Notification";
-import { teacherNotExits } from "../Redux/slices/TeacherSlice";
-import { studentNotExits } from "../Redux/slices/StudentSlices";
-import { useLogoutMutation as StudentLogoutMutation } from "../Redux/API/Student";
-import { useLogoutMutation as TeacherLogoutMutation } from "../Redux/API/Teacher";
+import LoadingLayer from "../../Components/LoadingLayer";
+import socket from "../../Components/Socket";
+import { StudentReducerInitialState } from "../../Types/API/StudentApiType";
+import { haversineDistance } from "../../Utils/LocationFunctions";
+import { submitAttendance } from "../../Utils/ValidationFunction";
+import Notification from "../Notification";
+import { teacherNotExits } from "../../Redux/slices/TeacherSlice";
+import { studentNotExits } from "../../Redux/slices/StudentSlices";
+import { useLogoutMutation as StudentLogoutMutation } from "../../Redux/API/Student";
+import { useLogoutMutation as TeacherLogoutMutation } from "../../Redux/API/Teacher";
 import { useLocation, useNavigate } from "react-router-dom";
 
 
@@ -154,9 +154,7 @@ export default function StudentDashboard() {
     const handleNotification = (upperHeadding:string, description:string) => {
       setNotifications((prev) => [...prev, { upperHeadding, description }]);
     };
-  
     socket.on("Notification_of_attendance", handleNotification);
-  
     return () => {
       socket.off("Notification_of_attendance", handleNotification);
     };

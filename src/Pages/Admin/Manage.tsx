@@ -1,10 +1,10 @@
 import { Avatar, Tooltip } from "@mui/material";
 import { Bell } from "lucide-react";
-import { Link, useNavigate } from "react-router-dom";
-import MiniChat from "../Components/Admin/TeacherChat";
-import TeacherTimeTable from "../Components/Admin/TeacherTimeTable";
 import { useEffect, useState } from "react";
-import Notification from "./Notification";
+import { Link, useNavigate } from "react-router-dom";
+import MiniChat from "../../Components/Admin/TeacherChat";
+import TeacherTimeTable from "../../Components/Admin/TeacherTimeTable";
+import Notification from "../Notification";
 
 interface NotificationType {
   _id: string;
@@ -30,9 +30,9 @@ const Manage = () => {
   return (
     <>
       {/* Navbar with Teacher Information */}
-      <div className="flex w-full  gap-4">
+      <div className="flex w-full flex-col sm:flex-row sm:p-0 p-2 gap-4">
         {/* Navbar */}
-        <div className="flex flex-col ml-4 w-[30%] gap-4">
+        <div className="flex flex-col ml-4 sm:w-[30%]  gap-4">
           <div className="landing_navbar sticky top-2 h-14 z-50">
             <nav className="flex justify-between items-center p-4 w-full h-full bg-amber-400 rounded-2xl shadow-lg">
               <div className="image">
@@ -69,7 +69,7 @@ const Manage = () => {
           </div>
         </div>
         {/* Side Navbar with Teacher Information */}
-        <div className="teacher_info  flex justify-start  items-center mt-2 p-2 bg-[#C3EBFA] w-[70%] h-14 ">
+        <div className="teacher_info  flex justify-start  items-center mt-2 p-2 bg-[#C3EBFA] sm:w-[70%] h-14 ">
           <div className="avatar">
             <Avatar
               src={`https://ui-avatars.com/api/?name=JG`}
@@ -89,9 +89,9 @@ const Manage = () => {
         </div>
       </div>
       {/* Timetable and Chat */}
-      <div className="info_of_manage flex justify-around items-center ">
+      <div className="info_of_manage flex w-full flex-col flex-wrap justify-around items-center ">
         {/* Timetable */}
-        <div className="timetable_container w-[70%]">
+        <div className="timetable_container sm:w-[70%] w-[90%] ">
           <TeacherTimeTable />
         </div>
         {/* Chat */}

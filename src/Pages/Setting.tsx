@@ -11,52 +11,57 @@ import { MouseEventHandler, useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useLocation, useNavigate } from "react-router-dom";
 import LandingNav from "../Components/LandingNav";
+import LoadingLayer from "../Components/LoadingLayer";
 import { useLogoutMutation as StudentLogoutMutation } from "../Redux/API/Student";
 import { useLogoutMutation as TeacherLogoutMutation } from "../Redux/API/Teacher";
 import { studentNotExits } from "../Redux/slices/StudentSlices";
 import { teacherNotExits } from "../Redux/slices/TeacherSlice";
 import { StudentReducerInitialState } from "../Types/API/StudentApiType";
-import LoadingLayer from "../Components/LoadingLayer";
 import { TeacherReducerInitialState } from "../Types/API/TeacherApiType";
 
 const Setting = () => {
     const { loading: studentLoading, student } = useSelector(
         (state: { student: StudentReducerInitialState }) => state.student
     );
-    const {loading:teacherLoading , teacher} = useSelector((state:{teacher:TeacherReducerInitialState})=>state.teacher);
+    const { loading: teacherLoading, teacher } = useSelector(
+        (state: { teacher: TeacherReducerInitialState }) => state.teacher
+    );
+
     const location = useLocation();
+    const dispatch = useDispatch();
+    const navigate = useNavigate();
+    const type = location.state?.type;
     const [StudentLogout] = StudentLogoutMutation();
     const [TeacherLogout] = TeacherLogoutMutation();
-    const type = location.state?.type;
-    const dispatch = useDispatch();
+
     const [open, setOpen] = useState(false);
     const [openSection, setOpenSection] = useState<string | null>(null);
     const [date, setdate] = useState<string>();
-    const navigate = useNavigate();
-    
+
     const toggleSection = (section: string) => {
         setOpenSection(openSection === section ? null : section);
     };
+
     const handelLogout = async () => {
         if (type === "Student") {
             const res = await StudentLogout(null);
             if (res.data?.success) {
                 dispatch(studentNotExits());
                 navigate("/")
-            }else{
+            } else {
                 alert(res.error)
             }
 
-        } else if (type === "Teacher") {
+        } else  {
             const res = await TeacherLogout(null);
             if (res.data?.success) {
                 dispatch(teacherNotExits());
                 navigate("/")
-            }else{
+            } else {
                 alert(res.error)
             }
 
-        }
+        } 
     }
     const handleDelete = () => {
         setOpen(true); // Open the confirmation dialog
@@ -67,17 +72,18 @@ const Setting = () => {
     }
 
     useEffect(() => {
-        if(type == "Student"){
+        if (type == "Student") {
             const datew = new Date(student?.collegeJoiningDate!).toISOString().split("T")[0];
             setdate(datew);
         }
     }, []);
-    const userType = student ? student : teacher
+    const userType = student ? student : teacher ;
 
-    return studentLoading || teacherLoading? <><LoadingLayer type={type} /></> : (
+    return studentLoading || teacherLoading  ? <><LoadingLayer type={type} /></> : (
         <>
             {type == "Student" ? <LandingNav path="/student/dashboard" home="/student" /> : <LandingNav path="/teacher/dashboard" home="/teacher" />}
             <section className="flex justify-around flex-col gap-5 items-center mt-5 w-full">
+
                 <Fields icon={AccountCircleIcon} Name="Profile" handleClick={() => toggleSection("profile")} isOpen={openSection === "profile"} />
                 {openSection === "profile" && (
                     <SectionCard title="Change Name" value={userType?.fullName} name="fullName" />
@@ -110,7 +116,7 @@ const Setting = () => {
                             <SectionCard title="Department" value={student?.departmentName} name="departmentName" />
                         </>
                     ) : (
-                        <SectionCard title="Department" value={teacher?.departmentName} />
+                        <SectionCard title="Department" value={userType!.departmentName} />
                     )
                 )}
 

@@ -1,9 +1,9 @@
-import { Typewriter } from "react-simple-typewriter";
-import LandingNav from "../Components/LandingNav";
-import DashBordImage from "../assets/DashBordImage.jpg";
 import { useSelector } from "react-redux";
-import { StudentReducerInitialState } from "../Types/API/StudentApiType";
-import socket from "../Components/Socket";
+import { Typewriter } from "react-simple-typewriter";
+import LandingNav from "../../Components/LandingNav";
+import socket from "../../Components/Socket";
+import { StudentReducerInitialState } from "../../Types/API/StudentApiType";
+import DashBordImage from "../../assets/DashBordImage.jpg";
 
 const StudentLanding = () => {
   const { loading: studentLoading, student } = useSelector(

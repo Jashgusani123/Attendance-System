@@ -1,11 +1,11 @@
 import { Tooltip } from "@mui/material"
 import { Bell } from "lucide-react"
 import { Link, useNavigate } from "react-router-dom"
-import UserCard from "../Components/Admin/UserCards";
-import StudentRatio from "../Components/Admin/StudentRatio";
-import AttendanceChart from "../Components/Admin/TotalAttedanceChart";
+import UserCard from "../../Components/Admin/UserCards";
+import StudentRatio from "../../Components/Admin/StudentRatio";
+import AttendanceChart from "../../Components/Admin/TotalAttedanceChart";
 import { useEffect, useState } from "react";
-import Notification from "./Notification";
+import Notification from "../Notification";
 
 interface NotificationType {
     _id: string;

@@ -343,6 +343,7 @@ body, html {
 }
 .WavingStudent{
   height: 200px;
+  z-index: 40;
   animation: comeHello 1s ease-in;
 }
 @keyframes comeHello {
