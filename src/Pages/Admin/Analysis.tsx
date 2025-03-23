@@ -30,9 +30,9 @@ const Analysis = () => {
 
     return (
         <>
-            <div className="flex w-full  gap-4">
+            <div className="flex w-full sm:flex-row flex-col px-4 gap-4">
                 {/* NavBar and Circal Graph */}
-                <div className="flex flex-col m-2 w-[30%] gap-4">
+                <div className="flex flex-col m-2 sm:w-[30%] w-full  gap-4">
                     <div className="landing_navbar sticky top-2 h-14 z-50">
                         <nav className="flex justify-between items-center p-4 w-full h-full bg-amber-400 rounded-2xl shadow-lg">
                             <div className="image">
@@ -72,7 +72,7 @@ const Analysis = () => {
                     </div>
                 </div>
                 {/* Attendance Chart (Properly Positioned) */}
-                <div className="flex flex-col w-[70%] mt-2 gap-4">
+                <div className="flex flex-col sm:w-[70%] w-full mt-2 gap-4">
                     {/* Overview With Cards */}
                     <div className="right_Cards grid grid-cols-2 md:grid-cols-4 gap-4">
                         <UserCard count={"58%"} type="Student Present In each Class" bgcolor="bg-[#C3EBFA]" />
