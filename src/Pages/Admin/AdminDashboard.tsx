@@ -5,35 +5,36 @@ import { Bell } from "lucide-react";
 import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Typewriter } from "react-simple-typewriter";
+import { useGetAllStudentMutation } from "../../Redux/API/Admin";
 import Notification from "../Notification";
 
 
-const studentsData = [
-  {
-    name: "Jash Gusani",
-    semester: "5th",
-    department: "Computer Science",
-    erNumber: "2021123456",
-    presentPercentage: 90,
-    absentPercentage: 10,
-  },
-  {
-    name: "John Doe",
-    semester: "6th",
-    department: "Electronics",
-    erNumber: "2021127890",
-    presentPercentage: 85,
-    absentPercentage: 15,
-  },
-  {
-    name: "Jane Smith",
-    semester: "3rd",
-    department: "Mechanical",
-    erNumber: "2021135678",
-    presentPercentage: 75,
-    absentPercentage: 25,
-  },
-];
+// const studentData = [
+//   {
+//     name: "Jash Gusani",
+//     semester: "5th",
+//     department: "Computer Science",
+//     erNumber: "2021123456",
+//     presentPercentage: 90,
+//     absentPercentage: 10,
+//   },
+//   {
+//     name: "John Doe",
+//     semester: "6th",
+//     department: "Electronics",
+//     erNumber: "2021127890",
+//     presentPercentage: 85,
+//     absentPercentage: 15,
+//   },
+//   {
+//     name: "Jane Smith",
+//     semester: "3rd",
+//     department: "Mechanical",
+//     erNumber: "2021135678",
+//     presentPercentage: 75,
+//     absentPercentage: 25,
+//   },
+// ];
 interface NotificationType {
   _id: string;
   upperHeadding: string;
@@ -46,12 +47,37 @@ const data = [
     description: "Hii"
   }
 ]
+interface AllStudentInfo  {
+  fullName: string,
+  enrollmentNumber: string,
+  departmentName: string,
+  semester:number,
+  present: number,
+  absent: number
+}
 const AdminDashboard = () => {
   const navigate = useNavigate();
   const [notifications, setNotifications] = useState<NotificationType[]>([]);
   const [showNotifications, setShowNotifications] = useState(false);
+  const [studentsData, setStudentsData] = useState<AllStudentInfo[]>([]);
+  const [GetAllStudentsData] = useGetAllStudentMutation()
 
   useEffect(() => {
+    const GetStudentsData = async()=>{
+      try{
+        const response = await GetAllStudentsData(null);
+        if(response && "data" in response && response.data?.success && response.data?.StudentData){
+          setStudentsData(response.data?.StudentData);
+        }else{
+          console.log(data);
+          
+        }
+      }catch(error){
+        console.log(error);
+        
+      }
+    }
+    GetStudentsData();
     setNotifications(data);
   }, [])
 
@@ -211,12 +237,12 @@ const AdminDashboard = () => {
             <TableBody>
               {studentsData.map((student, index) => (
                 <TableRow key={index} className="hover:bg-gray-100">
-                  <TableCell>{student.name}</TableCell>
+                  <TableCell>{student.fullName}</TableCell>
                   <TableCell>{student.semester}</TableCell>
-                  <TableCell>{student.department}</TableCell>
-                  <TableCell>{student.erNumber}</TableCell>
-                  <TableCell className="text-green-600 font-bold">{student.presentPercentage}%</TableCell>
-                  <TableCell className="text-red-600 font-bold">{student.absentPercentage}%</TableCell>
+                  <TableCell>{student.departmentName}</TableCell>
+                  <TableCell>{student.enrollmentNumber}</TableCell>
+                  <TableCell className="text-green-600 font-bold">{student.present}%</TableCell>
+                  <TableCell className="text-red-600 font-bold">{student.absent}%</TableCell>
                 </TableRow>
               ))}
             </TableBody>
