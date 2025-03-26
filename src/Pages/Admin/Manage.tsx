@@ -1,7 +1,7 @@
 import { Avatar, Tooltip } from "@mui/material";
 import { Bell } from "lucide-react";
 import { useEffect, useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import MiniChat from "../../Components/Admin/TeacherChat";
 import TeacherTimeTable from "../../Components/Admin/TeacherTimeTable";
 import Notification from "../Notification";
@@ -19,7 +19,8 @@ const data = [
 ]
 const Manage = () => {
   const navigate = useNavigate();
-
+  const location = useLocation();
+  const userId = location.state.id; 
   const [notifications, setNotifications] = useState<NotificationType[]>([]);
   const [showNotifications, setShowNotifications] = useState(false);
 

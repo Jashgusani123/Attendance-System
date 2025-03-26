@@ -37,9 +37,16 @@ export const AdminAPI = createApi({
                 method:"GET"  
             }),
             invalidatesTags:["admin"]
-        })
+        }),
+        getAllTeachers:builders.mutation({
+            query:()=>({
+                url:"getallteacher",
+                method:"GET"  
+            }),
+            invalidatesTags:["admin"]
+        }),
         
     })
 });
 
-export const { useSignupMutation , useLoginMutation , useLogoutMutation , useGetAllStudentMutation} = AdminAPI;
+export const { useSignupMutation , useLoginMutation , useLogoutMutation , useGetAllStudentMutation , useGetAllTeachersMutation} = AdminAPI;

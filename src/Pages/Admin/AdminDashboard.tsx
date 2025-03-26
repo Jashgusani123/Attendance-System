@@ -5,7 +5,7 @@ import { Bell } from "lucide-react";
 import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Typewriter } from "react-simple-typewriter";
-import { useGetAllStudentMutation } from "../../Redux/API/Admin";
+import { useGetAllStudentMutation, useGetAllTeachersMutation } from "../../Redux/API/Admin";
 import Notification from "../Notification";
 
 
@@ -47,36 +47,57 @@ const data = [
     description: "Hii"
   }
 ]
-interface AllStudentInfo  {
+interface AllStudentInfo {
   fullName: string,
   enrollmentNumber: string,
   departmentName: string,
-  semester:number,
+  semester: number,
   present: number,
   absent: number
+}
+
+interface AllTeacherInfo {
+  fullName: string,
+  _id: string,
+  avatarName: string
 }
 const AdminDashboard = () => {
   const navigate = useNavigate();
   const [notifications, setNotifications] = useState<NotificationType[]>([]);
   const [showNotifications, setShowNotifications] = useState(false);
   const [studentsData, setStudentsData] = useState<AllStudentInfo[]>([]);
+  const [teachersData, setTeachersData] = useState<AllTeacherInfo[]>([]);
   const [GetAllStudentsData] = useGetAllStudentMutation()
+  const [GetAllTeachersData] = useGetAllTeachersMutation()
+
 
   useEffect(() => {
-    const GetStudentsData = async()=>{
-      try{
+    const GetStudentsData = async () => {
+      try {
         const response = await GetAllStudentsData(null);
-        if(response && "data" in response && response.data?.success && response.data?.StudentData){
+        if (response && "data" in response && response.data?.success && response.data?.StudentData) {
           setStudentsData(response.data?.StudentData);
-        }else{
+        } else {
           console.log(data);
-          
+
         }
-      }catch(error){
+      } catch (error) {
         console.log(error);
-        
+
       }
     }
+    const GetTeachersData = async () => {
+      try {
+        const response = await GetAllTeachersData(null);
+        if (response && "data" in response && response.data.success && response.data?.TeacherData) {
+          setTeachersData(response.data?.TeacherData)
+        }
+      } catch (error) {
+        console.log(error);
+
+      }
+    }
+    GetTeachersData();
     GetStudentsData();
     setNotifications(data);
   }, [])
@@ -84,6 +105,12 @@ const AdminDashboard = () => {
   const handleSetting = () => {
     navigate("/admin/setting", { state: { type: "Admin" } });
   };
+  const manageBtn = (id:string) =>{
+    navigate("/admin/manage" ,{state:{id:id}} )
+  }
+  const analysisBtn = (id:string) =>{
+    navigate("/admin/analysis" ,{state:{id:id}} )
+  }
   return (
     <>
       {/* Navbar */}
@@ -164,6 +191,7 @@ const AdminDashboard = () => {
           </div>
         </motion.div>
       </div>
+
       {/* Foreground Content */}
       <div className="relative z-40 p-6">
         {/* Title */}
@@ -172,43 +200,28 @@ const AdminDashboard = () => {
         </Typography>
         <div className="teacherCard_container flex justify-around flex-wrap">
           {/* Teacher Card */}
-          <Card className="mt-5 mx-auto p-5 w-72 shadow-lg rounded-lg border border-gray-200">
-            <CardContent className="flex flex-col items-center text-center">
-              <div className="w-24 h-24 flex items-center justify-center bg-blue-500 text-white text-3xl font-bold rounded-full shadow-md">
-                JG
-              </div>
-              <Typography variant="h6" className="mt-3 text-gray-800 font-semibold">
-                Jash Gusani
-              </Typography>
-              <Typography variant="body2" className="mt-2 text-gray-600">
-                Creative developer exploring innovation with passion and dedication daily.
-              </Typography>
+          {teachersData.length > 0 && teachersData.map((teacher) => (
+            <>
+              <Card className="mt-5 mx-auto p-5 w-72 shadow-lg rounded-lg border border-gray-200" key={teacher._id}>
+                <CardContent className="flex flex-col items-center text-center">
+                  <div className="w-24 h-24 flex items-center justify-center bg-blue-500 text-white text-3xl font-bold rounded-full shadow-md">
+                    {teacher.avatarName}
+                  </div>
+                  <Typography variant="h6" className="mt-3 text-gray-800 font-semibold">
+                    {teacher.fullName}
+                  </Typography>
+                  <Typography variant="body2" className="mt-2 text-gray-600">
+                    Creative developer exploring innovation with passion and dedication daily.
+                  </Typography>
 
-              <Stack direction="row" spacing={2} className="mt-4">
-                <Button variant="contained" color="primary" component={Link} to="/admin/manage" className="z-30">Manage</Button>
-                <Button variant="contained" color="secondary" component={Link} to="/admin/analysis" className="z-30">Analysis</Button>
-              </Stack>
-            </CardContent>
-          </Card>
-
-          <Card className="mt-5 mx-auto p-5 w-72 shadow-lg rounded-lg border border-gray-200">
-            <CardContent className="flex flex-col items-center text-center">
-              <div className="w-24 h-24 flex items-center justify-center bg-blue-500 text-white text-3xl font-bold rounded-full shadow-md">
-                JG
-              </div>
-              <Typography variant="h6" className="mt-3 text-gray-800 font-semibold">
-                Jash Gusani
-              </Typography>
-              <Typography variant="body2" className="mt-2 text-gray-600">
-                Creative developer exploring innovation with passion and dedication daily.
-              </Typography>
-
-              <Stack direction="row" spacing={2} className="mt-4">
-                <Button variant="contained" color="primary" component={Link} to="/admin/manage" className="z-30">Manage</Button>
-                <Button variant="contained" color="secondary" component={Link} to="/admin/analysis" className="z-30">Analysis</Button>
-              </Stack>
-            </CardContent>
-          </Card>
+                  <Stack direction="row" spacing={2} className="mt-4">
+                    <Button variant="contained" color="primary" onClick={()=>manageBtn(teacher._id)} className="z-30">Manage</Button>
+                    <Button variant="contained" color="secondary" onClick={()=>analysisBtn(teacher._id)} className="z-30">Analysis</Button>
+                  </Stack>
+                </CardContent>
+              </Card>
+            </>
+          ))}
 
         </div>
       </div>
