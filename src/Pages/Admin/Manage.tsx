@@ -1,10 +1,11 @@
 import { Avatar, Tooltip } from "@mui/material";
 import { Bell } from "lucide-react";
 import { useEffect, useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import MiniChat from "../../Components/Admin/TeacherChat";
 import TeacherTimeTable from "../../Components/Admin/TeacherTimeTable";
 import Notification from "../Notification";
+import { useGetTeacherInfoMutation } from "../../Redux/API/Admin";
 
 interface NotificationType {
   _id: string;
@@ -17,14 +18,32 @@ const data = [
     description:"Hii"
   }
 ]
+interface TeacherInfo {
+  fullName:string,
+  departmentName:string,
+  email:string,
+  avatarName:string
+  collegeJoiningData:string,
+}
 const Manage = () => {
   const navigate = useNavigate();
-  // const location = useLocation();
-  // const userId = location.state.id; 
+  const location = useLocation();
+  const userId = location.state.id; 
   const [notifications, setNotifications] = useState<NotificationType[]>([]);
   const [showNotifications, setShowNotifications] = useState(false);
+  const [TeacherInfo, setTeacherInfo] = useState<TeacherInfo>()
+  const [GetTeacherInfo] = useGetTeacherInfoMutation();
 
   useEffect(()=>{
+    const funcGetTeachersInfo = async()=>{
+      const response = await GetTeacherInfo(userId);
+      if(response && "data" in response && response.data?.teacherInfo){
+        setTeacherInfo(response.data?.teacherInfo)
+      }else{
+        console.log(response.error);
+      }
+    }
+    funcGetTeachersInfo();
     setNotifications(data);
   },[])
 
@@ -73,18 +92,18 @@ const Manage = () => {
         <div className="teacher_info  flex justify-start items-center mt-2 p-2 bg-[#C3EBFA] sm:w-[70%] h-14 ">
           <div className="avatar">
             <Avatar
-              src={`https://ui-avatars.com/api/?name=JG`}
+              src={`https://ui-avatars.com/api/?name=${TeacherInfo?.avatarName}`}
               className="mr-4 w-16 h-16"
             />
           </div>
           <div className="info flex justify-between w-full ">
             <div className="names">
-              <p className="text-xl font-bold">Jash Gusani</p>
-              <p className="text-[10px] font-medium">Computer</p>
+              <p className="text-xl font-bold">{TeacherInfo?.fullName}</p>
+              <p className="text-[10px] font-medium">{TeacherInfo?.departmentName}</p>
             </div>
             <div className="joing flex justify-center flex-col items-end  " >
-              <p className=" flex">12/3/2035<svg xmlns="http://www.w3.org/2000/svg" className="bg-amber-300 rounded-full p-[3px]" height="24px" viewBox="0 -960 960 960" width="24px" fill="#ff"><path d="M200-80q-33 0-56.5-23.5T120-160v-560q0-33 23.5-56.5T200-800h40v-80h80v80h320v-80h80v80h40q33 0 56.5 23.5T840-720v560q0 33-23.5 56.5T760-80H200Zm0-80h560v-400H200v400Zm0-480h560v-80H200v80Zm0 0v-80 80Zm280 240q-17 0-28.5-11.5T440-440q0-17 11.5-28.5T480-480q17 0 28.5 11.5T520-440q0 17-11.5 28.5T480-400Zm-160 0q-17 0-28.5-11.5T280-440q0-17 11.5-28.5T320-480q17 0 28.5 11.5T360-440q0 17-11.5 28.5T320-400Zm320 0q-17 0-28.5-11.5T600-440q0-17 11.5-28.5T640-480q17 0 28.5 11.5T680-440q0 17-11.5 28.5T640-400ZM480-240q-17 0-28.5-11.5T440-280q0-17 11.5-28.5T480-320q17 0 28.5 11.5T520-280q0 17-11.5 28.5T480-240Zm-160 0q-17 0-28.5-11.5T280-280q0-17 11.5-28.5T320-320q17 0 28.5 11.5T360-280q0 17-11.5 28.5T320-240Zm320 0q-17 0-28.5-11.5T600-280q0-17 11.5-28.5T640-320q17 0 28.5 11.5T680-280q0 17-11.5 28.5T640-240Z" /></svg></p>
-              <p className="text-blue-900 flex gap-1 items-center">jashgusanii1@gmail.com<svg xmlns="http://www.w3.org/2000/svg" className="bg-amber-300 rounded-full p-[3px]" height="24px" viewBox="0 -960 960 960" width="24px" fill="#1E124A"><path d="M160-160q-33 0-56.5-23.5T80-240v-480q0-33 23.5-56.5T160-800h640q33 0 56.5 23.5T880-720v480q0 33-23.5 56.5T800-160H160Zm320-280L160-640v400h640v-400L480-440Zm0-80 320-200H160l320 200ZM160-640v-80 480-400Z" /></svg></p>
+              <p className=" flex">{TeacherInfo?.collegeJoiningData}<svg xmlns="http://www.w3.org/2000/svg" className="bg-amber-300 rounded-full p-[3px]" height="24px" viewBox="0 -960 960 960" width="24px" fill="#ff"><path d="M200-80q-33 0-56.5-23.5T120-160v-560q0-33 23.5-56.5T200-800h40v-80h80v80h320v-80h80v80h40q33 0 56.5 23.5T840-720v560q0 33-23.5 56.5T760-80H200Zm0-80h560v-400H200v400Zm0-480h560v-80H200v80Zm0 0v-80 80Zm280 240q-17 0-28.5-11.5T440-440q0-17 11.5-28.5T480-480q17 0 28.5 11.5T520-440q0 17-11.5 28.5T480-400Zm-160 0q-17 0-28.5-11.5T280-440q0-17 11.5-28.5T320-480q17 0 28.5 11.5T360-440q0 17-11.5 28.5T320-400Zm320 0q-17 0-28.5-11.5T600-440q0-17 11.5-28.5T640-480q17 0 28.5 11.5T680-440q0 17-11.5 28.5T640-400ZM480-240q-17 0-28.5-11.5T440-280q0-17 11.5-28.5T480-320q17 0 28.5 11.5T520-280q0 17-11.5 28.5T480-240Zm-160 0q-17 0-28.5-11.5T280-280q0-17 11.5-28.5T320-320q17 0 28.5 11.5T360-280q0 17-11.5 28.5T320-240Zm320 0q-17 0-28.5-11.5T600-280q0-17 11.5-28.5T640-320q17 0 28.5 11.5T680-280q0 17-11.5 28.5T640-240Z" /></svg></p>
+              <p className="text-blue-900 flex gap-1 items-center">{TeacherInfo?.email}<svg xmlns="http://www.w3.org/2000/svg" className="bg-amber-300 rounded-full p-[3px]" height="24px" viewBox="0 -960 960 960" width="24px" fill="#1E124A"><path d="M160-160q-33 0-56.5-23.5T80-240v-480q0-33 23.5-56.5T160-800h640q33 0 56.5 23.5T880-720v480q0 33-23.5 56.5T800-160H160Zm320-280L160-640v400h640v-400L480-440Zm0-80 320-200H160l320 200ZM160-640v-80 480-400Z" /></svg></p>
             </div>
           </div>
         </div>

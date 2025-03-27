@@ -8,6 +8,7 @@ import { StudentReducerInitialState } from "./Types/API/StudentApiType";
 import { TeacherReducerInitialState } from "./Types/API/TeacherApiType";
 import { AdminReducerInitialState } from "./Types/API/AdminApiType";
 import { adminExits, adminNotExits } from "./Redux/slices/AdminSlices";
+import ShowAllStudent from "./Pages/Admin/ShowAllStudent";
 
 
 const Landing = lazy(() => import("./Pages/Landing"));
@@ -129,7 +130,7 @@ function App() {
               <Route path="/admin/view" element={<ViewPage />} />
               <Route path="/admin/analysis" element={<Analysis />} />
               <Route path="/admin/setting" element={<AdminSetting />} />
-
+              <Route path="/admin/student_list" element={<ShowAllStudent />} />
             </>
           )}
           {/* 404 Page */}

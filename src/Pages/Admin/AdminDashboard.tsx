@@ -69,7 +69,7 @@ const AdminDashboard = () => {
   const [teachersData, setTeachersData] = useState<AllTeacherInfo[]>([]);
   const [GetAllStudentsData] = useGetAllStudentMutation()
   const [GetAllTeachersData] = useGetAllTeachersMutation()
-
+  const [visibleCount, setVisibleCount] = useState(4);
 
   useEffect(() => {
     const GetStudentsData = async () => {
@@ -78,7 +78,7 @@ const AdminDashboard = () => {
         if (response && "data" in response && response.data?.success && response.data?.StudentData) {
           setStudentsData(response.data?.StudentData);
         } else {
-          console.log(data);
+          console.log(response.data);
 
         }
       } catch (error) {
@@ -110,6 +110,9 @@ const AdminDashboard = () => {
   }
   const analysisBtn = (id:string) =>{
     navigate("/admin/analysis" ,{state:{id:id}} )
+  }
+  const showStudentList = ()=>{
+    navigate("/admin/student_list")
   }
   return (
     <>
@@ -235,7 +238,7 @@ const AdminDashboard = () => {
         </Typography>
 
         {/* Table Container */}
-        <TableContainer component={Paper} className="mt-5 shadow-lg">
+        <TableContainer component={Paper} className="mt-5 mb-5 shadow-lg">
           <Table>
             <TableHead>
               <TableRow className="bg-gray-200">
@@ -248,7 +251,7 @@ const AdminDashboard = () => {
               </TableRow>
             </TableHead>
             <TableBody>
-              {studentsData.map((student, index) => (
+              {studentsData.slice(0, visibleCount).map((student, index) => (
                 <TableRow key={index} className="hover:bg-gray-100">
                   <TableCell>{student.fullName}</TableCell>
                   <TableCell>{student.semester}</TableCell>
@@ -261,6 +264,17 @@ const AdminDashboard = () => {
             </TableBody>
           </Table>
         </TableContainer>
+        {studentsData.length > visibleCount && (
+        <button
+          className="mt-2 rounded-[10px] text-white p-2 bg-zinc-500"
+          onClick={() => {
+            setVisibleCount(visibleCount + 5)
+            showStudentList()
+          }}
+        >
+          Show More
+        </button>
+      )}
       </div>
     </>
   );
