@@ -53,8 +53,15 @@ export const AdminAPI = createApi({
             }),
             invalidatesTags:["admin"]
         }),
-        
+        getAbsentPresent7DaysData:builders.mutation({
+            query:(_id)=>({
+                url:"absent_present_data",
+                method:"POST",
+                body:{Id:_id}  
+            }),
+            invalidatesTags:["admin"]
+        }),
     })
 });
 
-export const { useSignupMutation , useLoginMutation , useLogoutMutation , useGetAllStudentMutation , useGetAllTeachersMutation , useGetTeacherInfoMutation} = AdminAPI;
+export const { useSignupMutation , useLoginMutation , useLogoutMutation , useGetAllStudentMutation , useGetAllTeachersMutation , useGetTeacherInfoMutation ,useGetAbsentPresent7DaysDataMutation} = AdminAPI;

@@ -1,6 +1,6 @@
 import { Tooltip } from "@mui/material"
 import { Bell } from "lucide-react"
-import { Link, useNavigate } from "react-router-dom"
+import { Link, useLocation, useNavigate } from "react-router-dom"
 import UserCard from "../../Components/Admin/UserCards";
 import StudentRatio from "../../Components/Admin/StudentRatio";
 import AttendanceChart from "../../Components/Admin/TotalAttedanceChart";
@@ -20,9 +20,11 @@ const data = [
   ]
 const Analysis = () => {
     const navigate = useNavigate();
-    
+    const location = useLocation();
     const [notifications, setNotifications] = useState<NotificationType[]>([]);
     const [showNotifications, setShowNotifications] = useState(false);
+
+  const userId = location.state.id; 
 
     useEffect(()=>{
         setNotifications(data);
@@ -68,7 +70,7 @@ const Analysis = () => {
                         </nav>
                     </div>
                     <div className="studentRatio h-[350px] w-full bg-white shadow-lg rounded-2xl flex items-center justify-center">
-                        <StudentRatio title="Present & Absent in Last 7 Days" other={true} />
+                        <StudentRatio title="Present & Absent in Last 7 Days" other={true}  userId={userId}/>
                     </div>
                 </div>
                 {/* Attendance Chart (Properly Positioned) */}

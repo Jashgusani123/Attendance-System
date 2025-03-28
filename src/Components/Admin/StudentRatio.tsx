@@ -2,6 +2,7 @@
 import { useEffect, useState } from "react";
 import { RadialBarChart, RadialBar, ResponsiveContainer } from "recharts";
 import maleFemale from '../../assets/maleFemale.png'
+import { useGetAbsentPresent7DaysDataMutation } from "../../Redux/API/Admin";
 
 const CountChart = ({ boys, girls, absent, present }: { boys?: number; girls?: number, present?: number, absent?: number }) => {
   let data: any;
@@ -47,12 +48,24 @@ const CountChart = ({ boys, girls, absent, present }: { boys?: number; girls?: n
 
 };
 
-const StudentRatio = ({ title, other }: { title?: string, other?: boolean }) => {
+const StudentRatio = ({ title, other, userId }: { title?: string, other?: boolean, userId?:string }) => {
   const [boys, setBoys] = useState(0);
   const [girls, setGirls] = useState(0);
-  const [present, setpresent] = useState(0)
-  const [absent, setabsent] = useState(0)
+  const [present, setpresent] = useState(0);
+  const [absent, setabsent] = useState(0);
+  const [GetPresentAbsentOverview] = useGetAbsentPresent7DaysDataMutation();
+
   useEffect(() => {
+    const GetPResentAbsent7Days = async()=>{
+      const response = await  GetPresentAbsentOverview(userId);
+      if(response && "data" in response && response.data?.success && response.data?.APData){
+        setpresent(response.data.APData.PresentStudents)
+        setabsent(response.data.APData.AbsentStudents)
+      }else{
+        console.log(response.error);
+      }
+      
+    }
     // Mocked Data (Replace with API call if needed)
     let data: any;
     if (!other) {
@@ -64,18 +77,7 @@ const StudentRatio = ({ title, other }: { title?: string, other?: boolean }) => 
       setGirls(data.find((d: any) => d.sex === "FEMALE")?._count || 0);
     }
     else {
-      data = [
-        {
-          sex: "Present",
-          _count: 56
-        },
-        {
-          sex: "Absent",
-          _count: 44
-        },
-      ]
-      setpresent(data.find((d: any) => d.sex === "Present")?._count | 0)
-      setabsent(data.find((d: any) => d.sex === "Absent")?._count | 0)
+      GetPResentAbsent7Days();
     }
 
 
