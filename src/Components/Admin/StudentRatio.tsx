@@ -56,7 +56,7 @@ const StudentRatio = ({ title, other, userId }: { title?: string, other?: boolea
   const [GetPresentAbsentOverview] = useGetAbsentPresent7DaysDataMutation();
 
   useEffect(() => {
-    const GetPResentAbsent7Days = async()=>{
+    const GetPresentAbsent7Days = async()=>{
       const response = await  GetPresentAbsentOverview(userId);
       if(response && "data" in response && response.data?.success && response.data?.APData){
         setpresent(response.data.APData.PresentStudents)
@@ -77,7 +77,7 @@ const StudentRatio = ({ title, other, userId }: { title?: string, other?: boolea
       setGirls(data.find((d: any) => d.sex === "FEMALE")?._count || 0);
     }
     else {
-      GetPResentAbsent7Days();
+      GetPresentAbsent7Days();
     }
 
 

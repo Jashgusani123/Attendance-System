@@ -61,7 +61,21 @@ export const AdminAPI = createApi({
             }),
             invalidatesTags:["admin"]
         }),
+        getOverViewOfLast7Days:builders.mutation({
+            query:(_id)=>({
+                url:"last7daysoverview",
+                method:"POST",
+                body:{Id:_id} 
+            })
+        }),
+        getPresentAndAbsentCards:builders.mutation({
+            query:(_id )=>({
+                url:"getapcard",
+                method:"POST",
+                body:{Id:_id }   
+            })
+        })
     })
 });
 
-export const { useSignupMutation , useLoginMutation , useLogoutMutation , useGetAllStudentMutation , useGetAllTeachersMutation , useGetTeacherInfoMutation ,useGetAbsentPresent7DaysDataMutation} = AdminAPI;
+export const { useSignupMutation , useLoginMutation , useLogoutMutation , useGetAllStudentMutation , useGetAllTeachersMutation , useGetTeacherInfoMutation ,useGetAbsentPresent7DaysDataMutation, useGetOverViewOfLast7DaysMutation , useGetPresentAndAbsentCardsMutation} = AdminAPI;

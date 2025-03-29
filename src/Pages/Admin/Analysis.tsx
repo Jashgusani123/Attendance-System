@@ -6,6 +6,7 @@ import StudentRatio from "../../Components/Admin/StudentRatio";
 import AttendanceChart from "../../Components/Admin/TotalAttedanceChart";
 import { useEffect, useState } from "react";
 import Notification from "../Notification";
+import { useGetPresentAndAbsentCardsMutation } from "../../Redux/API/Admin";
 
 interface NotificationType {
     _id: string;
@@ -23,12 +24,25 @@ const Analysis = () => {
     const location = useLocation();
     const [notifications, setNotifications] = useState<NotificationType[]>([]);
     const [showNotifications, setShowNotifications] = useState(false);
-
+    const [PresentPersentag, setPresentPersentag] = useState(0);
+    const [AbsentPersentag, setAbsentPersentag] = useState(0);
+    // const [PresentPersentag, setPresentPersentag] = useState(0);
+    // const [PresentPersentag, setPresentPersentag] = useState(0);
+    const [PresentAndAbsentCard] = useGetPresentAndAbsentCardsMutation();
   const userId = location.state.id; 
 
     useEffect(()=>{
+        const GetPersentAndAbsentCard = async()=>{
+            const response = await PresentAndAbsentCard(userId);
+            if(response && "data" in response && response.data?.success && response.data.PresentPersentage ){
+                setPresentPersentag(response.data.PresentPersentage);
+                setAbsentPersentag(100 - response.data.PresentPersentage )
+            }
+        }
+        GetPersentAndAbsentCard();
         setNotifications(data);
       },[])
+console.log(PresentPersentag);
 
     return (
         <>
@@ -77,15 +91,15 @@ const Analysis = () => {
                 <div className="flex flex-col sm:w-[70%] w-full mt-2 gap-4">
                     {/* Overview With Cards */}
                     <div className="right_Cards grid grid-cols-2 md:grid-cols-4 gap-4">
-                        <UserCard count={"58%"} type="Student Present In each Class" bgcolor="bg-[#C3EBFA]" />
-                        <UserCard count={"58%"} type="Student Absent In each Class" bgcolor="bg-amber-400" />
+                        <UserCard count={Math.round(PresentPersentag)+"%"} type="Student Present In each Class" bgcolor="bg-[#C3EBFA]" />
+                        <UserCard count={Math.round(AbsentPersentag)+"%"} type="Student Absent In each Class" bgcolor="bg-amber-400" />
                         <UserCard count={"68%"} type="Teacher Take Class in last 7 days" bgcolor="bg-[#C3EBFA]" />
                         <UserCard count={"48%"} type="Teacher don't Take Class in last 7 days" bgcolor="bg-amber-400" />
                     </div>
                     {/* Attendance Chart (Properly Positioned) */}
                     <div className="bg-white shadow-lg rounded-2xl p-4">
                         <h2 className="text-lg font-semibold mb-4">Attendance Overview (Total Class)</h2>
-                        <AttendanceChart isOther={true} />
+                        <AttendanceChart isOther={true} userId={userId} />
                     </div>
                 </div>
 
