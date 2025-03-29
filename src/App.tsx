@@ -35,7 +35,6 @@ function App() {
   const { loading: adminLoading, admin } = useSelector(
     (state: { admin: AdminReducerInitialState }) => state.admin
   );
-  // console.log(student);
 
   const navigate = useNavigate();
   const dispatch = useDispatch();

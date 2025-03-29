@@ -42,7 +42,6 @@ const Analysis = () => {
         GetPersentAndAbsentCard();
         setNotifications(data);
       },[])
-console.log(PresentPersentag);
 
     return (
         <>
@@ -83,21 +82,21 @@ console.log(PresentPersentag);
                             </div>
                         </nav>
                     </div>
-                    <div className="studentRatio h-[350px] w-full bg-white shadow-lg rounded-2xl flex items-center justify-center">
-                        <StudentRatio title="Present & Absent in Last 7 Days" other={true}  userId={userId}/>
+                    <div className="studentRatio h-[505px] w-full bg-white shadow-lg rounded-2xl flex items-center justify-center">
+                        <StudentRatio title="Present & Absent Overview (Till Now)" other={true}  userId={userId}/>
                     </div>
                 </div>
                 {/* Attendance Chart (Properly Positioned) */}
                 <div className="flex flex-col sm:w-[70%] w-full mt-2 gap-4">
                     {/* Overview With Cards */}
                     <div className="right_Cards grid grid-cols-2 md:grid-cols-4 gap-4">
-                        <UserCard count={Math.round(PresentPersentag)+"%"} type="Student Present In each Class" bgcolor="bg-[#C3EBFA]" />
-                        <UserCard count={Math.round(AbsentPersentag)+"%"} type="Student Absent In each Class" bgcolor="bg-amber-400" />
+                        <UserCard count={Math.round(PresentPersentag)+"%"} type="Student Present In each Class(Last 7 Days)" bgcolor="bg-[#C3EBFA]" />
+                        <UserCard count={Math.round(AbsentPersentag)+"%"} type="Student Absent In each Class(Last 7 Days)" bgcolor="bg-amber-400" />
                         <UserCard count={"68%"} type="Teacher Take Class in last 7 days" bgcolor="bg-[#C3EBFA]" />
                         <UserCard count={"48%"} type="Teacher don't Take Class in last 7 days" bgcolor="bg-amber-400" />
                     </div>
                     {/* Attendance Chart (Properly Positioned) */}
-                    <div className="bg-white shadow-lg rounded-2xl p-4">
+                    <div className="bg-white shadow-lg rounded-2xl h-[400px] p-4">
                         <h2 className="text-lg font-semibold mb-4">Attendance Overview (Total Class)</h2>
                         <AttendanceChart isOther={true} userId={userId} />
                     </div>

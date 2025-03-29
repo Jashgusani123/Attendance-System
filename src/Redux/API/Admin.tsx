@@ -74,8 +74,26 @@ export const AdminAPI = createApi({
                 method:"POST",
                 body:{Id:_id }   
             })
-        })
+        }),
+        getAllCards:builders.mutation({
+            query:()=>({
+                url:"getallcard",
+                method:"GET"
+            })
+        }),
+        getBoysAndGirlsOverview:builders.mutation({
+            query:()=>({
+                url:"getoverview",
+                method:"GET"
+            })
+        }),
+        getAttendaceOverview:builders.mutation({
+            query:()=>({
+                url:"getattendaceoverview",
+                method:"GET"
+            })
+        }),
     })
 });
 
-export const { useSignupMutation , useLoginMutation , useLogoutMutation , useGetAllStudentMutation , useGetAllTeachersMutation , useGetTeacherInfoMutation ,useGetAbsentPresent7DaysDataMutation, useGetOverViewOfLast7DaysMutation , useGetPresentAndAbsentCardsMutation} = AdminAPI;
+export const { useSignupMutation , useLoginMutation , useLogoutMutation , useGetAllStudentMutation , useGetAllTeachersMutation , useGetTeacherInfoMutation ,useGetAbsentPresent7DaysDataMutation, useGetOverViewOfLast7DaysMutation , useGetPresentAndAbsentCardsMutation , useGetAllCardsMutation , useGetBoysAndGirlsOverviewMutation , useGetAttendaceOverviewMutation} = AdminAPI;

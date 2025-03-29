@@ -5,6 +5,7 @@ import { Link, useNavigate } from "react-router-dom";
 import StudentRatio from "../../Components/Admin/StudentRatio";
 import AttendanceChart from "../../Components/Admin/TotalAttedanceChart";
 import UserCard from "../../Components/Admin/UserCards";
+import { useGetAllCardsMutation } from "../../Redux/API/Admin";
 import Notification from "../Notification";
 
 interface NotificationType {
@@ -18,14 +19,27 @@ const data = [
       description:"Hii"
     }
   ]
-
+interface Counts {
+    AllAdminCount:string , AllStudentCount:string , AllTeacherCount:string}
 const ViewPage = () => {
     const navigate = useNavigate();
 
     const [notifications, setNotifications] = useState<NotificationType[]>([]);
     const [showNotifications, setShowNotifications] = useState(false);
+    const [Counts, setCounts] = useState<Counts>();
+    const [GetAllCards] = useGetAllCardsMutation();
 
     useEffect(()=>{
+        const GetAllCardInfo = async()=>{
+            const response = await GetAllCards(null);
+            if(response && "data" in response && response.data?.success && response.data?.CardsData){
+                setCounts(response.data.CardsData)
+            }else{
+                console.log(response.error);
+            }
+        }
+        
+        GetAllCardInfo();
         setNotifications(data);
       },[])
 
@@ -70,23 +84,22 @@ const ViewPage = () => {
                 </div>
 
                 {/* Student Ratio - Below Navbar */}
-                <div className="studentRatio h-[350px] w-full bg-white shadow-lg rounded-2xl flex items-center justify-center">
+                <div className="studentRatio h-[510px] w-full bg-white shadow-lg rounded-2xl flex items-center justify-center">
                     <StudentRatio />
                 </div>
             </div>
 
             {/* Right Section - Cards + Attendance Chart */}
-            <div className="flex flex-col sm:w-[70%]  mt-2 gap-4">
+            <div className="flex flex-col sm:w-[70%] mt-2 gap-4">
                 {/* Cards with Overview */}
-                <div className="right_Cards grid grid-cols-2 md:grid-cols-4 gap-4">
-                    <UserCard type="student" count={23} bgcolor="bg-[#C3EBFA]" />
-                    <UserCard type="admin" count={1} bgcolor="bg-amber-400" />
-                    <UserCard type="teacher" count={33} bgcolor="bg-[#C3EBFA]" />
-                    <UserCard type="parent" count={21} bgcolor="bg-amber-400" />
+                <div className="right_Cards grid grid-cols-2 md:grid-cols-3 gap-4">
+                    <UserCard type="student" count={Counts?.AllStudentCount!} bgcolor="bg-[#C3EBFA]" />
+                    <UserCard type="teacher" count={Counts?.AllTeacherCount!}    bgcolor="bg-amber-400" />
+                    <UserCard type="admin" count={Counts?.AllAdminCount!} bgcolor="bg-[#C3EBFA]" />
                 </div>
 
                 {/* Attendance Chart (Properly Positioned) */}
-                <div className="bg-white shadow-lg rounded-2xl p-4">
+                <div className="bg-white shadow-lg rounded-2xl h-[419px] p-4">
                     <h2 className="text-lg font-semibold mb-4">Attendance Overview</h2>
                     <AttendanceChart />
                 </div>

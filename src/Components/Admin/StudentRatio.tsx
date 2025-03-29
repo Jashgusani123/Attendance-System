@@ -2,21 +2,23 @@
 import { useEffect, useState } from "react";
 import { RadialBarChart, RadialBar, ResponsiveContainer } from "recharts";
 import maleFemale from '../../assets/maleFemale.png'
-import { useGetAbsentPresent7DaysDataMutation } from "../../Redux/API/Admin";
+import { useGetAbsentPresent7DaysDataMutation, useGetBoysAndGirlsOverviewMutation } from "../../Redux/API/Admin";
 
 const CountChart = ({ boys, girls, absent, present }: { boys?: number; girls?: number, present?: number, absent?: number }) => {
   let data: any;
-  if (boys && girls) {
+  if (boys !== undefined && girls !== undefined) {
+    console.log("yes");
+    
     data = [
       { name: "Total", count: boys + girls, fill: "white" },
       { name: "Girls", count: girls, fill: "#ffc800" },
       { name: "Boys", count: boys, fill: "#C3EBFA" },
     ];
-  } else {
+  }else {
     data = [
       { name: "Total", count: absent! + present!, fill: "grey" },
-      { name: "Present", count: present!, fill: "green" },
-      { name: "Absent", count: absent!, fill: "red" },
+      { name: "Present", count: present!, fill: "#C3EBFA" },
+      { name: "Absent", count: absent!, fill: "#ffc800" },
     ]
   }
 
@@ -49,11 +51,13 @@ const CountChart = ({ boys, girls, absent, present }: { boys?: number; girls?: n
 };
 
 const StudentRatio = ({ title, other, userId }: { title?: string, other?: boolean, userId?:string }) => {
-  const [boys, setBoys] = useState(0);
-  const [girls, setGirls] = useState(0);
+  const [boys, setBoys] = useState();
+  const [girls, setGirls] = useState();
   const [present, setpresent] = useState(0);
   const [absent, setabsent] = useState(0);
   const [GetPresentAbsentOverview] = useGetAbsentPresent7DaysDataMutation();
+  const [GetBoysAndGirlsOverview] = useGetBoysAndGirlsOverviewMutation();
+
 
   useEffect(() => {
     const GetPresentAbsent7Days = async()=>{
@@ -64,24 +68,26 @@ const StudentRatio = ({ title, other, userId }: { title?: string, other?: boolea
       }else{
         console.log(response.error);
       }
-      
+    }
+    const GetBoysAndGirlsOverviewFunc = async()=>{
+      const response = await GetBoysAndGirlsOverview(null);
+        if(response && "data" in response && response.data?.success && response.data?.CardsData){
+        setBoys(response.data.CardsData.boys)
+        setGirls(response.data.CardsData.girls)
+      }else{
+        console.log(response.error);
+      }
     }
     // Mocked Data (Replace with API call if needed)
-    let data: any;
     if (!other) {
-      data = [
-        { sex: "MALE", _count: 60 },
-        { sex: "FEMALE", _count: 70 },
-      ];
-      setBoys(data.find((d: any) => d.sex === "MALE")?._count || 0);
-      setGirls(data.find((d: any) => d.sex === "FEMALE")?._count || 0);
+      GetBoysAndGirlsOverviewFunc();
     }
     else {
       GetPresentAbsent7Days();
     }
 
-
   }, []);
+  
 
   return (
     <div className="bg-white rounded-2xl w-full h-full p-4 shadow-md flex flex-col items-center">
@@ -92,13 +98,13 @@ const StudentRatio = ({ title, other, userId }: { title?: string, other?: boolea
       <div className="flex justify-center gap-6 mt-2">
         <div className="flex flex-col items-center">
           <div className="w-2 h-2 bg-blue-300 rounded-full" />
-          <h1 className="text-sm font-bold">{boys ? boys : present}</h1>
-          <h2 className="text-xs text-gray-500">{boys?"Boys":"Present"} ({Math.round(((boys ? boys : present) / ((boys ? boys : present) + (girls ? girls : absent))) * 100)}%)</h2>
+          <h1 className="text-sm font-bold">{boys !== undefined  ? boys : present}</h1>
+          <h2 className="text-xs text-gray-500">{boys !== undefined?"Boys":"Present"} ({Math.round(((boys ? boys : present) / ((boys ? boys : present) + (girls ? girls : absent))) * 100)}%)</h2>
         </div>
         <div className="flex flex-col items-center">
-          <div className="w-2 h-2 bg-[#ffc800] rounded-full" />
-          <h1 className="text-sm font-bold">{girls?girls:absent}</h1>
-          <h2 className="text-xs text-gray-500">{girls?"Girls":"Absent"} ({Math.round(((girls ? girls : absent) / ((boys ? boys : present) + (girls ? girls : absent))) * 100)}%)</h2>
+          <div className={`w-2 h-2 bg-[#ffc800] rounded-full`} />
+          <h1 className="text-sm font-bold">{girls !== undefined ?girls:absent}</h1>
+          <h2 className="text-xs text-gray-500">{girls !== undefined?"Girls":"Absent"} ({Math.round(((girls ? girls : absent) / ((boys ? boys : present) + (girls ? girls : absent))) * 100)}%)</h2>
         </div>
       </div>
     </div>

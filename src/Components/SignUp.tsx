@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useDispatch } from "react-redux";
 import { useSignupMutation as StudentSignupMution } from "../Redux/API/Student";
 import { useSignupMutation as TeacherSignupMution } from "../Redux/API/Teacher";
-import {useSignupMutation as AdminSignupMution} from '../Redux/API/Admin'
+import { useSignupMutation as AdminSignupMution } from '../Redux/API/Admin'
 import { studentExits } from "../Redux/slices/StudentSlices";
 import { teacherExits } from "../Redux/slices/TeacherSlice";
 import { StudentRequest } from "../Types/API/StudentApiType";
@@ -31,6 +31,7 @@ const SignUp = () => {
     enrollmentNumber: "",
     password: "",
     semester: 1,
+    gender:""
   });
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -55,7 +56,7 @@ const SignUp = () => {
           }
         }
 
-      } else if(role == "teacher") {
+      } else if (role == "teacher") {
         const obj = {
           fullName: formData.fullName,
           email: formData.email,
@@ -77,21 +78,21 @@ const SignUp = () => {
           }
         }
 
-      }else{
+      } else {
         const obj = {
-          fullName:formData.fullName,
-          email:formData.email,
-          collegeName:formData.collegeName,
-          password:formData.password,
-          departmentName:formData.departmentName
+          fullName: formData.fullName,
+          email: formData.email,
+          collegeName: formData.collegeName,
+          password: formData.password,
+          departmentName: formData.departmentName
         }
         res = await AdminSignup(obj);
-        if(res && "data" in res && res.data?.success){
+        if (res && "data" in res && res.data?.success) {
           const userData = res.data?.user;
           dispatch(adminExits(userData));
           setIsError({ error: false, message: "" });
-        }else{
-          if("error" in res && res.error && "data" in res.error){
+        } else {
+          if ("error" in res && res.error && "data" in res.error) {
             const errorData = res.error as FetchBaseQueryError;
             setIsError({ error: true, message: (errorData.data as { message?: string })?.message || "An unexpected error occurred." });
           } else {
@@ -115,7 +116,7 @@ const SignUp = () => {
       [name]: value,
     }));
   };
-
+  
   return (
     <div className="flex items-center justify-center p-6">
       <div className="bg-white p-8 rounded-xl shadow-xl w-full max-w-lg">
@@ -167,16 +168,25 @@ const SignUp = () => {
             onChange={handleChange}
           />
           <label className="block font-semibold text-gray-700">Department:</label>
-              <select
-                className="w-full p-2 border rounded-md text-blue-700 font-semibold"
-                name="departmentName"
-                onChange={handleChange}
-              >
-                <option value="civil">Civil</option>
-                <option value="computer">Computer</option>
-                <option value="mechanical">Mechanical</option>
-                <option value="electrical">Electrical</option>
-              </select>
+          <select
+            className="w-full p-2 border rounded-md text-blue-700 font-semibold"
+            name="departmentName"
+            onChange={handleChange}
+          >
+            <option value="civil">Civil</option>
+            <option value="computer">Computer</option>
+            <option value="mechanical">Mechanical</option>
+            <option value="electrical">Electrical</option>
+          </select>
+          <label className="block font-semibold text-gray-700">Gender:</label>
+          <select
+            className="w-full p-2 border rounded-md text-blue-700 font-semibold"
+            name="gender"
+            onChange={handleChange}
+          >
+            <option value="male">Male</option>
+            <option value="female">Female</option>
+          </select>
           {/* Student Fields */}
           {role === "student" && (
             <>
@@ -214,7 +224,7 @@ const SignUp = () => {
           {/* Teacher Fields */}
           {role === "teacher" && (
             <>
-              
+
             </>
           )}
           {IsError.error && <p className="text-red-800 font-bold">{IsError.message}</p>}

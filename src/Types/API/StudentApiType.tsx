@@ -6,7 +6,8 @@ export interface StudentRequest {
     "departmentName":string, 
     "enrollmentNumber":string, 
     "collegeName":string, 
-    "collegeJoiningDate":string
+    "collegeJoiningDate":string,
+    "gender":string
 }
 
 export interface StudentRequestForLogin {

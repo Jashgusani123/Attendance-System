@@ -1,9 +1,10 @@
 "use client";
 import { Bar, BarChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
-import { useGetOverViewOfLast7DaysMutation } from "../../Redux/API/Admin";
+import { useGetAttendaceOverviewMutation, useGetOverViewOfLast7DaysMutation } from "../../Redux/API/Admin";
 import { useEffect, useState } from "react";
 const AttendanceChart = ({ isOther, userId }: { isOther?: boolean, userId?: string }) => {
   const [GetOverviewLast7Days] = useGetOverViewOfLast7DaysMutation();
+  const [GetOverviewAllTime] = useGetAttendaceOverviewMutation();
   const [data, setData] = useState<any[]>([
     { name: "Mon", present: 20, absent: 5 },
     { name: "Tue", present: 18, absent: 7 },
@@ -13,7 +14,7 @@ const AttendanceChart = ({ isOther, userId }: { isOther?: boolean, userId?: stri
   ]);
   useEffect(() => {
 
-    const GetOverview = async () => {
+    const GetOverviewLast7daysFunc = async () => {
       const response = await GetOverviewLast7Days(userId);
       if(response && "data" in response && response.data.success && response.data.DataOf7Days){
         console.log(response.data);
@@ -30,28 +31,41 @@ const AttendanceChart = ({ isOther, userId }: { isOther?: boolean, userId?: stri
       }
 
     }
+    const GetOverview = async()=>{
+      const response = await GetOverviewAllTime(null);
+      if(response && "data" in response && response.data.success && response.data.DataOverview){
+        
+        setData(response.data.DataOverview.map((item: any) => ({
+          name: item.date, // Set the X-axis name
+          PresentStudents: item.PresentStudents,
+          AbsentStudents: item.AbsentStudents
+        })).reverse());
+      }else{
+        console.log(response.error);
+      }
+    }
     if (isOther && userId) {
-      GetOverview();
+      GetOverviewLast7daysFunc();
     } else {
-      
+      GetOverview();
     }
   }, [])
   return (
-    <ResponsiveContainer width="100%" height={180}>
+    <ResponsiveContainer width="100%" height={"85%"}>
       <BarChart data={data}>
         <XAxis dataKey="name" />
         <YAxis />
         <Tooltip />
         {isOther ? (
           <>
-            <Bar dataKey="TotalStudents" fill="#FFA07A" radius={5} name="Total Students" />
-            <Bar dataKey="PresentStudents" fill="#4CAF50" radius={5} name="Present Students" />
-            <Bar dataKey="AbsentStudents" fill="#FF5733" radius={5} name="Absent Students" />
+            <Bar dataKey="TotalStudents" fill="grey" radius={5} name="Total Students" />
+            <Bar dataKey="PresentStudents" fill="#C3EBFA" radius={5} name="Present Students" />
+            <Bar dataKey="AbsentStudents" fill="#ffc800" radius={5} name="Absent Students" />
           </>
         ) : (
           <>
-            <Bar dataKey="present" fill="#ffc800" radius={5} />
-            <Bar dataKey="absent" fill="#C3EBFA" radius={5} />
+            <Bar dataKey="PresentStudents" fill="#ffc800" radius={5} />
+            <Bar dataKey="AbsentStudents" fill="#C3EBFA" radius={5} />
           </>
         )}
       </BarChart>
