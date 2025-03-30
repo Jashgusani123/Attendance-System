@@ -31,8 +31,15 @@ export const TeacherAPI = createApi({
                 method:"GET"
             }),
             invalidatesTags:["teacher"]
-        })
+        }),
+        sendmessage:builders.mutation({
+            query:({message })=>({
+                url:"sendnotification",
+                method:"POST",
+                body:{message }
+            })
+        }),
     })
 });
 
-export const { useSignupMutation , useLoginMutation , useLogoutMutation} = TeacherAPI;
+export const { useSignupMutation , useLoginMutation , useLogoutMutation , useSendmessageMutation} = TeacherAPI;

@@ -46,6 +46,7 @@ interface NotificationType {
   _id: string;
   upperHeadding: string;
   description: string;
+  type:string
 }
 
 export default function TeacherDashboard() {
@@ -73,13 +74,13 @@ export default function TeacherDashboard() {
   const [lastClasses, setlastClasses] = useState<ClassType[]>()
   const [OpenExcelSheet, setOpenExcelSheet] = useState(false);
   const [ButtonLoading, setButtonLoading] = useState(false);
+  const [excelForm, setexcelForm] = useState(false)
+  const [SheetURL, setSheetURL] = useState("")
   const [ExcelFormData, setExcelFormData] = useState({
     spreadsheetId: "",
     sheetName: "",
     fileName: "",
   });
-  const [excelForm, setexcelForm] = useState(false)
-  const [SheetURL, setSheetURL] = useState("")
 
   const attendancesheet = ({ sub, classID }: { sub: string, classID: string }) => {
     navigate("/attendance", { state: { sub, classID } });
@@ -278,6 +279,7 @@ export default function TeacherDashboard() {
             console.log(data);
           }
         };
+
         await Promise.all([getAllNotifications(),
         fetchClasses(), GetOverview(), GetLastClasses()])
       }
@@ -369,7 +371,7 @@ export default function TeacherDashboard() {
               )}
               {showNotifications && (
                 <div className="absolute top-[-35px] right-0 z-50 bg-white shadow-lg rounded-lg">
-                  <Notification fun={setShowNotifications} notifications={notifications} />
+                  <Notification fun={setShowNotifications} notifications={notifications} type="Teacher"/>
                 </div>
               )}
             </span>

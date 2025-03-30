@@ -116,7 +116,7 @@ const Manage = () => {
         </div>
         {/* Chat */}
         <div className="functionality_container flex justify-between bg-amber-300 p-4 h-[450px] rounded-2xl flex-col gap-8 items-center sm:w-[28%]">
-          <MiniChat />
+          <MiniChat userId={userId} />
         </div>
       </div>
       {/* Timetable Button*/}

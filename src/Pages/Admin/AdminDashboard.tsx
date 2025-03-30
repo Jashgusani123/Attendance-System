@@ -5,7 +5,7 @@ import { Bell } from "lucide-react";
 import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Typewriter } from "react-simple-typewriter";
-import { useGetAllStudentMutation, useGetAllTeachersMutation } from "../../Redux/API/Admin";
+import { useGetAllNotificationMutation, useGetAllStudentMutation, useGetAllTeachersMutation } from "../../Redux/API/Admin";
 import Notification from "../Notification";
 
 
@@ -40,13 +40,6 @@ interface NotificationType {
   upperHeadding: string;
   description: string;
 }
-const data = [
-  {
-    _id: "1",
-    upperHeadding: "Hello",
-    description: "Hii"
-  }
-]
 interface AllStudentInfo {
   fullName: string,
   enrollmentNumber: string,
@@ -69,37 +62,52 @@ const AdminDashboard = () => {
   const [teachersData, setTeachersData] = useState<AllTeacherInfo[]>([]);
   const [GetAllStudentsData] = useGetAllStudentMutation()
   const [GetAllTeachersData] = useGetAllTeachersMutation()
+  const [GetAllNotificationData] = useGetAllNotificationMutation()
   const [visibleCount, setVisibleCount] = useState(4);
 
   useEffect(() => {
-    const GetStudentsData = async () => {
-      try {
-        const response = await GetAllStudentsData(null);
-        if (response && "data" in response && response.data?.success && response.data?.StudentData) {
-          setStudentsData(response.data?.StudentData);
-        } else {
-          console.log(response.data);
-
+    const fetchData = async()=>{
+      const GetStudentsData = async () => {
+        try {
+          const response = await GetAllStudentsData(null);
+          if (response && "data" in response && response.data?.success && response.data?.StudentData) {
+            setStudentsData(response.data?.StudentData);
+          } else {
+            console.log(response.data);
+  
+          }
+        } catch (error) {
+          console.log(error);
+  
         }
-      } catch (error) {
-        console.log(error);
-
       }
-    }
-    const GetTeachersData = async () => {
-      try {
-        const response = await GetAllTeachersData(null);
-        if (response && "data" in response && response.data.success && response.data?.TeacherData) {
-          setTeachersData(response.data?.TeacherData)
+      const GetTeachersData = async () => {
+        try {
+          const response = await GetAllTeachersData(null);
+          if (response && "data" in response && response.data.success && response.data?.TeacherData) {
+            setTeachersData(response.data?.TeacherData)
+          }
+        } catch (error) {
+          console.log(error);
+  
         }
-      } catch (error) {
-        console.log(error);
-
       }
+      const GetNotificationsData = async()=>{
+        
+        try {
+          const response = await GetAllNotificationData(null);
+          if (response && "data" in response && response.data.success && response.data?.notifications) {
+            setNotifications(response.data?.notifications);
+          }
+        } catch (error) {
+          console.log(error);
+  
+        }
+      }
+      await Promise.all([GetTeachersData(),GetStudentsData(),GetNotificationsData()]);
+      
     }
-    GetTeachersData();
-    GetStudentsData();
-    setNotifications(data);
+    fetchData();
   }, [])
 
   const handleSetting = () => {
@@ -145,7 +153,7 @@ const AdminDashboard = () => {
               )}
               {showNotifications && (
                 <div className="absolute top-[-35px] right-0 z-50 bg-white shadow-lg rounded-lg">
-                  <Notification fun={setShowNotifications} notifications={notifications} />
+                  <Notification fun={setShowNotifications} notifications={notifications} type="Admin" />
                 </div>
               )}
             </span>

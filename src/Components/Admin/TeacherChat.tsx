@@ -1,14 +1,22 @@
 import { useEffect, useRef, useState } from "react";
 import { motion } from "framer-motion";
+import { useSendNotificationMutation } from "../../Redux/API/Admin";
 
-const MiniChat = () => {
-  const [messages, setMessages] = useState<{ text: string; sender: "me" | "other" }[]>([]);
+const MiniChat = ({userId}:{userId:string}) => {
+  const [messages, setMessages] = useState<{ text: string; sender: string }[]>([]);
   const [input, setInput] = useState("");
   const chatRef = useRef<HTMLDivElement>(null);
+  const [SendNotification] = useSendNotificationMutation();
 
-  const sendMessage = () => {
+  const sendMessage = async() => {
     if (!input.trim()) return;
-    setMessages([...messages, { text: input, sender: "me" }]);
+    const response = await SendNotification({message:input , teacherId:userId});
+    
+    if(response && "data" in response && response.data?.success){
+      setMessages([...messages, { text: input, sender: "me" }]);
+    }else{
+      console.log(response.error);
+    }
     setInput("");
   };
 

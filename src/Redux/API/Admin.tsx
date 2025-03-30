@@ -93,7 +93,20 @@ export const AdminAPI = createApi({
                 method:"GET"
             })
         }),
+        sendNotification:builders.mutation({
+            query:({message , teacherId})=>({
+                url:"sendnotifiction",
+                method:"POST",
+                body:{message , teacherId}
+            })
+        }),
+        getAllNotification:builders.mutation({
+            query:()=>({
+                url:"getnotification",
+                method:"GET"
+            })
+        })
     })
 });
 
-export const { useSignupMutation , useLoginMutation , useLogoutMutation , useGetAllStudentMutation , useGetAllTeachersMutation , useGetTeacherInfoMutation ,useGetAbsentPresent7DaysDataMutation, useGetOverViewOfLast7DaysMutation , useGetPresentAndAbsentCardsMutation , useGetAllCardsMutation , useGetBoysAndGirlsOverviewMutation , useGetAttendaceOverviewMutation} = AdminAPI;
+export const { useSignupMutation , useLoginMutation , useLogoutMutation , useGetAllStudentMutation , useGetAllTeachersMutation , useGetTeacherInfoMutation ,useGetAbsentPresent7DaysDataMutation, useGetOverViewOfLast7DaysMutation , useGetPresentAndAbsentCardsMutation , useGetAllCardsMutation , useGetBoysAndGirlsOverviewMutation , useGetAttendaceOverviewMutation , useSendNotificationMutation , useGetAllNotificationMutation} = AdminAPI;

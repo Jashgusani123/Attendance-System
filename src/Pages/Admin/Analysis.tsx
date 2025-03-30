@@ -90,7 +90,7 @@ const Analysis = () => {
                 <div className="flex flex-col sm:w-[70%] w-full mt-2 gap-4">
                     {/* Overview With Cards */}
                     <div className="right_Cards grid grid-cols-2 md:grid-cols-4 gap-4">
-                        <UserCard count={Math.round(PresentPersentag)+"%"} type="Student Present In each Class(Last 7 Days)" bgcolor="bg-[#C3EBFA]" />
+                        <UserCard count={Math.round(PresentPersentag)+"%"} type="Student Present In each Class(Last 7 Days)w" bgcolor="bg-[#C3EBFA]" />
                         <UserCard count={Math.round(AbsentPersentag)+"%"} type="Student Absent In each Class(Last 7 Days)" bgcolor="bg-amber-400" />
                         <UserCard count={"68%"} type="Teacher Take Class in last 7 days" bgcolor="bg-[#C3EBFA]" />
                         <UserCard count={"48%"} type="Teacher don't Take Class in last 7 days" bgcolor="bg-amber-400" />
