@@ -12,6 +12,7 @@ import { PandingReducerInitialState } from "./Types/API/PandingApiType";
 import { StudentReducerInitialState } from "./Types/API/StudentApiType";
 import { TeacherReducerInitialState } from "./Types/API/TeacherApiType";
 import { useSignupMutation } from "./Redux/API/Teacher";
+import { useDeletePandingRequstMutation } from "./Redux/API/Panding";
 
 
 const Landing = lazy(() => import("./Pages/Landing"));
@@ -46,6 +47,7 @@ function App() {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const [TeacherSignup] = useSignupMutation()
+  const [DeletePandingRequest] = useDeletePandingRequstMutation();
   const user = student ? "Student" : teacher ? "Teacher" : admin ? "Admin" : panding ? "Panding" : ""
   const loading = studentLoading || teacherLoading || adminLoading || pandingLoading;
 
@@ -71,7 +73,7 @@ function App() {
         } else if (data.type === "Panding") {
           if (!data.user.accepted && !data.user.rejected) {
             dispatch(pandingExits(data.user));
-          } else {
+          } else if(data.user.accepted && !data.user.rejected){
             const obj = {
               fullName: data.user.fullName,
               email: data.user.email,
@@ -83,6 +85,13 @@ function App() {
             const response = await TeacherSignup(obj);
             if(response && "data" in response && response.data?.success){
               dispatch(teacherExits(response.data.user))
+            }
+            dispatch(pandingNotExits());
+          }else{
+            const response = await DeletePandingRequest(null);
+            if(response && "data" in response && response.data?.success){
+              dispatch(pandingNotExits());
+                navigate("/", { replace: true });
             }
             dispatch(pandingNotExits());
           }
