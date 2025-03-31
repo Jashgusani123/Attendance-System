@@ -278,8 +278,7 @@ export default function StudentDashboard() {
 
                         if (isWithinRange) {
 
-                          await submitAttendance(student?.enrollmentNumber!, cls._id, (er) => {
-                          });
+                          await submitAttendance(student?.enrollmentNumber!, cls._id , ()=>{});
                         } else {
                           setLocation(null)
                           alert("You are outside the allowed location range.");
