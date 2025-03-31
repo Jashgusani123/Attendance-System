@@ -94,20 +94,6 @@ const SignUp = () => {
           console.log(res.error);
         }
 
-        // res = await TeacherSignup(obj);
-        // if (res && "data" in res && res.data?.success) {
-        //   const userData = res.data?.user;
-        //   dispatch(teacherExits(userData));
-        //   setIsError({ error: false, message: "" });
-        // } else {
-        //   if ("error" in res && res.error && "data" in res.error) {
-        //     const errorData = res.error as FetchBaseQueryError;
-        //     setIsError({ error: true, message: (errorData.data as { message?: string })?.message || "An unexpected error occurred." });
-        //   } else {
-        //     setIsError({ error: true, message: "An unexpected error occurred." });
-        //   }
-        // }
-
       } else {
         const obj = {
           fullName: formData.fullName,

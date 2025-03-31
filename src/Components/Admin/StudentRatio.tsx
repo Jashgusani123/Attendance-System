@@ -7,7 +7,6 @@ import { useGetAbsentPresent7DaysDataMutation, useGetBoysAndGirlsOverviewMutatio
 const CountChart = ({ boys, girls, absent, present }: { boys?: number; girls?: number, present?: number, absent?: number }) => {
   let data: any;
   if (boys !== undefined && girls !== undefined) {
-    console.log("yes");
     
     data = [
       { name: "Total", count: boys + girls, fill: "white" },

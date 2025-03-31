@@ -12,8 +12,6 @@ const StudentReducer = createSlice({
     reducers: {
         studentExits: (state, action: PayloadAction<StudentRequest>) => {
             state.loading = false;
-            console.log("In State : " , action.payload);
-            
             state.student = action.payload;
         },
         studentNotExits: (state) => {

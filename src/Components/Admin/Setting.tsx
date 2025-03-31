@@ -32,7 +32,7 @@ const ViewPage = () => {
         (state: { admin: AdminReducerInitialState }) => state.admin
     );
     const [openSection, setOpenSection] = useState<string | null>(null);
-
+    
     const navigate = useNavigate();
 
     const [notifications, setNotifications] = useState<NotificationType[]>([]);

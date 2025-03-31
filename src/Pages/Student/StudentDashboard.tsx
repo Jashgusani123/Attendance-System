@@ -57,13 +57,10 @@ export default function StudentDashboard() {
   // Handle incoming classes via socket
   useEffect(() => {
     socket.on("class-live", (receivedClassDetails) => {
-      console.log("Received class details:", receivedClassDetails);
 
       // Check if the received class _id is in the list
       if (!classDetails.includes(receivedClassDetails._id)) {
         setClassDetails((prevDetails) => [...prevDetails, receivedClassDetails]);
-      } else {
-        console.log(`Class ${receivedClassDetails._id} already exists, not adding.`);
       }
     });
 
@@ -111,9 +108,7 @@ export default function StudentDashboard() {
           const data = await response.json();
           if (data.success) {
             setData(data.last7DaysData);
-          } else {
-            console.log(data);
-          }
+          } 
         };
 
         // Run all fetch functions
@@ -168,7 +163,6 @@ export default function StudentDashboard() {
         dispatch(studentNotExits());
       }
     } else if (type === "Teacher") {
-      // console.log("etew");
       const res = await TeacherLogout(null);
       if (res.data?.success) {
         dispatch(teacherNotExits());
@@ -285,7 +279,6 @@ export default function StudentDashboard() {
                         if (isWithinRange) {
 
                           await submitAttendance(student?.enrollmentNumber!, cls._id, (er) => {
-                            console.log(er)
                           });
                         } else {
                           setLocation(null)

@@ -60,14 +60,11 @@ function App() {
         });
 
         const data = await res.json();
-        // console.log("Fetched User Data:", data); // ✅ Log API response
 
         if (data.type === "Student") {
           dispatch(studentExits(data.user)); // ✅ Ensure this runs
-          // console.log("Dispatched student:", data.user);
         } else if (data.type === "Teacher") {
           dispatch(teacherExits(data.user)); // ✅ Ensure this runs
-          // console.log("Dispatched teacher:", data.user);
         } else if (data.type === "Admin") {
           dispatch(adminExits(data.user));// ✅ Ensure this runs
         } else if (data.type === "Panding") {
