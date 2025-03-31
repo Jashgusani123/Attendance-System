@@ -8,37 +8,12 @@ import { Typewriter } from "react-simple-typewriter";
 import { useGetAllNotificationMutation, useGetAllStudentMutation, useGetAllTeachersMutation } from "../../Redux/API/Admin";
 import Notification from "../Notification";
 
-
-// const studentData = [
-//   {
-//     name: "Jash Gusani",
-//     semester: "5th",
-//     department: "Computer Science",
-//     erNumber: "2021123456",
-//     presentPercentage: 90,
-//     absentPercentage: 10,
-//   },
-//   {
-//     name: "John Doe",
-//     semester: "6th",
-//     department: "Electronics",
-//     erNumber: "2021127890",
-//     presentPercentage: 85,
-//     absentPercentage: 15,
-//   },
-//   {
-//     name: "Jane Smith",
-//     semester: "3rd",
-//     department: "Mechanical",
-//     erNumber: "2021135678",
-//     presentPercentage: 75,
-//     absentPercentage: 25,
-//   },
-// ];
 interface NotificationType {
   _id: string;
   upperHeadding: string;
   description: string;
+  type:string;
+  pandingId?:string
 }
 interface AllStudentInfo {
   fullName: string,
@@ -54,6 +29,7 @@ interface AllTeacherInfo {
   _id: string,
   avatarName: string
 }
+
 const AdminDashboard = () => {
   const navigate = useNavigate();
   const [notifications, setNotifications] = useState<NotificationType[]>([]);
@@ -105,7 +81,6 @@ const AdminDashboard = () => {
         }
       }
       await Promise.all([GetTeachersData(),GetStudentsData(),GetNotificationsData()]);
-      
     }
     fetchData();
   }, [])

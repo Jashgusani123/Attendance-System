@@ -4,7 +4,8 @@ export interface TeacherRequest {
     "password":string,
     "departmentName":string, 
     "collegeName":string,
-    "_id"?:string
+    "_id"?:string,
+    "gender":string
 }
 
 export interface TeacherRequestForLogin {

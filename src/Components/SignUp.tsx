@@ -1,21 +1,22 @@
 import { useState } from "react";
 import { useDispatch } from "react-redux";
 import { useSignupMutation as StudentSignupMution } from "../Redux/API/Student";
-import { useSignupMutation as TeacherSignupMution } from "../Redux/API/Teacher";
-import { useSignupMutation as AdminSignupMution } from '../Redux/API/Admin'
+import { useSignupMutation as AdminSignupMution } from '../Redux/API/Admin';
+import { useCreatePandingRequestMutation as PandingReuestMution } from '../Redux/API/Panding';
 import { studentExits } from "../Redux/slices/StudentSlices";
-import { teacherExits } from "../Redux/slices/TeacherSlice";
 import { StudentRequest } from "../Types/API/StudentApiType";
 import { FetchBaseQueryError } from "@reduxjs/toolkit/query";
 import { adminExits } from "../Redux/slices/AdminSlices";
+import { useNavigate } from "react-router-dom";
+import { pandingExits } from "../Redux/slices/PandingSlices";
 
 const SignUp = () => {
   const dispatch = useDispatch();
 
   const [role, setRole] = useState("student");
   const [StudentSignup] = StudentSignupMution();
-  const [TeacherSignup] = TeacherSignupMution();
   const [AdminSignup] = AdminSignupMution();
+  const [PandingRequest] = PandingReuestMution();
   const [loading, setloading] = useState(false)
   const [IsError, setIsError] = useState(
     {
@@ -31,8 +32,10 @@ const SignUp = () => {
     enrollmentNumber: "",
     password: "",
     semester: 1,
-    gender:""
+    gender: ""
   });
+
+  const navigate = useNavigate();
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -62,21 +65,48 @@ const SignUp = () => {
           email: formData.email,
           password: formData.password,
           collegeName: formData.collegeName,
-          departmentName: formData.departmentName
+          departmentName: formData.departmentName,
+          gender: formData.gender
         }
-        res = await TeacherSignup(obj);
-        if (res && "data" in res && res.data?.success) {
-          const userData = res.data?.user;
-          dispatch(teacherExits(userData));
-          setIsError({ error: false, message: "" });
-        } else {
-          if ("error" in res && res.error && "data" in res.error) {
-            const errorData = res.error as FetchBaseQueryError;
-            setIsError({ error: true, message: (errorData.data as { message?: string })?.message || "An unexpected error occurred." });
-          } else {
-            setIsError({ error: true, message: "An unexpected error occurred." });
+        res = await PandingRequest(obj);
+        if (res && "data" in res && res.data.success) {
+          navigate("/");
+          dispatch(pandingExits(res.data.newPanding));
+          const response = await fetch(`${import.meta.env.VITE_SERVER}/notification/create`, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            credentials: "include",
+            body: JSON.stringify({
+              type:"request",
+              upperHeadding:`${res.data.newPanding.fullName} is Send an Request to ...`,
+              description:`${res.data.newPanding.fullName} is Send an Request to Create an Account For \n Teacher, If Yess then Click on Accept otherwise click on Reject Button .`,
+              to:res.data.newPanding.adminId,
+              pandingId:res.data.newPanding._id
+            }),
+          });
+          const data = await response.json();
+          if(data.success){
+            alert("Your Request Send to Department HOD ... \n Wait to for Accept Request ( or You can ask to accept the request to the HOD ).")
           }
+        } else {
+          console.log(res.error);
         }
+
+        // res = await TeacherSignup(obj);
+        // if (res && "data" in res && res.data?.success) {
+        //   const userData = res.data?.user;
+        //   dispatch(teacherExits(userData));
+        //   setIsError({ error: false, message: "" });
+        // } else {
+        //   if ("error" in res && res.error && "data" in res.error) {
+        //     const errorData = res.error as FetchBaseQueryError;
+        //     setIsError({ error: true, message: (errorData.data as { message?: string })?.message || "An unexpected error occurred." });
+        //   } else {
+        //     setIsError({ error: true, message: "An unexpected error occurred." });
+        //   }
+        // }
 
       } else {
         const obj = {
@@ -107,8 +137,6 @@ const SignUp = () => {
     }
   };
 
-
-
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
     setFormData((prev) => ({
@@ -116,7 +144,7 @@ const SignUp = () => {
       [name]: value,
     }));
   };
-  
+
   return (
     <div className="flex items-center justify-center p-6">
       <div className="bg-white p-8 rounded-xl shadow-xl w-full max-w-lg">
@@ -173,10 +201,10 @@ const SignUp = () => {
             name="departmentName"
             onChange={handleChange}
           >
-            <option value="civil">Civil</option>
-            <option value="computer">Computer</option>
-            <option value="mechanical">Mechanical</option>
-            <option value="electrical">Electrical</option>
+            <option value="Civil">Civil</option>
+            <option value="Computer">Computer</option>
+            <option value="Mechanical">Mechanical</option>
+            <option value="Electrical">Electrical</option>
           </select>
           <label className="block font-semibold text-gray-700">Gender:</label>
           <select

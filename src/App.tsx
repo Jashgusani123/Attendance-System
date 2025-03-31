@@ -1,18 +1,21 @@
-import "./App.css";
 import { lazy, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Route, Routes, useNavigate } from "react-router-dom";
+import "./App.css";
+import ShowAllStudent from "./Pages/Admin/ShowAllStudent";
+import { adminExits, adminNotExits } from "./Redux/slices/AdminSlices";
+import { pandingExits, pandingNotExits } from "./Redux/slices/PandingSlices";
 import { studentExits, studentNotExits } from "./Redux/slices/StudentSlices";
 import { teacherExits, teacherNotExits } from "./Redux/slices/TeacherSlice";
+import { AdminReducerInitialState } from "./Types/API/AdminApiType";
+import { PandingReducerInitialState } from "./Types/API/PandingApiType";
 import { StudentReducerInitialState } from "./Types/API/StudentApiType";
 import { TeacherReducerInitialState } from "./Types/API/TeacherApiType";
-import { AdminReducerInitialState } from "./Types/API/AdminApiType";
-import { adminExits, adminNotExits } from "./Redux/slices/AdminSlices";
-import ShowAllStudent from "./Pages/Admin/ShowAllStudent";
+import { useSignupMutation } from "./Redux/API/Teacher";
 
 
 const Landing = lazy(() => import("./Pages/Landing"));
-const Setting = lazy(()=>import("./Pages/Setting"));
+const Setting = lazy(() => import("./Pages/Setting"));
 const AdminSetting = lazy(() => import("./Components/Admin/Setting"));
 const StudentDashboard = lazy(() => import("./Pages/Student/StudentDashboard"));
 const StudentLanding = lazy(() => import("./Pages/Student/StudentLanding"));
@@ -35,12 +38,16 @@ function App() {
   const { loading: adminLoading, admin } = useSelector(
     (state: { admin: AdminReducerInitialState }) => state.admin
   );
+  const { loading: pandingLoading, panding } = useSelector(
+    (state: { panding: PandingReducerInitialState }) => state.panding
+  );
+
 
   const navigate = useNavigate();
   const dispatch = useDispatch();
-
-  const loading = studentLoading || teacherLoading || adminLoading;
-  const user = student ? "Student" : teacher ? "Teacher" : admin ? "Admin" : "";
+  const [TeacherSignup] = useSignupMutation()
+  const user = student ? "Student" : teacher ? "Teacher" : admin ? "Admin" : panding ? "Panding" : ""
+  const loading = studentLoading || teacherLoading || adminLoading || pandingLoading;
 
   useEffect(() => {
     const fetchUser = async () => {
@@ -59,9 +66,28 @@ function App() {
         } else if (data.type === "Teacher") {
           dispatch(teacherExits(data.user)); // ✅ Ensure this runs
           // console.log("Dispatched teacher:", data.user);
-        } else if(data.type === "Admin") {
+        } else if (data.type === "Admin") {
           dispatch(adminExits(data.user));// ✅ Ensure this runs
-        }else {
+        } else if (data.type === "Panding") {
+          if (!data.user.accepted && !data.user.rejected) {
+            dispatch(pandingExits(data.user));
+          } else {
+            const obj = {
+              fullName: data.user.fullName,
+              email: data.user.email,
+              password: data.user.password,
+              departmentName: data.user.departmentName,
+              collegeName: data.user.collegeName,
+              gender: data.user.gender
+            }
+            const response = await TeacherSignup(obj);
+            if(response && "data" in response && response.data?.success){
+              dispatch(teacherExits(response.data.user))
+            }
+            dispatch(pandingNotExits());
+          }
+        }
+        else {
           dispatch(studentNotExits())
           dispatch(teacherNotExits())
           dispatch(adminNotExits())
@@ -81,9 +107,11 @@ function App() {
     } else if (user === "Teacher" && window.location.pathname !== "/teacher") {
       navigate("/teacher", { replace: true });
     } else if (user === "Admin" && window.location.pathname !== "/admin") {
-      navigate("/admin", { replace: true })
+      navigate("/admin", { replace: true });
+    } else if (user === "Panding" && window.location.pathname !== "/requstsend") {
+      navigate("/requstsend", { replace: true });
     }
-    else if(!user && !["/login", "/register"].includes(window.location.pathname)) {
+    else if (!user && !["/login", "/register"].includes(window.location.pathname)) {
       navigate("/", { replace: true });
     }
   }, [user]);  // ✅ Run whenever `user` updates
@@ -121,6 +149,12 @@ function App() {
               <Route path="/attendance" element={<AttendanceSheet />} />
             </>
           )}
+          {/* Panding Routes */}
+          {user === "Panding" && (
+            <>
+              <Route path="/requstsend" element={<PandingRequst />} />
+            </>
+          )}
           {/* Admin Route */}
           {user === "Admin" && (
             <>
@@ -132,9 +166,10 @@ function App() {
               <Route path="/admin/student_list" element={<ShowAllStudent />} />
             </>
           )}
+
+
           {/* 404 Page */}
           <Route path="*" element={<>Sorry, page not found</>} />
-          <Route path="/requstsend" element={<PandingRequst />} />
         </Routes>
       )}
     </>

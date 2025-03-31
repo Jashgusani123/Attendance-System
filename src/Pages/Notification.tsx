@@ -2,6 +2,7 @@ import { motion } from "framer-motion";
 import { ChevronDown, X } from "lucide-react";
 import { useState } from "react";
 import { useSendmessageMutation } from "../Redux/API/Teacher";
+import { useAcceptPandingReuestMutation, useRejectPandingReuestMutation } from "../Redux/API/Panding";
 
 
 
@@ -10,8 +11,10 @@ const Notification = ({ fun, notifications, type }: { fun: any, notifications: a
     const [expandedNotification, setExpandedNotification] = useState<string | null>(null);
     const [input, setinput] = useState("");
     const [sentMessages, setSentMessages] = useState<{ [key: string]: boolean }>({});
-
+    const [text, settext] = useState("")
     const [sendMessage] = useSendmessageMutation();
+    const [AcceptPandingRequest] = useAcceptPandingReuestMutation();
+    const [RejectPandingRequest] = useRejectPandingReuestMutation();
 
     const toggledescription = (id: string) => {
         setExpandedNotification((prev) => (prev === id ? null : id));
@@ -25,7 +28,20 @@ const Notification = ({ fun, notifications, type }: { fun: any, notifications: a
         setinput("");
     };
 
-
+    const acceptRequestFunc = async (pandingId: string,_id:string) => {
+        
+        const response = await AcceptPandingRequest({pandingId,_id});
+        if (response && "data" in response && response.data.success) {
+            settext(response.data.message)
+        }
+    }
+    const rejectRequestFunc = async (pandingId: string,_id:string) => {
+        
+        const response = await RejectPandingRequest({pandingId,_id});
+        if (response && "data" in response && response.data.success) {
+            settext(response.data.message)
+        }
+    }
 
     return (
         <motion.div
@@ -84,7 +100,16 @@ const Notification = ({ fun, notifications, type }: { fun: any, notifications: a
                                         )}
                                     </div>
                                 )}
-
+                                {notification.type === "request" && type === "Admin" && (
+                                    <div className="flex flex-wrap gap-2 justify-center flex-row">
+                                        {text ? <p className="text-[#a39e9e] ">{text}</p> : <><button className="bg-green-800 mt-1 text-white rounded-xl h-7 w-[20%]" onClick={() => acceptRequestFunc(notification.pandingId, notification._id)}>
+                                            Accept
+                                        </button>
+                                            <button className="bg-red-800 mt-1 text-white rounded-xl h-7 w-[20%]" onClick={() => rejectRequestFunc(notification.pandingId , notification._id)}>
+                                                Reject
+                                            </button></>}
+                                    </div>
+                                )}
                             </p>
                         )}
                     </li>

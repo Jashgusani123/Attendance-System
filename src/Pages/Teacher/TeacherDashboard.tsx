@@ -59,14 +59,7 @@ export default function TeacherDashboard() {
   const [loadingLocation, setLoadingLocation] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [formData, setFormData] = useState<ClassFormData>({
-    subjectName: "",
-    startingTime: "",
-    endingTime: "",
-    semester: "",
-    department: "",
-    location: { latitude: 0, longitude: 0 },
-  });
+ 
   const [showNotifications, setShowNotifications] = useState(false);
   const [notifications, setNotifications] = useState<NotificationType[]>([]);
   const [attendanceGraphData, setattendanceGraphData] = useState();
@@ -76,6 +69,14 @@ export default function TeacherDashboard() {
   const [ButtonLoading, setButtonLoading] = useState(false);
   const [excelForm, setexcelForm] = useState(false)
   const [SheetURL, setSheetURL] = useState("")
+  const [formData, setFormData] = useState<ClassFormData>({
+    subjectName: "",
+    startingTime: "",
+    endingTime: "",
+    semester: "",
+    department: "",
+    location: { latitude: 0, longitude: 0 },
+  });
   const [ExcelFormData, setExcelFormData] = useState({
     spreadsheetId: "",
     sheetName: "",
