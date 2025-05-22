@@ -40,10 +40,10 @@ const LoginForm = () => {
       let res;
       if (role === "student") {
         const obj = {
-          fullName: formData.fullName,
-          email:formData.email,
+          fullName: formData.fullName.toLowerCase(),
+          email:formData.email.toLowerCase(),
           enrollmentNumber: formData.enrollmentNumber,
-          password: formData.password,
+          password: formData.password.toLowerCase(),
         }
         res = await studentLogin(obj);
         if (res && "data" in res && res.data?.success) {

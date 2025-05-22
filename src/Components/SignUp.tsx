@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
 import { useSignupMutation as StudentSignupMution } from "../Redux/API/Student";
 import { useSignupMutation as AdminSignupMution } from '../Redux/API/Admin';
@@ -9,6 +9,9 @@ import { FetchBaseQueryError } from "@reduxjs/toolkit/query";
 import { adminExits } from "../Redux/slices/AdminSlices";
 import { useNavigate } from "react-router-dom";
 import { pandingExits } from "../Redux/slices/PandingSlices";
+import { DatePicker } from "@mui/x-date-pickers/DatePicker";
+import { LocalizationProvider } from "@mui/x-date-pickers";
+import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
 
 const SignUp = () => {
   const dispatch = useDispatch();
@@ -17,7 +20,9 @@ const SignUp = () => {
   const [StudentSignup] = StudentSignupMution();
   const [AdminSignup] = AdminSignupMution();
   const [PandingRequest] = PandingReuestMution();
-  const [loading, setloading] = useState(false)
+  const [loading, setloading] = useState(false);
+  const [collegeLists, setCollegeLists] = useState([]);
+  const [departmentLists, setDepartmentLists] = useState([]);
   const [IsError, setIsError] = useState(
     {
       error: false,
@@ -35,6 +40,40 @@ const SignUp = () => {
     gender: ""
   });
 
+  useEffect(() => {
+    const fetchColleges = async () => {
+      const response = await fetch(`${import.meta.env.VITE_SERVER}/api/v1/supported/getallcollege`);
+      const data = await response.json();
+      if (data.success) {
+        setCollegeLists(data.collegeNames);
+      }
+    };
+
+    return () => {
+      fetchColleges();
+    }
+  }, [role === "student" || role === "teacher"]);
+
+  useEffect(() => {
+    const fetchDepartment = async () => {
+      if (!formData.collegeName) return;
+      const response = await fetch(`${import.meta.env.VITE_SERVER}/api/v1/supported/getalldepartment`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ collegeName: formData.collegeName }),
+      });
+      const data = await response.json();
+      if (data.success) {
+        setDepartmentLists(data.departmentNames);
+      }
+    };
+
+    fetchDepartment(); // ✅ Correct place to call it
+  }, [formData.collegeName]); // ✅ Depend only on collegeName change
+
+
   const navigate = useNavigate();
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -45,7 +84,18 @@ const SignUp = () => {
       let res;
 
       if (role === "student") {
-        res = await StudentSignup(formData);
+        const formDataWithLowercase = {
+          fullName: formData.fullName.toLowerCase(),
+          collegeJoiningDate: formData.collegeJoiningDate.toLowerCase(), // Changed to empty string for proper handling
+          departmentName: formData.departmentName.toLowerCase(),
+          collegeName: formData.collegeName.toLowerCase(),
+          email: formData.email.toLowerCase(),
+          enrollmentNumber: formData.enrollmentNumber.toLowerCase(),
+          password: formData.password,
+          semester: formData.semester,
+          gender: formData.gender.toLowerCase()
+        }
+        res = await StudentSignup(formDataWithLowercase);
         if (res && "data" in res && res.data?.success) {
           const userData = res.data?.user;
           dispatch(studentExits(userData));
@@ -61,12 +111,12 @@ const SignUp = () => {
 
       } else if (role == "teacher") {
         const obj = {
-          fullName: formData.fullName,
-          email: formData.email,
+          fullName: formData.fullName.toLowerCase(),
+          email: formData.email.toLowerCase(),
           password: formData.password,
-          collegeName: formData.collegeName,
-          departmentName: formData.departmentName,
-          gender: formData.gender
+          collegeName: formData.collegeName.toLowerCase(),
+          departmentName: formData.departmentName.toLowerCase(),
+          gender: formData.gender.toLowerCase()
         }
         res = await PandingRequest(obj);
         if (res && "data" in res && res.data.success) {
@@ -79,15 +129,15 @@ const SignUp = () => {
             },
             credentials: "include",
             body: JSON.stringify({
-              type:"request",
-              upperHeadding:`${res.data.newPanding.fullName} is Send an Request to ...`,
-              description:`${res.data.newPanding.fullName} is Send an Request to Create an Account For \n Teacher, If Yess then Click on Accept otherwise click on Reject Button .`,
-              to:res.data.newPanding.adminId,
-              pandingId:res.data.newPanding._id
+              type: "request",
+              upperHeadding: `${res.data.newPanding.fullName} is Send an Request to ...`,
+              description: `${res.data.newPanding.fullName} is Send an Request to Create an Account For \n Teacher, If Yess then Click on Accept otherwise click on Reject Button .`,
+              to: res.data.newPanding.adminId,
+              pandingId: res.data.newPanding._id
             }),
           });
           const data = await response.json();
-          if(data.success){
+          if (data.success) {
             alert("Your Request Send to Department HOD ... \n Wait to for Accept Request ( or You can ask to accept the request to the HOD ).")
           }
         } else {
@@ -95,12 +145,13 @@ const SignUp = () => {
         }
 
       } else {
+        //Add Here Admin For Gender
         const obj = {
-          fullName: formData.fullName,
-          email: formData.email,
-          collegeName: formData.collegeName,
+          fullName: formData.fullName.toLowerCase(),
+          email: formData.email.toLowerCase(),
+          collegeName: formData.collegeName.toLowerCase(),
           password: formData.password,
-          departmentName: formData.departmentName
+          departmentName: formData.departmentName.toLowerCase()
         }
         res = await AdminSignup(obj);
         if (res && "data" in res && res.data?.success) {
@@ -130,6 +181,8 @@ const SignUp = () => {
       [name]: value,
     }));
   };
+
+
 
   return (
     <div className="flex items-center justify-center p-6">
@@ -173,74 +226,141 @@ const SignUp = () => {
             name="password"
             onChange={handleChange}
           />
-          <input
-            type="text"
-            placeholder="College Name"
-            className="w-full p-2 border rounded-md"
-            required
+
+          {role === "student" && (
+            <input
+              type="text"
+              placeholder="Enrollment Number"
+              className="w-full p-2 border rounded-md"
+              required
+              name="enrollmentNumber"
+              onChange={handleChange}
+            />
+          )}
+
+          {/* Admin Fields */}
+          {role === "admin" && (
+            <>
+              {/* Department  */}
+              <input
+                type="text"
+                placeholder="Department Name"
+                className="w-full p-2 border rounded-md font-semibold"
+                name="departmentName"
+                onChange={handleChange}
+              ></input>
+            </>
+
+          )}
+
+          <select
+            className="w-full p-2 border rounded-md text-blue-700 font-semibold"
             name="collegeName"
             onChange={handleChange}
-          />
-          <label className="block font-semibold text-gray-700">Department:</label>
-          <select
-            className="w-full p-2 border rounded-md text-blue-700 font-semibold"
-            name="departmentName"
-            onChange={handleChange}
           >
-            <option value="Civil">Civil</option>
-            <option value="Computer">Computer</option>
-            <option value="Mechanical">Mechanical</option>
-            <option value="Electrical">Electrical</option>
+            <option value="">Select College</option>
+            {collegeLists?.map((i) => (
+              <option value={i}>{i}</option>
+            ))}
           </select>
-          <label className="block font-semibold text-gray-700">Gender:</label>
-          <select
-            className="w-full p-2 border rounded-md text-blue-700 font-semibold"
-            name="gender"
-            onChange={handleChange}
-          >
-            <option value="male">Male</option>
-            <option value="female">Female</option>
-          </select>
-          {/* Student Fields */}
+
+
           {role === "student" && (
             <>
 
-              <input
-                type="text"
-                placeholder="Enrollment Number"
-                className="w-full p-2 border rounded-md"
-                required
-                name="enrollmentNumber"
+              {/* Department  */}
+              <select
+                className={`${formData.collegeName === "" ? "text-gray-600" : "text-blue-700"} w-full p-2 border rounded-md font-semibold`}
+                name="departmentName"
                 onChange={handleChange}
-              />
+              >
+                <option value="" > {formData.collegeName === ""
+                  ? "First Select College Name"
+                  : "Select Department"}</option>
+                {departmentLists.length > 0 && formData.collegeName !== "" && departmentLists.map((i) => (
+                  <option value={i}>{i}</option>
+                ))}
+              </select>
+            </>
+          )}
 
-              <input
-                type="number"
-                placeholder="Semester"
-                className="w-full p-2 border rounded-md"
-                required
+
+
+          {/* Student Fields */}
+          {role === "student" && (
+            <>
+              <select
+                className="w-full p-2 border rounded-md text-blue-700 font-semibold"
                 name="semester"
-                min="1"
-                max="8"
                 onChange={handleChange}
-              />
-              <label>College Joining Date</label>
-              <input
-                type="date"
-                className="w-full p-2 border rounded-md"
-                required
-                name="collegeJoiningDate"
-                onChange={handleChange}
-              />
+              >
+                <option value="">Select Semester</option>
+                <option value="1">1</option>
+                <option value="2">2</option>
+                <option value="3">3</option>
+                <option value="4">4</option>
+                <option value="5">5</option>
+                <option value="6">6</option>
+                <option value="7">7</option>
+                <option value="8">8</option>
+              </select>
+
             </>
           )}
 
           {/* Teacher Fields */}
           {role === "teacher" && (
             <>
-
+              {/* Department  */}
+              <select
+                className={`${formData.collegeName === "" ? "text-gray-600" : "text-blue-700"} w-full p-2 border rounded-md font-semibold`}
+                name="departmentName"
+                onChange={handleChange}
+              >
+                <option value="" > {formData.collegeName === ""
+                  ? "First Select College Name"
+                  : "Select Department"}</option>
+                {departmentLists.length > 0 && formData.collegeName !== "" && departmentLists.map((i) => (
+                  <option value={i}>{i}</option>
+                ))}
+              </select>
             </>
+
           )}
+
+
+
+          {/* Gender */}
+          <select
+            className="w-full p-2 border rounded-md text-blue-700 font-semibold"
+            name="gender"
+            onChange={handleChange}
+          >
+            <option value="">Select Gender</option>
+            <option value="male">Male</option>
+            <option value="female">Female</option>
+          </select>
+
+          {role === "student" && (
+            <>
+              <div>
+                <LocalizationProvider dateAdapter={AdapterDateFns}>
+                  <DatePicker
+                    label="College Joining Date"
+                    className="w-full"
+                    value={formData.collegeJoiningDate ? new Date(formData.collegeJoiningDate) : null}
+                    onChange={(newValue) => {
+                      setFormData((prev) => ({
+                        ...prev,
+                        collegeJoiningDate: newValue ? newValue.toISOString().split("T")[0] : "", // format as yyyy-mm-dd
+                      }));
+                    }}
+                  />
+                </LocalizationProvider>
+              </div>
+            </>)}
+
+
           {IsError.error && <p className="text-red-800 font-bold">{IsError.message}</p>}
           <button
             type="submit"

@@ -62,11 +62,11 @@ function App() {
         const data = await res.json();
 
         if (data.type === "Student") {
-          dispatch(studentExits(data.user)); // ✅ Ensure this runs
+          dispatch(studentExits(data.user)); 
         } else if (data.type === "Teacher") {
-          dispatch(teacherExits(data.user)); // ✅ Ensure this runs
+          dispatch(teacherExits(data.user)); 
         } else if (data.type === "Admin") {
-          dispatch(adminExits(data.user));// ✅ Ensure this runs
+          dispatch(adminExits(data.user));
         } else if (data.type === "Panding") {
           if (!data.user.accepted && !data.user.rejected) {
             dispatch(pandingExits(data.user));
