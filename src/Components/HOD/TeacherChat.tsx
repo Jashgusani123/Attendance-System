@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { motion } from "framer-motion";
-import { useSendNotificationMutation } from "../../Redux/API/Admin";
+import { useSendNotificationMutation } from "../../Redux/API/Hod";
 
 const MiniChat = ({userId}:{userId:string}) => {
   const [messages, setMessages] = useState<{ text: string; sender: string }[]>([]);

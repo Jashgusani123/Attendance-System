@@ -1,12 +1,12 @@
 import { Tooltip } from "@mui/material"
 import { Bell } from "lucide-react"
 import { Link, useLocation, useNavigate } from "react-router-dom"
-import UserCard from "../../Components/Admin/UserCards";
-import StudentRatio from "../../Components/Admin/StudentRatio";
-import AttendanceChart from "../../Components/Admin/TotalAttedanceChart";
+import UserCard from "../../Components/HOD/UserCards";
+import StudentRatio from "../../Components/HOD/StudentRatio";
+import AttendanceChart from "../../Components/HOD/TotalAttedanceChart";
 import { useEffect, useState } from "react";
 import Notification from "../Notification";
-import { useGetPresentAndAbsentCardsMutation } from "../../Redux/API/Admin";
+import { useGetPresentAndAbsentCardsMutation } from "../../Redux/API/Hod";
 
 interface NotificationType {
     _id: string;
@@ -59,7 +59,7 @@ const Analysis = () => {
                                 <Tooltip title="GraphView">
                                     <span
                                         className="text-blue-900 rounded-full flex items-center justify-center text-xl w-10 h-10 cursor-pointer"
-                                        onClick={() => navigate("/admin")}
+                                        onClick={() => navigate("/hod")}
                                     >
                                         Home
                                     </span>

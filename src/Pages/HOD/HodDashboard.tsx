@@ -5,7 +5,7 @@ import { Bell } from "lucide-react";
 import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Typewriter } from "react-simple-typewriter";
-import { useGetAllNotificationMutation, useGetAllStudentMutation, useGetAllTeachersMutation } from "../../Redux/API/Admin";
+import { useGetAllNotificationMutation, useGetAllStudentMutation, useGetAllTeachersMutation } from "../../Redux/API/Hod";
 import Notification from "../Notification";
 
 interface NotificationType {
@@ -30,7 +30,7 @@ interface AllTeacherInfo {
   avatarName: string
 }
 
-const AdminDashboard = () => {
+const HodDashboard = () => {
   const navigate = useNavigate();
   const [notifications, setNotifications] = useState<NotificationType[]>([]);
   const [showNotifications, setShowNotifications] = useState(false);
@@ -86,16 +86,16 @@ const AdminDashboard = () => {
   }, [])
 
   const handleSetting = () => {
-    navigate("/admin/setting", { state: { type: "Admin" } });
+    navigate("/hod/setting", { state: { type: "Hod" } });
   };
   const manageBtn = (id:string) =>{
-    navigate("/admin/manage" ,{state:{id:id}} )
+    navigate("/hod/manage" ,{state:{id:id}} )
   }
   const analysisBtn = (id:string) =>{
-    navigate("/admin/analysis" ,{state:{id:id}} )
+    navigate("/hod/analysis" ,{state:{id:id}} )
   }
   const showStudentList = ()=>{
-    navigate("/admin/student_list")
+    navigate("/hod/student_list")
   }
   return (
     <>
@@ -109,7 +109,7 @@ const AdminDashboard = () => {
           </div>
           <div className="flex justify-between items-center w-36 ">
             <Tooltip title="GraphView">
-              <span className="text-blue-900 rounded-full flex items-center justify-center text-xl w-10 h-10 cursor-pointer" onClick={() => navigate("/admin/view")}>View</span>
+              <span className="text-blue-900 rounded-full flex items-center justify-center text-xl w-10 h-10 cursor-pointer" onClick={() => navigate("/hod/view")}>View</span>
             </Tooltip>
             <span onClick={handleSetting} className="text-blue-900 rounded-full flex items-center justify-center w-10 h-10 cursor-pointer bg-white shadow-md relative">
               <Tooltip title="Setting">
@@ -128,7 +128,7 @@ const AdminDashboard = () => {
               )}
               {showNotifications && (
                 <div className="absolute top-[-35px] right-0 z-50 bg-white shadow-lg rounded-lg">
-                  <Notification fun={setShowNotifications} notifications={notifications} type="Admin" />
+                  <Notification fun={setShowNotifications} notifications={notifications} type="Hod" />
                 </div>
               )}
             </span>
@@ -157,7 +157,7 @@ const AdminDashboard = () => {
           className="absolute sm:top-[30%] sm:left-[0%] top-[25%] left-[0%] z-40 p-6"
         >
           <div className="bg-[#0e578c] sm:p-6 p-4 rounded-lg shadow-lg w-[100%] sm:w-[600px] h-fit ">
-            <p className="text-zinc-800 text-xl font-extrabold">Admin Dashboard</p>
+            <p className="text-zinc-800 text-xl font-extrabold">HOD Dashboard</p>
             <p className="lg:text-[30px] font-bold text-white text-2xl">
               <span className="text-amber-400">
                 <Typewriter
@@ -263,4 +263,4 @@ const AdminDashboard = () => {
   );
 };
 
-export default AdminDashboard;
+export default HodDashboard;

@@ -28,16 +28,16 @@ const Notification = ({ fun, notifications, type }: { fun: any, notifications: a
         setinput("");
     };
 
-    const acceptRequestFunc = async (pandingId: string,_id:string) => {
-        
-        const response = await AcceptPandingRequest({pandingId,_id});
+    const acceptRequestFunc = async (pandingId: string, _id: string) => {
+
+        const response = await AcceptPandingRequest({ pandingId, _id });
         if (response && "data" in response && response.data.success) {
             settext(response.data.message)
         }
     }
-    const rejectRequestFunc = async (pandingId: string,_id:string) => {
-        
-        const response = await RejectPandingRequest({pandingId,_id});
+    const rejectRequestFunc = async (pandingId: string, _id: string) => {
+
+        const response = await RejectPandingRequest({ pandingId, _id });
         if (response && "data" in response && response.data.success) {
             settext(response.data.message)
         }
@@ -100,12 +100,12 @@ const Notification = ({ fun, notifications, type }: { fun: any, notifications: a
                                         )}
                                     </div>
                                 )}
-                                {notification.type === "request" && type === "Admin" && (
+                                {notification.type === "request" && type === "Hod" && (
                                     <div className="flex flex-wrap gap-2 justify-center flex-row">
                                         {text ? <p className="text-[#a39e9e] ">{text}</p> : <><button className="bg-green-800 mt-1 text-white rounded-xl h-7 w-[20%]" onClick={() => acceptRequestFunc(notification.pandingId, notification._id)}>
                                             Accept
                                         </button>
-                                            <button className="bg-red-800 mt-1 text-white rounded-xl h-7 w-[20%]" onClick={() => rejectRequestFunc(notification.pandingId , notification._id)}>
+                                            <button className="bg-red-800 mt-1 text-white rounded-xl h-7 w-[20%]" onClick={() => rejectRequestFunc(notification.pandingId, notification._id)}>
                                                 Reject
                                             </button></>}
                                     </div>

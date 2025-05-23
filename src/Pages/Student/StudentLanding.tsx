@@ -29,7 +29,7 @@ const StudentLanding = () => {
             <p className="lg:text-[30px] font-bold text-gray-800 text-2xl">
               <span className="text-blue-600">
                 <Typewriter
-                  words={["Hello ,", `${student?.fullName} !!`]}
+                  words={["Hello ,", `${student?.fullName.toLocaleUpperCase()} !!`]}
                   loop={Infinity}
                   cursor
                   cursorStyle="|"

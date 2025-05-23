@@ -6,7 +6,7 @@ export interface PandingRequest {
     "collegeName":string,
     "_id"?:string,
     "gender":string,
-    "adminId":string,
+    "hodId":string,
     "accepted": boolean,
     "rejected": boolean,
 }

@@ -2,7 +2,7 @@
 import { useEffect, useState } from "react";
 import { RadialBarChart, RadialBar, ResponsiveContainer } from "recharts";
 import maleFemale from '../../assets/maleFemale.png'
-import { useGetAbsentPresent7DaysDataMutation, useGetBoysAndGirlsOverviewMutation } from "../../Redux/API/Admin";
+import { useGetAbsentPresent7DaysDataMutation, useGetBoysAndGirlsOverviewMutation } from "../../Redux/API/Hod";
 
 const CountChart = ({ boys, girls, absent, present }: { boys?: number; girls?: number, present?: number, absent?: number }) => {
   let data: any;

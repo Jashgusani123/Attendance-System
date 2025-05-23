@@ -1,9 +1,9 @@
 import { configureStore } from "@reduxjs/toolkit";
 import { StudentAPI } from '../Redux/API/Student';
-import { AdminAPI } from "./API/Admin";
+import { HodAPI } from "./API/Hod";
 import { TeacherAPI } from "./API/Teacher";
 import { PandingAPI } from "./API/Panding";
-import AdminReducer from './slices/AdminSlices';
+import HodReducer from './slices/HodSlices';
 import StudentReducer from './slices/StudentSlices';
 import TeacherReducer from './slices/TeacherSlice';
 import PandingReducer from './slices/PandingSlices';
@@ -14,13 +14,13 @@ const store = configureStore({
     student:StudentReducer,
     [TeacherAPI.reducerPath]: TeacherAPI.reducer,
     teacher:TeacherReducer,
-    [AdminAPI.reducerPath]: AdminAPI.reducer,
-    admin:AdminReducer,
+    [HodAPI.reducerPath]: HodAPI.reducer,
+    hod:HodReducer,
     [PandingAPI.reducerPath]: PandingAPI.reducer,
     panding:PandingReducer,
   },
   middleware: (getDefaultMiddleware) =>
-    getDefaultMiddleware().concat(StudentAPI.middleware).concat(TeacherAPI.middleware).concat(AdminAPI.middleware).concat(PandingAPI.middleware),
+    getDefaultMiddleware().concat(StudentAPI.middleware).concat(TeacherAPI.middleware).concat(HodAPI.middleware).concat(PandingAPI.middleware),
 });
 
 export default store;

@@ -1,6 +1,6 @@
 import { TableBody, TableCell, TableContainer, Table, TableHead, TableRow, Paper, Tooltip } from "@mui/material"
 import { useEffect, useState } from "react"
-import { useGetAllStudentMutation } from "../../Redux/API/Admin"
+import { useGetAllStudentMutation } from "../../Redux/API/Hod"
 import { Link, useNavigate } from "react-router-dom"
 import { Bell } from "lucide-react"
 import Notification from "../Notification"
@@ -58,7 +58,7 @@ const ShowAllStudent = () => {
                             <Tooltip title="GraphView">
                                 <span
                                     className="text-blue-900 rounded-full flex items-center justify-center text-xl w-10 h-10 cursor-pointer"
-                                    onClick={() => navigate("/admin")}
+                                    onClick={() => navigate("/hod")}
                                 >
                                     Home
                                 </span>

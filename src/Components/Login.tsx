@@ -2,18 +2,18 @@ import { useState } from "react";
 import { useDispatch } from "react-redux";
 import { useLoginMutation as StudentLoginMutation } from "../Redux/API/Student";
 import { useLoginMutation as TeacherLoginMutation } from "../Redux/API/Teacher";
-import { useLoginMutation as AdminLoginMutation } from "../Redux/API/Admin";
+import { useLoginMutation as HodLoginMutation } from "../Redux/API/Hod";
 import { studentExits, studentNotExits } from "../Redux/slices/StudentSlices";
 import { teacherExits, teacherNotExits } from "../Redux/slices/TeacherSlice";
 import { FetchBaseQueryError } from "@reduxjs/toolkit/query";
-import { adminExits } from "../Redux/slices/AdminSlices";
+import { HodExits } from "../Redux/slices/HodSlices";
 
 const LoginForm = () => {
   const dispatch = useDispatch();
   const [role, setRole] = useState("student");
   const [studentLogin] = StudentLoginMutation();
   const [teacherLogin] = TeacherLoginMutation();
-  const [adminLogin] = AdminLoginMutation();
+  const [HodLogin] = HodLoginMutation();
   const [loading, setloading] = useState(false);
   const [IsError, setIsError] = useState(
     {
@@ -78,14 +78,14 @@ const LoginForm = () => {
           });
         }
       }else{
-         res = await adminLogin({
+         res = await HodLogin({
           email:formData.email,
           password:formData.password,
           secretKey:formData.secretkey
          });
 
          if(res && "data" in res && res.data?.success){
-          dispatch(adminExits(res.data?.user))
+          dispatch(HodExits(res.data?.user))
           setIsError({ error: false, message: "" });
          }else{
           setIsError({
@@ -128,12 +128,12 @@ const LoginForm = () => {
         >
           <option value="student">Student</option>
           <option value="teacher">Teacher</option>
-          <option value="admin">Admin</option>
+          <option value="hod">HOD</option>
         </select>
 
         <form className="space-y-4" onSubmit={handleSubmit}>
           {/* Common Name Field */}
-          {role !== "admin" && (
+          {role !== "hod" && (
             <input
               type="text"
               placeholder="Full Name"
@@ -182,8 +182,8 @@ const LoginForm = () => {
             <></>
           )}
 
-          {/* Admin Fields */}
-          {role === "admin" && (
+          {/* Hod Fields */}
+          {role === "hod" && (
             <input
               type="password"
               placeholder="Secret Key"

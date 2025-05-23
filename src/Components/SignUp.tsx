@@ -1,12 +1,12 @@
 import { useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
 import { useSignupMutation as StudentSignupMution } from "../Redux/API/Student";
-import { useSignupMutation as AdminSignupMution } from '../Redux/API/Admin';
+import { useSignupMutation as HodSignupMution } from '../Redux/API/Hod';
 import { useCreatePandingRequestMutation as PandingReuestMution } from '../Redux/API/Panding';
 import { studentExits } from "../Redux/slices/StudentSlices";
 import { StudentRequest } from "../Types/API/StudentApiType";
 import { FetchBaseQueryError } from "@reduxjs/toolkit/query";
-import { adminExits } from "../Redux/slices/AdminSlices";
+import { HodExits } from "../Redux/slices/HodSlices";
 import { useNavigate } from "react-router-dom";
 import { pandingExits } from "../Redux/slices/PandingSlices";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
@@ -18,7 +18,7 @@ const SignUp = () => {
 
   const [role, setRole] = useState("student");
   const [StudentSignup] = StudentSignupMution();
-  const [AdminSignup] = AdminSignupMution();
+  const [HodSignup] = HodSignupMution();
   const [PandingRequest] = PandingReuestMution();
   const [loading, setloading] = useState(false);
   const [collegeLists, setCollegeLists] = useState([]);
@@ -132,7 +132,7 @@ const SignUp = () => {
               type: "request",
               upperHeadding: `${res.data.newPanding.fullName} is Send an Request to ...`,
               description: `${res.data.newPanding.fullName} is Send an Request to Create an Account For \n Teacher, If Yess then Click on Accept otherwise click on Reject Button .`,
-              to: res.data.newPanding.adminId,
+              to: res.data.newPanding.hodId,
               pandingId: res.data.newPanding._id
             }),
           });
@@ -145,7 +145,7 @@ const SignUp = () => {
         }
 
       } else {
-        //Add Here Admin For Gender
+        //Add Here Hod For Gender
         const obj = {
           fullName: formData.fullName.toLowerCase(),
           email: formData.email.toLowerCase(),
@@ -153,10 +153,10 @@ const SignUp = () => {
           password: formData.password,
           departmentName: formData.departmentName.toLowerCase()
         }
-        res = await AdminSignup(obj);
+        res = await HodSignup(obj);
         if (res && "data" in res && res.data?.success) {
           const userData = res.data?.user;
-          dispatch(adminExits(userData));
+          dispatch(HodExits(userData));
           setIsError({ error: false, message: "" });
         } else {
           if ("error" in res && res.error && "data" in res.error) {
@@ -197,7 +197,7 @@ const SignUp = () => {
         >
           <option value="student">Student</option>
           <option value="teacher">Teacher</option>
-          <option value="admin">Admin</option>
+          <option value="Hod">HOD</option>
         </select>
 
         <form className="space-y-4" onSubmit={handleSubmit}>
@@ -238,8 +238,8 @@ const SignUp = () => {
             />
           )}
 
-          {/* Admin Fields */}
-          {role === "admin" && (
+          {/* Hod Fields */}
+          {role === "Hod" && (
             <>
               {/* Department  */}
               <input
@@ -249,20 +249,32 @@ const SignUp = () => {
                 name="departmentName"
                 onChange={handleChange}
               ></input>
+              <select
+              className="w-full p-2 border rounded-md text-blue-700 font-semibold"
+              name="collegeName"
+              onChange={handleChange}
+            >
+              <option value="">Select College</option>
+              <option value="Goverment Polytechnic Junagadh">Goverment Polytechnic Junagadh</option>
+              <option value="Nobal College Junagadh">Nobal College Junagadh</option>
+            </select>
+
             </>
 
           )}
+          {(role === "student" || role === "teacher") && (
+            <select
+              className="w-full p-2 border rounded-md text-blue-700 font-semibold"
+              name="collegeName"
+              onChange={handleChange}
+            >
+              <option value="">Select College</option>
+              {collegeLists?.map((i) => (
+                <option value={i}>{i}</option>
+              ))}
+            </select>
+          )}
 
-          <select
-            className="w-full p-2 border rounded-md text-blue-700 font-semibold"
-            name="collegeName"
-            onChange={handleChange}
-          >
-            <option value="">Select College</option>
-            {collegeLists?.map((i) => (
-              <option value={i}>{i}</option>
-            ))}
-          </select>
 
 
           {role === "student" && (

@@ -1,12 +1,12 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 
-export const AdminAPI = createApi({
-    reducerPath: "AdminAPI",
+export const HodAPI = createApi({
+    reducerPath: "HodAPI",
     baseQuery: fetchBaseQuery({ 
-        baseUrl: `${import.meta.env.VITE_SERVER}/admin/`, 
+        baseUrl: `${import.meta.env.VITE_SERVER}/hod/`, 
         credentials: "include"  // ✅ Ensure cookies are sent with requests
     }),
-    tagTypes: ["admin"],  //  Added tagTypes for caching
+    tagTypes: ["hod"],  //  Added tagTypes for caching
     endpoints: (builders) => ({
         signup: builders.mutation({
             query: (formData) => ({
@@ -14,7 +14,7 @@ export const AdminAPI = createApi({
                 method: "POST",
                 body: formData,
             }),
-            invalidatesTags: ["admin"]  //  Invalidate cache after signup
+            invalidatesTags: ["hod"]  //  Invalidate cache after signup
         }),
         login:builders.mutation({
             query: (formData)=>({
@@ -22,28 +22,28 @@ export const AdminAPI = createApi({
                 method:"POST",
                 body:formData
             }) ,
-            invalidatesTags:["admin"]
+            invalidatesTags:["hod"]
         }),
         logout:builders.mutation({
             query:()=>({
                 url:"logout",
                 method:"GET"
             }),
-            invalidatesTags:["admin"]
+            invalidatesTags:["hod"]
         }),
         getAllStudent:builders.mutation({
             query:()=>({
                 url:"getallstudent",
                 method:"GET"  
             }),
-            invalidatesTags:["admin"]
+            invalidatesTags:["hod"]
         }),
         getAllTeachers:builders.mutation({
             query:()=>({
                 url:"getallteacher",
                 method:"GET"  
             }),
-            invalidatesTags:["admin"]
+            invalidatesTags:["hod"]
         }),
         getTeacherInfo:builders.mutation({
             query:(_id)=>({
@@ -51,7 +51,7 @@ export const AdminAPI = createApi({
                 method:"POST",
                 body:{_id:_id}  
             }),
-            invalidatesTags:["admin"]
+            invalidatesTags:["hod"]
         }),
         getAbsentPresent7DaysData:builders.mutation({
             query:(_id)=>({
@@ -59,7 +59,7 @@ export const AdminAPI = createApi({
                 method:"POST",
                 body:{Id:_id}  
             }),
-            invalidatesTags:["admin"]
+            invalidatesTags:["hod"]
         }),
         getOverViewOfLast7Days:builders.mutation({
             query:(_id)=>({
@@ -109,4 +109,4 @@ export const AdminAPI = createApi({
     })
 });
 
-export const { useSignupMutation , useLoginMutation , useLogoutMutation , useGetAllStudentMutation , useGetAllTeachersMutation , useGetTeacherInfoMutation ,useGetAbsentPresent7DaysDataMutation, useGetOverViewOfLast7DaysMutation , useGetPresentAndAbsentCardsMutation , useGetAllCardsMutation , useGetBoysAndGirlsOverviewMutation , useGetAttendaceOverviewMutation , useSendNotificationMutation , useGetAllNotificationMutation} = AdminAPI;
+export const { useSignupMutation , useLoginMutation , useLogoutMutation , useGetAllStudentMutation , useGetAllTeachersMutation , useGetTeacherInfoMutation ,useGetAbsentPresent7DaysDataMutation, useGetOverViewOfLast7DaysMutation , useGetPresentAndAbsentCardsMutation , useGetAllCardsMutation , useGetBoysAndGirlsOverviewMutation , useGetAttendaceOverviewMutation , useSendNotificationMutation , useGetAllNotificationMutation} = HodAPI;

@@ -2,10 +2,10 @@ import { Avatar, Tooltip } from "@mui/material";
 import { Bell } from "lucide-react";
 import { useEffect, useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import MiniChat from "../../Components/Admin/TeacherChat";
-import TeacherTimeTable from "../../Components/Admin/TeacherTimeTable";
+import MiniChat from "../../Components/HOD/TeacherChat";
+import TeacherTimeTable from "../../Components/HOD/TeacherTimeTable";
 import Notification from "../Notification";
-import { useGetTeacherInfoMutation } from "../../Redux/API/Admin";
+import { useGetTeacherInfoMutation } from "../../Redux/API/Hod";
 
 interface NotificationType {
   _id: string;
@@ -64,7 +64,7 @@ const Manage = () => {
                 <Tooltip title="GraphView">
                   <span
                     className="text-blue-900 rounded-full flex items-center justify-center text-xl w-10 h-10 cursor-pointer"
-                    onClick={() => navigate("/admin")}
+                    onClick={() => navigate("/hod")}
                   >
                     Home
                   </span>

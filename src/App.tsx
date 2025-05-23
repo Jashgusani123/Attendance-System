@@ -2,12 +2,12 @@ import { lazy, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Route, Routes, useNavigate } from "react-router-dom";
 import "./App.css";
-import ShowAllStudent from "./Pages/Admin/ShowAllStudent";
-import { adminExits, adminNotExits } from "./Redux/slices/AdminSlices";
+import ShowAllStudent from "./Pages/HOD/ShowAllStudent";
+import { HodExits, HodNotExits } from "./Redux/slices/HodSlices";
 import { pandingExits, pandingNotExits } from "./Redux/slices/PandingSlices";
 import { studentExits, studentNotExits } from "./Redux/slices/StudentSlices";
 import { teacherExits, teacherNotExits } from "./Redux/slices/TeacherSlice";
-import { AdminReducerInitialState } from "./Types/API/AdminApiType";
+import { HodReducerInitialState } from "./Types/API/HodApiType";
 import { PandingReducerInitialState } from "./Types/API/PandingApiType";
 import { StudentReducerInitialState } from "./Types/API/StudentApiType";
 import { TeacherReducerInitialState } from "./Types/API/TeacherApiType";
@@ -17,17 +17,17 @@ import { useDeletePandingRequstMutation } from "./Redux/API/Panding";
 
 const Landing = lazy(() => import("./Pages/Landing"));
 const Setting = lazy(() => import("./Pages/Setting"));
-const AdminSetting = lazy(() => import("./Components/Admin/Setting"));
+const HodSetting = lazy(() => import("./Components/HOD/Setting"));
 const StudentDashboard = lazy(() => import("./Pages/Student/StudentDashboard"));
 const StudentLanding = lazy(() => import("./Pages/Student/StudentLanding"));
 const TeacherDashboard = lazy(() => import("./Pages/Teacher/TeacherDashboard"));
 const TeacherLanding = lazy(() => import("./Pages/Teacher/TeacherLanding"));
 const AttendanceSheet = lazy(() => import("./Pages/Teacher/AttendanceSheet"));
 const PandingRequst = lazy(() => import("./Pages/Teacher/PandingRequst"));
-const AdminDashboard = lazy(() => import("./Pages/Admin/AdminDashboard"));
-const ViewPage = lazy(() => import("./Pages/Admin/ViewPage"));
-const Manage = lazy(() => import("./Pages/Admin/Manage"));
-const Analysis = lazy(() => import("./Pages/Admin/Analysis"));
+const HodDashboard = lazy(() => import("./Pages/HOD/HodDashboard"));
+const ViewPage = lazy(() => import("./Pages/HOD/ViewPage"));
+const Manage = lazy(() => import("./Pages/HOD/Manage"));
+const Analysis = lazy(() => import("./Pages/HOD/Analysis"));
 
 function App() {
   const { loading: studentLoading, student } = useSelector(
@@ -36,8 +36,8 @@ function App() {
   const { loading: teacherLoading, teacher } = useSelector(
     (state: { teacher: TeacherReducerInitialState }) => state.teacher
   );
-  const { loading: adminLoading, admin } = useSelector(
-    (state: { admin: AdminReducerInitialState }) => state.admin
+  const { loading: hodLoading, hod } = useSelector(
+    (state: { hod: HodReducerInitialState }) => state.hod
   );
   const { loading: pandingLoading, panding } = useSelector(
     (state: { panding: PandingReducerInitialState }) => state.panding
@@ -48,8 +48,8 @@ function App() {
   const dispatch = useDispatch();
   const [TeacherSignup] = useSignupMutation()
   const [DeletePandingRequest] = useDeletePandingRequstMutation();
-  const user = student ? "Student" : teacher ? "Teacher" : admin ? "Admin" : panding ? "Panding" : ""
-  const loading = studentLoading || teacherLoading || adminLoading || pandingLoading;
+  const user = student ? "Student" : teacher ? "Teacher" : hod ? "hod" : panding ? "Panding" : ""
+  const loading = studentLoading || teacherLoading || hodLoading || pandingLoading;
 
   useEffect(() => {
     const fetchUser = async () => {
@@ -65,8 +65,8 @@ function App() {
           dispatch(studentExits(data.user)); 
         } else if (data.type === "Teacher") {
           dispatch(teacherExits(data.user)); 
-        } else if (data.type === "Admin") {
-          dispatch(adminExits(data.user));
+        } else if (data.type === "Hod") {
+          dispatch(HodExits(data.user));
         } else if (data.type === "Panding") {
           if (!data.user.accepted && !data.user.rejected) {
             dispatch(pandingExits(data.user));
@@ -96,7 +96,7 @@ function App() {
         else {
           dispatch(studentNotExits())
           dispatch(teacherNotExits())
-          dispatch(adminNotExits())
+          dispatch(HodNotExits())
         }
       } catch (error) {
         console.error("Fetch user error:", error);
@@ -112,8 +112,8 @@ function App() {
       navigate("/student", { replace: true });
     } else if (user === "Teacher" && window.location.pathname !== "/teacher") {
       navigate("/teacher", { replace: true });
-    } else if (user === "Admin" && window.location.pathname !== "/admin") {
-      navigate("/admin", { replace: true });
+    } else if (user === "hod" && window.location.pathname !== "/hod") {
+      navigate("/hod", { replace: true });
     } else if (user === "Panding" && window.location.pathname !== "/requstsend") {
       navigate("/requstsend", { replace: true });
     }
@@ -161,15 +161,15 @@ function App() {
               <Route path="/requstsend" element={<PandingRequst />} />
             </>
           )}
-          {/* Admin Route */}
-          {user === "Admin" && (
+          {/* hod Route */}
+          {user === "hod" && (
             <>
-              <Route path="/admin" element={<AdminDashboard />} />
-              <Route path="/admin/manage" element={<Manage />} />
-              <Route path="/admin/view" element={<ViewPage />} />
-              <Route path="/admin/analysis" element={<Analysis />} />
-              <Route path="/admin/setting" element={<AdminSetting />} />
-              <Route path="/admin/student_list" element={<ShowAllStudent />} />
+              <Route path="/hod" element={<HodDashboard />} />
+              <Route path="/hod/manage" element={<Manage />} />
+              <Route path="/hod/view" element={<ViewPage />} />
+              <Route path="/hod/analysis" element={<Analysis />} />
+              <Route path="/hod/setting" element={<HodSetting />} />
+              <Route path="/hod/student_list" element={<ShowAllStudent />} />
             </>
           )}
 

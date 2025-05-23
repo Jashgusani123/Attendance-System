@@ -7,9 +7,9 @@ import { ArrowDownwardRounded, ArrowUpwardRounded, Class, NotificationAddRounded
 import { OverridableComponent } from "@mui/material/OverridableComponent";
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 import { useDispatch, useSelector } from "react-redux";
-import { AdminReducerInitialState } from "../../Types/API/AdminApiType";
-import { useLogoutMutation as AdminLogoutMutation } from "../../Redux/API/Admin";
-import { adminNotExits } from "../../Redux/slices/AdminSlices";
+import { HodReducerInitialState } from "../../Types/API/HodApiType";
+import { useLogoutMutation as HodLogoutMutation } from "../../Redux/API/Hod";
+import { HodNotExits } from "../../Redux/slices/HodSlices";
 import LoadingLayer from "../LoadingLayer";
 
 
@@ -28,8 +28,8 @@ const data = [
 
 
 const ViewPage = () => {
-    const { loading: adminLoading, admin } = useSelector(
-        (state: { admin: AdminReducerInitialState }) => state.admin
+    const { loading: HodLoading, hod } = useSelector(
+        (state: { hod: HodReducerInitialState }) => state.hod
     );
     const [openSection, setOpenSection] = useState<string | null>(null);
     
@@ -38,7 +38,7 @@ const ViewPage = () => {
     const [notifications, setNotifications] = useState<NotificationType[]>([]);
     const [showNotifications, setShowNotifications] = useState(false);
     const [open, setOpen] = useState(false);
-    const [AdminLogout] = AdminLogoutMutation();
+    const [HodLogout] = HodLogoutMutation();
     const location = useLocation();
     const type = location.state?.type;
     const dispatch = useDispatch();
@@ -51,10 +51,10 @@ const ViewPage = () => {
     };
 
     const handelLogout = async () => {
-        if (type === "Admin") {
-            const res = await AdminLogout(null);
+        if (type === "Hod") {
+            const res = await HodLogout(null);
             if (res.data?.success) {
-                dispatch(adminNotExits());
+                dispatch(HodNotExits());
                 navigate("/")
             } else {
                 alert(res.error)
@@ -69,7 +69,7 @@ const ViewPage = () => {
         handelLogout();
     }
 
-    return adminLoading ? (
+    return HodLoading ? (
         <><LoadingLayer type={type} /></>
     ) : (
         <>
@@ -88,7 +88,7 @@ const ViewPage = () => {
                         <Tooltip title="GraphView">
                             <span
                                 className="text-blue-900 rounded-full flex items-center justify-center text-xl w-10 h-10 cursor-pointer"
-                                onClick={() => navigate("/admin")}
+                                onClick={() => navigate("/Hod")}
                             >
                                 Home
                             </span>
@@ -117,13 +117,13 @@ const ViewPage = () => {
                 {/* Settings Section */}
                 <div className="w-full max-w-full mt-6 p-4 justify-center items-center flex flex-col gap-4">
                     <Fields icon={AccountCircleIcon} Name="Profile" handleClick={() => toggleSection("profile")} isOpen={openSection === "profile"} />
-                    {openSection === "profile" && <SectionCard title="Change Name" value={admin?.fullName} name="fullName" />}
+                    {openSection === "profile" && <SectionCard title="Change Name" value={hod?.fullName} name="fullName" />}
     
                     <Fields icon={AccountCircleIcon} Name="Account & Security" handleClick={() => toggleSection("security")} isOpen={openSection === "security"} />
                     {openSection === "security" && (
                         <>
-                            <SectionCard title="Change Email" value={admin?.email} name="email" />
-                            <SectionCard title="Change Password" value={admin?.password} type="password" name="password" />
+                            <SectionCard title="Change Email" value={hod?.email} name="email" />
+                            <SectionCard title="Change Password" value={hod?.password} type="password" name="password" />
                         </>
                     )}
     
@@ -136,7 +136,7 @@ const ViewPage = () => {
                     )}
     
                     <Fields icon={Class} Name="Academic" handleClick={() => toggleSection("academic")} isOpen={openSection === "academic"} />
-                    {openSection === "academic" && <SectionCard title="Department" value={admin!.departmentName} />}
+                    {openSection === "academic" && <SectionCard title="Department" value={hod!.departmentName} />}
     
                     <div className="flex justify-between w-full mt-4">
                         <Button variant="contained" color="primary" onClick={handelLogout}>Logout</Button>

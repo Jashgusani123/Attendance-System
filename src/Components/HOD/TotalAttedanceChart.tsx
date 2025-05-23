@@ -1,6 +1,6 @@
 "use client";
 import { Bar, BarChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
-import { useGetAttendaceOverviewMutation, useGetOverViewOfLast7DaysMutation } from "../../Redux/API/Admin";
+import { useGetAttendaceOverviewMutation, useGetOverViewOfLast7DaysMutation } from "../../Redux/API/Hod";
 import { useEffect, useState } from "react";
 const AttendanceChart = ({ isOther, userId }: { isOther?: boolean, userId?: string }) => {
   const [GetOverviewLast7Days] = useGetOverViewOfLast7DaysMutation();

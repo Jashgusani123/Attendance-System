@@ -1,4 +1,4 @@
-export interface AdminRequest {
+export interface HodRequest {
     "fullName":string,
     "email":string,
     "password":string,
@@ -6,7 +6,7 @@ export interface AdminRequest {
     "departmentName":string, 
 }
 
-export interface AdminReducerInitialState {
-    admin:AdminRequest | null;
+export interface HodReducerInitialState {
+    hod:HodRequest | null;
     loading:boolean
 }
