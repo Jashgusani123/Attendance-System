@@ -3,6 +3,7 @@ import { ChevronDown, X } from "lucide-react";
 import { useState } from "react";
 import { useSendmessageMutation } from "../Redux/API/Teacher";
 import { useAcceptPandingReuestMutation, useRejectPandingReuestMutation } from "../Redux/API/Panding";
+import { Capitalize } from "../Utils/toCapitalize";
 
 
 
@@ -102,7 +103,7 @@ const Notification = ({ fun, notifications, type }: { fun: any, notifications: a
                                 )}
                                 {notification.type === "request" && type === "Hod" && (
                                     <div className="flex flex-wrap gap-2 justify-center flex-row">
-                                        {text ? <p className="text-[#a39e9e] ">{text}</p> : <><button className="bg-green-800 mt-1 text-white rounded-xl h-7 w-[20%]" onClick={() => acceptRequestFunc(notification.pandingId, notification._id)}>
+                                        {text ? <p className="text-[#a39e9e] ">{Capitalize(text)}</p> : <><button className="bg-green-800 mt-1 text-white rounded-xl h-7 w-[20%]" onClick={() => acceptRequestFunc(notification.pandingId, notification._id)}>
                                             Accept
                                         </button>
                                             <button className="bg-red-800 mt-1 text-white rounded-xl h-7 w-[20%]" onClick={() => rejectRequestFunc(notification.pandingId, notification._id)}>

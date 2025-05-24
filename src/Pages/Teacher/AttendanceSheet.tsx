@@ -4,7 +4,7 @@ import { Link, useLocation, useNavigate } from "react-router-dom";
 import socket from "../../Components/Socket";
 
 interface StudentAttendance {
-    name: string;
+    id: number;
     isPresent: boolean;
     erno: number;
 }
@@ -54,7 +54,7 @@ const AttendanceSheet = () => {
                     const formattedData = data.allAttendance.map((item: any) => ({
                         erno: item.erno,
                         isPresent: item.isPresent,
-                        name: item.id
+                        id: item.id
                     }));
 
                     setAccepted((prev) => {
@@ -112,19 +112,19 @@ const AttendanceSheet = () => {
             </div>
             <section className="m-2 flex gap-4 flex-col">
                 {Accepted.length > 0 && Accepted.map((i) => (
-                    <Student key={i.erno} name={i.name} isPresent={i.isPresent} erno={i.erno} />
+                    <Student key={i.erno} id={i.id} isPresent={i.isPresent} erno={i.erno} />
                 ))}
             </section>
         </>
     );
 };
 
-const Student = ({ name, isPresent, erno }: { name: string, isPresent: boolean, erno: number }) => {
+const Student = ({ id, isPresent, erno }: { id: number, isPresent: boolean, erno: number }) => {
 
     return (
         <div className="box flex justify-between items-center p-4 bg-amber-400 rounded-lg">
             <div className="left flex justify-around items-center gap-2">
-                <div className="name border-r-2 border-zinc-900 p-2">{name}</div>
+                <div className="name border-r-2 border-zinc-900 p-2">{id}</div>
                 <div className="er_number ">{erno}</div>
             </div>
             <div className="right flex justify-between gap-2">

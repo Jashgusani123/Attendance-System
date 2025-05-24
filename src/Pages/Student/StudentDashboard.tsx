@@ -14,7 +14,7 @@ import { studentNotExits } from "../../Redux/slices/StudentSlices";
 import { useLogoutMutation as StudentLogoutMutation } from "../../Redux/API/Student";
 import { useLogoutMutation as TeacherLogoutMutation } from "../../Redux/API/Teacher";
 import { useLocation, useNavigate } from "react-router-dom";
-import { WordsCapitalize } from "../../Utils/toCapitalize";
+import { Capitalize, WordsCapitalize } from "../../Utils/toCapitalize";
 
 
 interface ClassDetail {
@@ -263,7 +263,7 @@ export default function StudentDashboard() {
               {classDetails.map((cls, index) => (
                 <li key={index} className="flex justify-between items-center bg-[#183687] p-3 rounded-lg shadow-md">
                   <div>
-                    <p className="text-base font-medium text-white">{cls.subjectName}</p>
+                    <p className="text-base font-medium text-white">{Capitalize(cls.subjectName)}</p>
                     <p className="text-sm text-gray-400">{cls.startingTime ? cls.startingTime : cls.starting} to {cls.endingTime ? cls.endingTime : cls.ending}</p>
                   </div>
                   <button

@@ -7,8 +7,24 @@ interface VariableType {
     "gender"?:string
 }
 
-export const Capitalize = (User : VariableType  , Variable : keyof VariableType )=>{
-    return User ?(  User[Variable]?.charAt(0).toUpperCase())?.concat(User[Variable].slice(1).toLowerCase()): "";
+export const Capitalize = ( str : any)=>{
+    
+    let returnStr = "";
+    let ArrayofStr = [];
+     const strArray = str.split(" ");
+        if(strArray?.length! > 1){
+            for(let i = 0 ; i < strArray?.length! ; i++){
+               ArrayofStr.push(strArray![i].charAt(0).toUpperCase().concat(strArray![i].slice(1).toLowerCase()));
+            }
+        }
+        else{
+            ArrayofStr.push(strArray![0].charAt(0).toUpperCase().concat(strArray![0].slice(1).toLowerCase()));
+        }
+  
+    
+    returnStr = ArrayofStr.join(" ");
+    
+    return returnStr;
 }
 
 export const WordsCapitalize = (User : VariableType  , Variable : keyof VariableType )=>{

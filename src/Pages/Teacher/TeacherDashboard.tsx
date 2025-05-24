@@ -20,7 +20,7 @@ import LoadingLayer from "../../Components/LoadingLayer";
 import socket from "../../Components/Socket";
 import { TeacherReducerInitialState } from "../../Types/API/TeacherApiType";
 import Notification from "../Notification";
-import { WordsCapitalize } from "../../Utils/toCapitalize";
+import { Capitalize, WordsCapitalize } from "../../Utils/toCapitalize";
 
 
 
@@ -104,7 +104,7 @@ export default function TeacherDashboard() {
     }));
   };
 
-  const handleSubmitForm = async (e: React.FormEvent) => {
+  const handleSubmitForm = async (e: React.FormEvent) => {  
     e.preventDefault();
 
     // Validate time
@@ -125,16 +125,16 @@ export default function TeacherDashboard() {
         },
         credentials: "include",
         body: JSON.stringify({
-          subjectName: formData.subjectName,
+          subjectName: formData.subjectName.toLowerCase(),
           starting: moment().format("YYYY-MM-DD") + " " + formData.startingTime,  // Store full date
           ending: moment().format("YYYY-MM-DD") + " " + formData.endingTime,      // Store full date
           semester: formData.semester,
-          departmentName: formData.department,
+          departmentName: formData.department.toLowerCase(),
           location: {
             latitude: formData.location.latitude.toFixed(4),
             longitude: formData.location.longitude.toFixed(4),
           },
-          teacherName: teacher?.fullName,
+          teacherName: teacher?.fullName.toLowerCase(),
         }),
 
       });
@@ -150,9 +150,10 @@ export default function TeacherDashboard() {
       if (data?.newClass) {
 
         socket.connect();
+        
         const obj = {
           _id: data.newClass._id,
-          subjectName: data.newClass.subjectName,
+          subjectName: Capitalize(data.newClass.subjectName),
           starting: data.newClass.starting,
           ending: data.newClass.ending,
           location: data.newClass.location
@@ -432,10 +433,10 @@ export default function TeacherDashboard() {
                   <li
                     key={i._id}
                     className="flex justify-between items-center bg-[#183687] p-3 rounded-lg shadow-md"
-                    onClick={() => attendancesheet({ sub: i.subjectName, classID: i._id })}
+                    onClick={() => attendancesheet({ sub: Capitalize(i.subjectName), classID: i._id })}
                   >
                     <div>
-                      <p className="text-base font-medium text-white">{i.subjectName}</p>
+                      <p className="text-base font-medium text-white">{Capitalize(i.subjectName)}</p>
                       <p className="text-sm text-gray-400">{i.starting ? i.starting : i.startingTime} - {i.ending ? i.ending : i.endingTime}</p>
                     </div>
                     <p className="text-sm font-semibold text-blue-500 cursor-pointer">View Details</p>
@@ -457,10 +458,10 @@ export default function TeacherDashboard() {
                   <li
                     key={i._id}
                     className="flex justify-between items-center bg-[#183687] p-3 rounded-lg shadow-md"
-                    onClick={() => attendancesheet({ sub: i.subjectName, classID: i._id })}
+                    onClick={() => attendancesheet({ sub: Capitalize(i.subjectName), classID: i._id })}
                   >
                     <div>
-                      <p className="text-base font-medium text-white">{i.subjectName}</p>
+                      <p className="text-base font-medium text-white">{Capitalize(i.subjectName)}</p>
                       <p className="text-sm text-gray-400">{i.starting ? i.starting : i.startingTime} - {i.ending ? i.ending : i.endingTime}</p>
                     </div>
                     <p className="text-sm font-semibold text-blue-500 cursor-pointer">View Details</p>
