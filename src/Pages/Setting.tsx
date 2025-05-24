@@ -18,6 +18,7 @@ import { studentNotExits } from "../Redux/slices/StudentSlices";
 import { teacherNotExits } from "../Redux/slices/TeacherSlice";
 import { StudentReducerInitialState } from "../Types/API/StudentApiType";
 import { TeacherReducerInitialState } from "../Types/API/TeacherApiType";
+import { Capitalize, WordsCapitalize } from "../Utils/toCapitalize";
 
 const Setting = () => {
     const { loading: studentLoading, student } = useSelector(
@@ -52,7 +53,7 @@ const Setting = () => {
                 alert(res.error)
             }
 
-        } else  {
+        } else {
             const res = await TeacherLogout(null);
             if (res.data?.success) {
                 dispatch(teacherNotExits());
@@ -61,7 +62,7 @@ const Setting = () => {
                 alert(res.error)
             }
 
-        } 
+        }
     }
     const handleDelete = () => {
         setOpen(true); // Open the confirmation dialog
@@ -77,16 +78,16 @@ const Setting = () => {
             setdate(datew);
         }
     }, []);
-    const userType = student ? student : teacher ;
+    const userType = student ? student : teacher;
 
-    return studentLoading || teacherLoading  ? <><LoadingLayer type={type} /></> : (
+    return studentLoading || teacherLoading ? <><LoadingLayer type={type} /></> : (
         <>
             {type == "Student" ? <LandingNav path="/student/dashboard" home="/student" /> : <LandingNav path="/teacher/dashboard" home="/teacher" />}
             <section className="flex justify-around flex-col gap-5 items-center mt-5 w-full">
 
                 <Fields icon={AccountCircleIcon} Name="Profile" handleClick={() => toggleSection("profile")} isOpen={openSection === "profile"} />
                 {openSection === "profile" && (
-                    <SectionCard title="Change Name" value={userType?.fullName} name="fullName" />
+                    <SectionCard title="Change Name" value={WordsCapitalize(userType!, "fullName")} name="fullName" />
                 )}
 
                 <Fields icon={AccountCircleIcon} Name="Account & Security" handleClick={() => toggleSection("security")} isOpen={openSection === "security"} />
@@ -110,13 +111,13 @@ const Setting = () => {
                     type === "Student" ? (
                         <>
                             <SectionCard title="Enrollment Number" value={student?.enrollmentNumber} name="enrollmentNumber" />
-                            <SectionCard title="College Name" value={student?.collegeName} name="collegeName" />
+                            <SectionCard title="College Name" value={WordsCapitalize(student!, "collegeName")} name="collegeName" />
                             <SectionCard title="Semester" value={student?.semester} name="semester" />
                             <SectionCard title="College Joining Date" value={date} type="date" name="collegeJoiningDate" />
-                            <SectionCard title="Department" value={student?.departmentName} name="departmentName" />
+                            <SectionCard title="Department" value={WordsCapitalize(student!, "departmentName")} name="departmentName" />
                         </>
                     ) : (
-                        <SectionCard title="Department" value={userType!.departmentName} />
+                        <SectionCard title="Department" value={WordsCapitalize(teacher!,"departmentName")} />
                     )
                 )}
 

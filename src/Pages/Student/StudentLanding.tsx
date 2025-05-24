@@ -4,6 +4,7 @@ import LandingNav from "../../Components/LandingNav";
 import socket from "../../Components/Socket";
 import { StudentReducerInitialState } from "../../Types/API/StudentApiType";
 import DashBordImage from "../../assets/DashBordImage.jpg";
+import { Capitalize, WordsCapitalize } from "../../Utils/toCapitalize";
 
 const StudentLanding = () => {
   const { loading: studentLoading, student } = useSelector(
@@ -29,7 +30,7 @@ const StudentLanding = () => {
             <p className="lg:text-[30px] font-bold text-gray-800 text-2xl">
               <span className="text-blue-600">
                 <Typewriter
-                  words={["Hello ,", `${student?.fullName.toLocaleUpperCase()} !!`]}
+                  words={["Hello ,", `${WordsCapitalize(student!, "fullName")} !!`]}
                   loop={Infinity}
                   cursor
                   cursorStyle="|"

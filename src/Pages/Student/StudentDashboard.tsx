@@ -14,6 +14,7 @@ import { studentNotExits } from "../../Redux/slices/StudentSlices";
 import { useLogoutMutation as StudentLogoutMutation } from "../../Redux/API/Student";
 import { useLogoutMutation as TeacherLogoutMutation } from "../../Redux/API/Teacher";
 import { useLocation, useNavigate } from "react-router-dom";
+import { Capitalize, WordsCapitalize } from "../../Utils/toCapitalize";
 
 
 interface ClassDetail {
@@ -223,7 +224,7 @@ export default function StudentDashboard() {
       <Card className="bg-blue-900 text-white p-6 rounded-2xl flex items-center shadow-lg">
         <Avatar src={`https://ui-avatars.com/api/?name=${student?.fullName}`} className="mr-4 w-16 h-16" />
         <div>
-          <h2 className="text-xl font-semibold">{student ? student?.fullName.charAt(0).toUpperCase() + student?.fullName.slice(1).toLowerCase() : ""}</h2>
+          <h2 className="text-xl font-semibold">{WordsCapitalize(student! , "fullName")}</h2>
           <p className="text-sm text-gray-300">Roll No: {student?.enrollmentNumber}</p>
         </div>
       </Card>

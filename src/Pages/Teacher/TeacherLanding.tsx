@@ -3,6 +3,7 @@ import { Typewriter } from "react-simple-typewriter";
 import LandingNav from "../../Components/LandingNav";
 import { TeacherReducerInitialState } from "../../Types/API/TeacherApiType";
 import DashBordImage from "../../assets/DashBordImage.jpg";
+import { WordsCapitalize } from "../../Utils/toCapitalize";
 
 const TeacherLanding = () => {
   const { loading: teacherLoading, teacher } = useSelector(
@@ -20,7 +21,7 @@ const TeacherLanding = () => {
             <p className="lg:text-[30px] font-bold text-gray-800 text-2xl">
               <span className="text-blue-600">
                 <Typewriter
-                  words={["Hello ,", ` ${teacher?.fullName} !!`]}
+                  words={["Hello ,", ` ${WordsCapitalize(teacher! , "fullName")} !!`]}
                   loop={Infinity}
                   cursor
                   cursorStyle="|"

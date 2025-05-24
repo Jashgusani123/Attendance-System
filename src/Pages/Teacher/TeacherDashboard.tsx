@@ -20,6 +20,7 @@ import LoadingLayer from "../../Components/LoadingLayer";
 import socket from "../../Components/Socket";
 import { TeacherReducerInitialState } from "../../Types/API/TeacherApiType";
 import Notification from "../Notification";
+import { WordsCapitalize } from "../../Utils/toCapitalize";
 
 
 
@@ -197,8 +198,7 @@ export default function TeacherDashboard() {
         setSheetURL(data.spreadsheetUrl)
       } else if (!data.success) {
         alert(data.message)
-      }
-      else {
+      }else {
         console.log(data.error);
       }
       setExcelFormData({
@@ -392,8 +392,8 @@ export default function TeacherDashboard() {
             className="mr-4 w-16 h-16"
           />
           <div>
-            <h2 className="text-xl font-semibold">{teacher?.fullName}</h2>
-            <p className="text-sm text-gray-300">Department: {teacher?.departmentName}</p>
+            <h2 className="text-xl font-semibold">{WordsCapitalize(teacher! , "fullName")}</h2>
+            <p className="text-sm text-gray-300">Department: {WordsCapitalize(teacher! , "departmentName")}</p>
           </div>
         </Card>
 
