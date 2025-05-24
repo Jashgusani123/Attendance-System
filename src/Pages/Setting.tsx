@@ -18,7 +18,7 @@ import { studentNotExits } from "../Redux/slices/StudentSlices";
 import { teacherNotExits } from "../Redux/slices/TeacherSlice";
 import { StudentReducerInitialState } from "../Types/API/StudentApiType";
 import { TeacherReducerInitialState } from "../Types/API/TeacherApiType";
-import { Capitalize, WordsCapitalize } from "../Utils/toCapitalize";
+import { WordsCapitalize } from "../Utils/toCapitalize";
 
 const Setting = () => {
     const { loading: studentLoading, student } = useSelector(

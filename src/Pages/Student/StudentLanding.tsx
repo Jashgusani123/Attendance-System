@@ -1,10 +1,10 @@
 import { useSelector } from "react-redux";
 import { Typewriter } from "react-simple-typewriter";
+import DashBordImage from "../../assets/DashBordImage.jpg";
 import LandingNav from "../../Components/LandingNav";
 import socket from "../../Components/Socket";
 import { StudentReducerInitialState } from "../../Types/API/StudentApiType";
-import DashBordImage from "../../assets/DashBordImage.jpg";
-import { Capitalize, WordsCapitalize } from "../../Utils/toCapitalize";
+import { WordsCapitalize } from "../../Utils/toCapitalize";
 
 const StudentLanding = () => {
   const { loading: studentLoading, student } = useSelector(

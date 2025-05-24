@@ -14,7 +14,7 @@ import { studentNotExits } from "../../Redux/slices/StudentSlices";
 import { useLogoutMutation as StudentLogoutMutation } from "../../Redux/API/Student";
 import { useLogoutMutation as TeacherLogoutMutation } from "../../Redux/API/Teacher";
 import { useLocation, useNavigate } from "react-router-dom";
-import { Capitalize, WordsCapitalize } from "../../Utils/toCapitalize";
+import { WordsCapitalize } from "../../Utils/toCapitalize";
 
 
 interface ClassDetail {
