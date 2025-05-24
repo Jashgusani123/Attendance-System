@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
 import { useLoginMutation as StudentLoginMutation } from "../Redux/API/Student";
 import { useLoginMutation as TeacherLoginMutation } from "../Redux/API/Teacher";
@@ -114,6 +114,24 @@ const LoginForm = () => {
     }));
   };
 
+  
+  useEffect(() => {
+    setFormData({
+      fullName: "",
+      email: "",
+      enrollmentNumber: "",
+      password: "",
+      secretkey: ""
+    });
+  
+    setIsError({
+      error: false,
+      message: ""
+    });
+  }, [role]);
+  
+
+
   return (
     <div className="flex items-center justify-center overflow-hidden p-6 h-full">
       <div className="bg-white p-8 rounded-xl shadow-xl w-full max-w-lg">
@@ -139,6 +157,7 @@ const LoginForm = () => {
               placeholder="Full Name"
               className="w-full p-2 border rounded-md focus:ring-2 focus:ring-blue-400"
               required
+              value={formData.fullName}
               onChange={handleChange}
               name="fullName"
             />
@@ -148,6 +167,7 @@ const LoginForm = () => {
             placeholder="Email"
             className="w-full p-2 border rounded-md"
             required
+            value={formData.email}
             onChange={handleChange}
             name="email"
 
@@ -157,6 +177,7 @@ const LoginForm = () => {
             placeholder="Password"
             className="w-full p-2 border rounded-md"
             required
+            value={formData.password}
             onChange={handleChange}
             name="password"
 
@@ -171,6 +192,7 @@ const LoginForm = () => {
                 className="w-full p-2 border rounded-md"
                 required
                 onChange={handleChange}
+                value={formData.enrollmentNumber}
                 name="enrollmentNumber"
 
               />
@@ -190,6 +212,7 @@ const LoginForm = () => {
               className="w-full p-2 border rounded-md"
               required
               onChange={handleChange}
+              value={formData.secretkey}
               name="secretkey"
             />
           )}

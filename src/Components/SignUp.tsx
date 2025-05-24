@@ -23,11 +23,10 @@ const SignUp = () => {
   const [loading, setloading] = useState(false);
   const [collegeLists, setCollegeLists] = useState([]);
   const [departmentLists, setDepartmentLists] = useState([]);
-  const [IsError, setIsError] = useState(
-    {
-      error: false,
-      message: ""
-    });
+  const [IsError, setIsError] = useState({
+    error: false,
+    message: ""
+  });
   const [formData, setFormData] = useState<StudentRequest>({
     fullName: "",
     collegeJoiningDate: "", // Changed to empty string for proper handling
@@ -79,14 +78,57 @@ const SignUp = () => {
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setloading(true);
-
+  
     try {
+      
+  
+      // 3. Continue submission if all fields are filled
       let res;
-
+  
       if (role === "student") {
+        // 1. Define required fields and their labels
+      const requiredFields = {
+        fullName: formData.fullName,
+        email: formData.email,
+        departmentName: formData.departmentName,
+        collegeName: formData.collegeName,
+        collegeJoiningDate: formData.collegeJoiningDate,
+        enrollmentNumber: formData.enrollmentNumber,
+        gender: formData.gender,
+        password: formData.password,
+        semester: formData.semester,
+      };
+  
+      const fieldLabels = {
+        fullName: "Full Name",
+        email: "Email",
+        departmentName: "Department Name",
+        collegeName: "College Name",
+        collegeJoiningDate: "College Joining Date",
+        enrollmentNumber: "Enrollment Number",
+        gender: "Gender",
+        password: "Password",
+        semester: "Semester",
+      };
+  
+      // 2. Find any empty fields
+      const emptyFields = Object.entries(requiredFields)
+      .filter(([_, value]) => value === "" || value === 0 || value === null || value === undefined)
+      .map(([key]) => fieldLabels[key as keyof typeof fieldLabels]);
+    
+  
+      if (emptyFields.length > 0) {
+        setIsError({
+          error: true,
+          message: `Fille Up This : ${emptyFields.join(", ")}`,
+        });
+        setloading(false);
+        return; 
+      }
+
         const formDataWithLowercase = {
           fullName: formData.fullName.toLowerCase(),
-          collegeJoiningDate: formData.collegeJoiningDate.toLowerCase(), // Changed to empty string for proper handling
+          collegeJoiningDate: formData.collegeJoiningDate.toLowerCase(),
           departmentName: formData.departmentName.toLowerCase(),
           collegeName: formData.collegeName.toLowerCase(),
           email: formData.email.toLowerCase(),
@@ -94,8 +136,10 @@ const SignUp = () => {
           password: formData.password,
           semester: formData.semester,
           gender: formData.gender.toLowerCase()
-        }
+        };
+  
         res = await StudentSignup(formDataWithLowercase);
+  
         if (res && "data" in res && res.data?.success) {
           const userData = res.data?.user;
           dispatch(studentExits(userData));
@@ -103,13 +147,49 @@ const SignUp = () => {
         } else {
           if ("error" in res && res.error && "data" in res.error) {
             const errorData = res.error as FetchBaseQueryError;
-            setIsError({ error: true, message: (errorData.data as { message?: string })?.message || "An unexpected error occurred." });
+            setIsError({
+              error: true,
+              message: (errorData.data as { message?: string })?.message || "An unexpected error occurred.",
+            });
           } else {
             setIsError({ error: true, message: "An unexpected error occurred." });
           }
         }
-
-      } else if (role == "teacher") {
+  
+      } else if (role === "teacher") {
+        // 1. Define required fields and their labels
+      const requiredFields = {
+        fullName: formData.fullName,
+        email: formData.email,
+        departmentName: formData.departmentName,
+        collegeName: formData.collegeName,
+        gender: formData.gender,
+        password: formData.password,
+      };
+  
+      const fieldLabels = {
+        fullName: "Full Name",
+        email: "Email",
+        departmentName: "Department Name",
+        collegeName: "College Name",
+        gender: "Gender",
+        password: "Password",
+      };
+  
+      // 2. Find any empty fields
+      const emptyFields = Object.entries(requiredFields)
+      .filter(([_, value]) => value === "" || value === null || value === undefined)
+      .map(([key]) => fieldLabels[key as keyof typeof fieldLabels]);
+    
+  
+      if (emptyFields.length > 0) {
+        setIsError({
+          error: true,
+          message: `Fille Up This : ${emptyFields.join(", ")}`,
+        });
+        setloading(false);
+        return; 
+      }
         const obj = {
           fullName: formData.fullName.toLowerCase(),
           email: formData.email.toLowerCase(),
@@ -117,43 +197,81 @@ const SignUp = () => {
           collegeName: formData.collegeName.toLowerCase(),
           departmentName: formData.departmentName.toLowerCase(),
           gender: formData.gender.toLowerCase()
-        }
+        };
+  
         res = await PandingRequest(obj);
+  
         if (res && "data" in res && res.data.success) {
           navigate("/");
           dispatch(pandingExits(res.data.newPanding));
+  
           const response = await fetch(`${import.meta.env.VITE_SERVER}/notification/create`, {
             method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
+            headers: { "Content-Type": "application/json" },
             credentials: "include",
             body: JSON.stringify({
               type: "request",
               upperHeadding: `${res.data.newPanding.fullName} is Send an Request to ...`,
-              description: `${res.data.newPanding.fullName} is Send an Request to Create an Account For \n Teacher, If Yess then Click on Accept otherwise click on Reject Button .`,
+              description: `${res.data.newPanding.fullName} is Send an Request to Create an Account For \n Teacher, If Yes then Click on Accept otherwise click on Reject Button.`,
               to: res.data.newPanding.hodId,
               pandingId: res.data.newPanding._id
             }),
           });
+  
           const data = await response.json();
           if (data.success) {
-            alert("Your Request Send to Department HOD ... \n Wait to for Accept Request ( or You can ask to accept the request to the HOD ).")
+            alert("Your Request Sent to Department HOD. Wait for acceptance or ask the HOD to accept it.");
           }
+  
         } else {
           console.log(res.error);
         }
-
+  
       } else {
-        //Add Here Hod For Gender
+        // 1. Define required fields and their labels
+      const requiredFields = {
+        fullName: formData.fullName,
+        email: formData.email,
+        departmentName: formData.departmentName,
+        collegeName: formData.collegeName,
+        gender: formData.gender,
+        password: formData.password,
+      };
+  
+      const fieldLabels = {
+        fullName: "Full Name",
+        email: "Email",
+        departmentName: "Department Name",
+        collegeName: "College Name",
+        gender: "Gender",
+        password: "Password",
+      };
+  
+      // 2. Find any empty fields
+      const emptyFields = Object.entries(requiredFields)
+      .filter(([_, value]) => value === "" || value === null || value === undefined)
+      .map(([key]) => fieldLabels[key as keyof typeof fieldLabels]);
+    
+  
+      if (emptyFields.length > 0) {
+        setIsError({
+          error: true,
+          message: `Fille Up This : ${emptyFields.join(", ")}`,
+        });
+        setloading(false);
+        return; 
+      }
         const obj = {
           fullName: formData.fullName.toLowerCase(),
           email: formData.email.toLowerCase(),
           collegeName: formData.collegeName.toLowerCase(),
           password: formData.password,
-          departmentName: formData.departmentName.toLowerCase()
-        }
+          departmentName: formData.departmentName.toLowerCase(),
+          gender:formData.gender
+        };
+  
         res = await HodSignup(obj);
+  
         if (res && "data" in res && res.data?.success) {
           const userData = res.data?.user;
           dispatch(HodExits(userData));
@@ -161,7 +279,10 @@ const SignUp = () => {
         } else {
           if ("error" in res && res.error && "data" in res.error) {
             const errorData = res.error as FetchBaseQueryError;
-            setIsError({ error: true, message: (errorData.data as { message?: string })?.message || "An unexpected error occurred." });
+            setIsError({
+              error: true,
+              message: (errorData.data as { message?: string })?.message || "An unexpected error occurred.",
+            });
           } else {
             setIsError({ error: true, message: "An unexpected error occurred." });
           }
@@ -173,6 +294,7 @@ const SignUp = () => {
       setloading(false);
     }
   };
+  
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
@@ -182,6 +304,24 @@ const SignUp = () => {
     }));
   };
 
+  useEffect(() => {
+    setFormData({
+      fullName: "",
+      collegeJoiningDate: "", // Changed to empty string for proper handling
+      departmentName: "",
+      collegeName: "",
+      email: "",
+      enrollmentNumber: "",
+      password: "",
+      semester: 0,
+      gender: ""
+    });
+
+    setIsError({
+      error: false,
+      message: ""
+    });
+  }, [role])
 
 
   return (
@@ -208,6 +348,7 @@ const SignUp = () => {
             className="w-full p-2 border rounded-md focus:ring-2 focus:ring-blue-400"
             required
             name="fullName"
+            value={formData.fullName}
             onChange={handleChange}
           />
           <input
@@ -215,6 +356,7 @@ const SignUp = () => {
             placeholder="Email"
             className="w-full p-2 border rounded-md"
             required
+            value={formData.email}
             name="email"
             onChange={handleChange}
           />
@@ -223,6 +365,7 @@ const SignUp = () => {
             placeholder="Password"
             className="w-full p-2 border rounded-md"
             required
+            value={formData.password}
             name="password"
             onChange={handleChange}
           />
@@ -233,6 +376,7 @@ const SignUp = () => {
               placeholder="Enrollment Number"
               className="w-full p-2 border rounded-md"
               required
+              value={formData.enrollmentNumber}
               name="enrollmentNumber"
               onChange={handleChange}
             />
@@ -247,17 +391,20 @@ const SignUp = () => {
                 placeholder="Department Name"
                 className="w-full p-2 border rounded-md font-semibold"
                 name="departmentName"
+                required
+                value={formData.departmentName}
                 onChange={handleChange}
               ></input>
               <select
-              className="w-full p-2 border rounded-md text-blue-700 font-semibold"
-              name="collegeName"
-              onChange={handleChange}
-            >
-              <option value="">Select College</option>
-              <option value="Goverment Polytechnic Junagadh">Goverment Polytechnic Junagadh</option>
-              <option value="Nobal College Junagadh">Nobal College Junagadh</option>
-            </select>
+                className="w-full p-2 border rounded-md text-blue-700 font-semibold"
+                name="collegeName"
+                required
+                onChange={handleChange}
+              >
+                <option value="">Select College</option>
+                <option value="Goverment Polytechnic Junagadh">Goverment Polytechnic Junagadh</option>
+                <option value="Nobal College Junagadh">Nobal College Junagadh</option>
+              </select>
 
             </>
 
@@ -266,6 +413,8 @@ const SignUp = () => {
             <select
               className="w-full p-2 border rounded-md text-blue-700 font-semibold"
               name="collegeName"
+              required
+              value={formData.collegeName}
               onChange={handleChange}
             >
               <option value="">Select College</option>
@@ -284,6 +433,8 @@ const SignUp = () => {
               <select
                 className={`${formData.collegeName === "" ? "text-gray-600" : "text-blue-700"} w-full p-2 border rounded-md font-semibold`}
                 name="departmentName"
+                value={formData.departmentName}
+                required
                 onChange={handleChange}
               >
                 <option value="" > {formData.collegeName === ""
@@ -304,6 +455,8 @@ const SignUp = () => {
               <select
                 className="w-full p-2 border rounded-md text-blue-700 font-semibold"
                 name="semester"
+                required
+                value={formData.semester}
                 onChange={handleChange}
               >
                 <option value="">Select Semester</option>
@@ -327,6 +480,8 @@ const SignUp = () => {
               <select
                 className={`${formData.collegeName === "" ? "text-gray-600" : "text-blue-700"} w-full p-2 border rounded-md font-semibold`}
                 name="departmentName"
+                required
+                value={formData.departmentName}
                 onChange={handleChange}
               >
                 <option value="" > {formData.collegeName === ""
@@ -340,12 +495,12 @@ const SignUp = () => {
 
           )}
 
-
-
           {/* Gender */}
           <select
             className="w-full p-2 border rounded-md text-blue-700 font-semibold"
             name="gender"
+            value={formData.gender}
+            required
             onChange={handleChange}
           >
             <option value="">Select Gender</option>

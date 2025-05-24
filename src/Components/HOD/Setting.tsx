@@ -11,6 +11,7 @@ import { HodReducerInitialState } from "../../Types/API/HodApiType";
 import { useLogoutMutation as HodLogoutMutation } from "../../Redux/API/Hod";
 import { HodNotExits } from "../../Redux/slices/HodSlices";
 import LoadingLayer from "../LoadingLayer";
+import { Capitalize } from "../../Utils/toCapitalize";
 
 
 interface NotificationType {
@@ -117,7 +118,7 @@ const ViewPage = () => {
                 {/* Settings Section */}
                 <div className="w-full max-w-full mt-6 p-4 justify-center items-center flex flex-col gap-4">
                     <Fields icon={AccountCircleIcon} Name="Profile" handleClick={() => toggleSection("profile")} isOpen={openSection === "profile"} />
-                    {openSection === "profile" && <SectionCard title="Change Name" value={hod?.fullName} name="fullName" />}
+                    {openSection === "profile" && <SectionCard title="Change Name" value={Capitalize(hod?.fullName)} name="fullName" />}
     
                     <Fields icon={AccountCircleIcon} Name="Account & Security" handleClick={() => toggleSection("security")} isOpen={openSection === "security"} />
                     {openSection === "security" && (
@@ -136,7 +137,7 @@ const ViewPage = () => {
                     )}
     
                     <Fields icon={Class} Name="Academic" handleClick={() => toggleSection("academic")} isOpen={openSection === "academic"} />
-                    {openSection === "academic" && <SectionCard title="Department" value={hod!.departmentName} />}
+                    {openSection === "academic" && <SectionCard title="Department" value={Capitalize(hod!.departmentName)} />}
     
                     <div className="flex justify-between w-full mt-4">
                         <Button variant="contained" color="primary" onClick={handelLogout}>Logout</Button>
