@@ -1,15 +1,21 @@
-import Navbar from '../../Components/Admin/Navbar'
+import Navbar from '../../Components/Admin/Navbar';
 
-const AdminDashbord = () => {
-  
-  return (
-    <>
-    <Navbar />
-    <div className='w-full h-full bg-red-500 abosulute top-0 lef-0'>
-      <p>Hello</p>
-    </div>
-    </>
-  )
+interface AdminDashboardProps {
+  Component: React.ComponentType;
 }
 
-export default AdminDashbord
+const AdminDashboard: React.FC<AdminDashboardProps> = ({ Component }) => {
+  return (
+    <div className="flex h-screen bg-zinc-200 overflow-hidden">
+      {/* Sidebar/Navbar */}
+      <Navbar />
+
+      {/* Main Component */}
+      <div className="flex-1 overflow-y-auto">
+        <Component />
+      </div>
+    </div>
+  );
+};
+
+export default AdminDashboard;

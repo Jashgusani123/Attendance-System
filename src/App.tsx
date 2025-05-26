@@ -14,6 +14,8 @@ import { TeacherReducerInitialState } from "./Types/API/TeacherApiType";
 import { useSignupMutation } from "./Redux/API/Teacher";
 import { useDeletePandingRequstMutation } from "./Redux/API/Panding";
 import AdminDashbord from "./Pages/Admin/AdminDashbord";
+import AdminColleges from "./Pages/Admin/AdminColleges";
+import AdminHome from "./Components/Admin/AdminHome";
 
 
 const Landing = lazy(() => import("./Pages/Landing"));
@@ -149,7 +151,8 @@ function App() {
               <Route path="/" element={<Landing login={false} register={false} />} />
               <Route path="/login" element={<Landing login={true} register={false} />} />
               <Route path="/register" element={<Landing register={true} login={false} />} />
-              <Route path="/admin" element={<AdminDashbord/>} />
+              <Route path="/admin" element={<AdminDashbord  Component={AdminHome}/>} />
+              <Route path="/admin/colleges" element={<AdminDashbord  Component={AdminColleges}/>} />
             </>
           )}
           {/* Student Routes */}

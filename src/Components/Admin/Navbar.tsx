@@ -45,14 +45,14 @@ const Navbar = () => {
     <div
       onMouseEnter={() => setIsExpanded(true)}
       onMouseLeave={() => setIsExpanded(false)}
-      className={`transition-all duration-300 sticky top-2 ${isExpanded ? 'w-[25%]' : 'w-[5%]'} h-full z-50`}
+      className={`transition-all duration-100 ${isExpanded ? 'w-[25%]' : 'w-[5%]'} h-full z-50`}
     >
       <nav className="flex flex-col justify-between items-center p-4 w-full h-full bg-amber-400 rounded-tr-2xl rounded-br-2xl shadow-lg">
         
         {/* Header with Logo and Menu Button */}
         <div className={`flex items-center w-full ${isExpanded ? 'justify-between' : 'justify-center'} h-16`}>
           {isExpanded && (
-            <Link to="/" className="font-bold text-2xl text-blue-900">
+            <Link to="/admin" className="font-bold text-2xl text-blue-900">
               QuickAttend
             </Link>
           )}
@@ -68,7 +68,7 @@ const Navbar = () => {
           {navItems.map((item) => (
             <Tooltip key={item.label} title={item.label} placement="right">
               <span
-                onClick={() => navigate('/hod/view')}
+                onClick={() => navigate(`/admin/${item.label.toLowerCase()}`)}
                 className="text-blue-900 flex items-center gap-2 text-base font-medium cursor-pointer hover:bg-yellow-300 px-3 py-2 rounded-lg transition-all"
               >
                 <span className="text-xl">{item.icon}</span>
