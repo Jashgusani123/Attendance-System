@@ -2,7 +2,7 @@ import { Settings } from "@mui/icons-material";
 import { Button, Card, CardContent, Paper, Stack, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Tooltip, Typography } from "@mui/material";
 import { motion } from "framer-motion";
 import { Bell } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Typewriter } from "react-simple-typewriter";
 import { useGetAllNotificationMutation, useGetAllStudentMutation, useGetAllTeachersMutation } from "../../Redux/API/Hod";
@@ -40,63 +40,68 @@ const HodDashboard = () => {
   const [GetAllTeachersData] = useGetAllTeachersMutation()
   const [GetAllNotificationData] = useGetAllNotificationMutation()
   const [visibleCount, setVisibleCount] = useState(4);
-
+  const dataFetchedRef = useRef(false);
   useEffect(() => {
-    const fetchData = async()=>{
+    if (dataFetchedRef.current) return; // ⛔ Prevent if already fetched
+    dataFetchedRef.current = true;     // ✅ Mark as fetched
+  
+    const fetchData = async () => {
       const GetStudentsData = async () => {
         try {
           const response = await GetAllStudentsData(null);
-          if (response && "data" in response && response.data?.success && response.data?.StudentData) {
-            setStudentsData(response.data?.StudentData);
+          if (response?.data?.success && response.data?.StudentData) {
+            setStudentsData(response.data.StudentData);
           } else {
             console.log(response.data);
-  
           }
         } catch (error) {
           console.log(error);
-  
         }
-      }
+      };
+  
       const GetTeachersData = async () => {
         try {
           const response = await GetAllTeachersData(null);
-          if (response && "data" in response && response.data.success && response.data?.TeacherData) {
-            setTeachersData(response.data?.TeacherData)
+          if (response?.data?.success && response.data?.TeacherData) {
+            setTeachersData(response.data.TeacherData);
           }
         } catch (error) {
           console.log(error);
-  
         }
-      }
-      const GetNotificationsData = async()=>{
-        
+      };
+  
+      const GetNotificationsData = async () => {
         try {
           const response = await GetAllNotificationData(null);
-          if (response && "data" in response && response.data.success && response.data?.notifications) {
-            setNotifications(response.data?.notifications);
+          if (response?.data?.success && response.data?.notifications) {
+            setNotifications(response.data.notifications);
           }
         } catch (error) {
           console.log(error);
-  
         }
-      }
-      await Promise.all([GetTeachersData(),GetStudentsData(),GetNotificationsData()]);
-    }
+      };
+  
+      await Promise.all([
+        GetTeachersData(),
+        GetStudentsData(),
+        GetNotificationsData(),
+      ]);
+    };
+  
     fetchData();
-  }, [])
-
+  }, []);
   const handleSetting = () => {
     navigate("/hod/setting", { state: { type: "Hod" } });
   };
   const manageBtn = (id:string) =>{
     navigate("/hod/manage" ,{state:{id:id}} )
-  }
+  };
   const analysisBtn = (id:string) =>{
     navigate("/hod/analysis" ,{state:{id:id}} )
-  }
+  };
   const showStudentList = ()=>{
     navigate("/hod/student_list")
-  }
+  };
   return (
     <>
       {/* Navbar */}

@@ -1,4 +1,4 @@
-import { lazy, useEffect } from "react";
+import { lazy, useEffect, useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Route, Routes, useNavigate } from "react-router-dom";
 import "./App.css";
@@ -13,6 +13,7 @@ import { StudentReducerInitialState } from "./Types/API/StudentApiType";
 import { TeacherReducerInitialState } from "./Types/API/TeacherApiType";
 import { useSignupMutation } from "./Redux/API/Teacher";
 import { useDeletePandingRequstMutation } from "./Redux/API/Panding";
+import AdminDashbord from "./Pages/Admin/AdminDashbord";
 
 
 const Landing = lazy(() => import("./Pages/Landing"));
@@ -50,59 +51,72 @@ function App() {
   const [DeletePandingRequest] = useDeletePandingRequstMutation();
   const user = student ? "Student" : teacher ? "Teacher" : hod ? "hod" : panding ? "Panding" : ""
   const loading = studentLoading || teacherLoading || hodLoading || pandingLoading;
+  const hasSignedUp = useRef(false);
+  const hasGetuser = useRef(false);
 
   useEffect(() => {
     const fetchUser = async () => {
       try {
+        if(hasGetuser.current)return;
+        hasGetuser.current = true;
         const res = await fetch(`${import.meta.env.VITE_SERVER}/getuser`, {
           method: "GET",
           credentials: "include",
         });
-
+  
         const data = await res.json();
-
+  
         if (data.type === "Student") {
-          dispatch(studentExits(data.user)); 
+          dispatch(studentExits(data.user));
         } else if (data.type === "Teacher") {
-          dispatch(teacherExits(data.user)); 
+          dispatch(teacherExits(data.user));
         } else if (data.type === "Hod") {
           dispatch(HodExits(data.user));
         } else if (data.type === "Panding") {
           if (!data.user.accepted && !data.user.rejected) {
             dispatch(pandingExits(data.user));
-          } else if(data.user.accepted && !data.user.rejected){
+          } else if (data.user.accepted && !data.user.rejected) {
+            if (hasSignedUp.current) return; 
+            hasSignedUp.current = true;
+  
             const obj = {
               fullName: data.user.fullName,
               email: data.user.email,
               password: data.user.password,
               departmentName: data.user.departmentName,
               collegeName: data.user.collegeName,
-              gender: data.user.gender
-            }
-            const response = await TeacherSignup(obj);
-            if(response && "data" in response && response.data?.success){
-              dispatch(teacherExits(response.data.user))
-            }
-            dispatch(pandingNotExits());
-          }else{
-            const response = await DeletePandingRequest(null);
-            if(response && "data" in response && response.data?.success){
+              gender: data.user.gender,
+            };
+  
+            const response2 = await DeletePandingRequest(null);
+            if (response2?.data?.success) {
               dispatch(pandingNotExits());
-                navigate("/", { replace: true });
+              navigate("/", { replace: true });
+            }
+  
+            const response = await TeacherSignup(obj);
+            if (response?.data?.success) {
+              dispatch(teacherExits(response.data.user));
+            }
+  
+          } else {
+            const response = await DeletePandingRequest(null);
+            if (response?.data?.success) {
+              dispatch(pandingNotExits());
+              navigate("/", { replace: true });
             }
             dispatch(pandingNotExits());
           }
-        }
-        else {
-          dispatch(studentNotExits())
-          dispatch(teacherNotExits())
-          dispatch(HodNotExits())
+        } else {
+          dispatch(studentNotExits());
+          dispatch(teacherNotExits());
+          dispatch(HodNotExits());
         }
       } catch (error) {
         console.error("Fetch user error:", error);
       }
     };
-
+  
     fetchUser();
   }, []);
 
@@ -135,6 +149,7 @@ function App() {
               <Route path="/" element={<Landing login={false} register={false} />} />
               <Route path="/login" element={<Landing login={true} register={false} />} />
               <Route path="/register" element={<Landing register={true} login={false} />} />
+              <Route path="/admin" element={<AdminDashbord/>} />
             </>
           )}
           {/* Student Routes */}
