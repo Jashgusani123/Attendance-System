@@ -35,7 +35,7 @@ const Navbar = () => {
   const navigate = useNavigate();
   const [isExpanded, setIsExpanded] = useState(false);
   const [showNotifications, setShowNotifications] = useState(false);
-  const [notifications, setNotifications] = useState<NotificationType[]>([]);
+  const [notifications] = useState<NotificationType[]>([]);
 
   const handleSetting = () => {
     navigate('/admin/setting', { state: { type: 'Admin' } });

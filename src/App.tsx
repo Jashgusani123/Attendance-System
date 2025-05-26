@@ -131,7 +131,7 @@ function App() {
     } else if (user === "Panding" && window.location.pathname !== "/requstsend") {
       navigate("/requstsend", { replace: true });
     }
-    else if (!user && !["/login", "/register"].includes(window.location.pathname)) {
+    else if (!user && !["/login", "/register","/admin"].includes(window.location.pathname)) {
       navigate("/", { replace: true });
     }
   }, [user]);  // ✅ Run whenever `user` updates
