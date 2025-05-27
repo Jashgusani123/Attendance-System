@@ -35,7 +35,13 @@ const Navbar = () => {
   const navigate = useNavigate();
   const [isExpanded, setIsExpanded] = useState(false);
   const [showNotifications, setShowNotifications] = useState(false);
-  const [notifications] = useState<NotificationType[]>([]);
+  const [notifications] = useState<NotificationType[]>([
+   { _id: "string",
+    upperHeadding: "string",
+    description: "string",
+    type: "string",
+    pandingId: "string"
+  }]);
 
   const handleSetting = () => {
     navigate('/admin/setting', { state: { type: 'Admin' } });
@@ -47,7 +53,7 @@ const Navbar = () => {
       onMouseLeave={() => setIsExpanded(false)}
       className={`transition-all duration-100 ${isExpanded ? 'w-[25%]' : 'w-[5%]'} h-full z-50`}
     >
-      <nav className="flex flex-col justify-between items-center p-4 w-full h-full bg-amber-400 rounded-tr-2xl rounded-br-2xl shadow-lg">
+      <nav className="flex flex-col justify-between items-center p-4 w-full h-full bg-amber-400 rounded-tr-2xl rounded-br-2xl shadow-lg ">
         
         {/* Header with Logo and Menu Button */}
         <div className={`flex items-center w-full ${isExpanded ? 'justify-between' : 'justify-center'} h-16`}>
@@ -100,13 +106,13 @@ const Navbar = () => {
                 </Tooltip>
 
                 {notifications.length > 0 && (
-                  <span className="absolute top-[-5px] right-[-8px] bg-red-500 text-white text-xs rounded-full px-1.5 py-0.5">
+                  <span className="absolute top-[-8px] right-[-8px] bg-red-500 text-white text-xs rounded-full px-1.5 py-0.5">
                     {notifications.length}
                   </span>
                 )}
 
                 {showNotifications && (
-                  <div className="absolute top-[-35px] right-0 z-50 bg-white shadow-lg rounded-lg">
+                  <div className="absolute top-[-240px] left-[260px] z-[100] bg-white shadow-lg rounded-lg">
                     <Notification
                       fun={setShowNotifications}
                       notifications={notifications}

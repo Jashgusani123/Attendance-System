@@ -2,7 +2,18 @@ import { lazy, useEffect, useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Route, Routes, useNavigate } from "react-router-dom";
 import "./App.css";
+import AdminDashbord from "./Components/Admin/AdminDashbord";
+import AdminClasses from "./Pages/Admin/AdminClasses";
+import AdminColleges from "./Pages/Admin/AdminColleges";
+import AdminDepartment from "./Pages/Admin/AdminDepartments";
+import AdminHome from "./Pages/Admin/AdminHome";
+import AdminNotifications from "./Pages/Admin/AdminNotification";
+import AdminRequests from "./Pages/Admin/AdminRequest";
+import AdminUsers from "./Pages/Admin/AdminUsers";
+import AdminView from "./Pages/Admin/AdminView";
 import ShowAllStudent from "./Pages/HOD/ShowAllStudent";
+import { useDeletePandingRequstMutation } from "./Redux/API/Panding";
+import { useSignupMutation } from "./Redux/API/Teacher";
 import { HodExits, HodNotExits } from "./Redux/slices/HodSlices";
 import { pandingExits, pandingNotExits } from "./Redux/slices/PandingSlices";
 import { studentExits, studentNotExits } from "./Redux/slices/StudentSlices";
@@ -11,11 +22,6 @@ import { HodReducerInitialState } from "./Types/API/HodApiType";
 import { PandingReducerInitialState } from "./Types/API/PandingApiType";
 import { StudentReducerInitialState } from "./Types/API/StudentApiType";
 import { TeacherReducerInitialState } from "./Types/API/TeacherApiType";
-import { useSignupMutation } from "./Redux/API/Teacher";
-import { useDeletePandingRequstMutation } from "./Redux/API/Panding";
-import AdminDashbord from "./Pages/Admin/AdminDashbord";
-import AdminColleges from "./Pages/Admin/AdminColleges";
-import AdminHome from "./Components/Admin/AdminHome";
 
 
 const Landing = lazy(() => import("./Pages/Landing"));
@@ -133,7 +139,7 @@ function App() {
     } else if (user === "Panding" && window.location.pathname !== "/requstsend") {
       navigate("/requstsend", { replace: true });
     }
-    else if (!user && !["/login", "/register","/admin"].includes(window.location.pathname)) {
+    else if (!user && !["/login", "/register","/admin","/admin-login"].includes(window.location.pathname)) {
       navigate("/", { replace: true });
     }
   }, [user]);  // ✅ Run whenever `user` updates
@@ -153,6 +159,13 @@ function App() {
               <Route path="/register" element={<Landing register={true} login={false} />} />
               <Route path="/admin" element={<AdminDashbord  Component={AdminHome}/>} />
               <Route path="/admin/colleges" element={<AdminDashbord  Component={AdminColleges}/>} />
+              <Route path="/admin/colleges/view" element={<AdminDashbord  Component={AdminView}/>} />
+              <Route path="/admin/departments" element={<AdminDashbord  Component={AdminDepartment}/>} />
+              <Route path="/admin/users" element={<AdminDashbord  Component={AdminUsers}/>} />
+              <Route path="/admin/classes" element={<AdminDashbord  Component={AdminClasses}/>} />
+              <Route path="/admin/requests" element={<AdminDashbord  Component={AdminRequests}/>} />
+              <Route path="/admin/notifications" element={<AdminDashbord  Component={AdminNotifications}/>} />
+
             </>
           )}
           {/* Student Routes */}

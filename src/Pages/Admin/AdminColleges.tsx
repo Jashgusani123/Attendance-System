@@ -1,6 +1,8 @@
 import { motion } from 'framer-motion';
 import { Eye, Plus, Search, X } from 'lucide-react';
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import InnerNavbar from '../../Components/Admin/InnerNavbar';
 
 const colleges = [
     {
@@ -52,32 +54,51 @@ const colleges = [
 const AdminColleges = () => {
   const [showForm, setShowForm] = useState(false);
   const [step, setStep] = useState(1);
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<{
+    name: string;
+    place: string;
+    category: string;
+    logo: File | null;
+    image: File | null;
+    departments: string;
+  }>({
     name: '',
-    logo: '',
-    image: '',
     place: '',
     category: '',
+    logo: null,
+    image: null,
     departments: ''
   });
-
+  
+  
+  const navigate = useNavigate();
   const handleNext = () => setStep(prev => Math.min(prev + 1, 3));
   const handlePrev = () => setStep(prev => Math.max(prev - 1, 1));
   const handleChange = (e: any) => setFormData({ ...formData, [e.target.name]: e.target.value });
 
-  const handleSubmit = () => {
-    console.log("Submitted Data:", formData);
-    // TODO: Call API here
-    setShowForm(false);
-    setStep(1);
+  const handleSubmit = async () => {
+    const data = new FormData();
+    data.append('name', formData.name);
+    data.append('place', formData.place);
+    data.append('category', formData.category);
+    data.append('departments', formData.departments);
+    if (formData.logo) data.append('logo', formData.logo);
+    if (formData.image) data.append('image', formData.image);
+  
+    // Send using fetch or axios
+    await fetch('/api/colleges', {
+      method: 'POST',
+      body: data,
+    });
   };
+  const handleViewOfCollege = (id:number) =>{
+    navigate("/admin/colleges/view" , {state:{id:id}})
+  }
 
   return (
     <div className="p-6 w-full">
       {/* NAVBAR */}
-      <nav className="bg-zinc-300 rounded-[10px] sticky top-0 z-50 w-full flex justify-between items-center px-4 py-3 mb-4">
-        <h1 className="text-2xl font-bold text-zinc-800">All Colleges</h1>
-        <div className="flex items-center gap-2">
+      <InnerNavbar Name='All Colleges' Components={<div className="flex items-center gap-2">
           <input
             type="text"
             placeholder="Search Here.."
@@ -91,8 +112,7 @@ const AdminColleges = () => {
             <Plus className="w-4 h-4" />
             Add College
           </button>
-        </div>
-      </nav>
+        </div>}/>
 
       {/* CARDS */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -114,7 +134,7 @@ const AdminColleges = () => {
               <p><strong>🎓 Departments:</strong> {college.departments.join(', ')}</p>
             </div>
             <div className="px-4 py-4">
-              <button className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white text-sm px-4 py-2 rounded-full">
+              <button className="flex items-center gap-2 bg-blue-600 cursor-pointer hover:bg-blue-700 text-white text-sm px-4 py-2 rounded-full" onClick={()=>handleViewOfCollege(college.id)}>
                 <Eye className="w-4 h-4" />
                 View
               </button>
@@ -125,62 +145,148 @@ const AdminColleges = () => {
 
       {/* FORM MODAL */}
       {showForm && (
-        <div className="fixed inset-0 bg-[#000000d9] bg-opacity-40 flex justify-center items-center z-50">
-          <div className="bg-white rounded-xl shadow-lg w-[90%] max-w-xl p-6 relative">
-            <button onClick={() => setShowForm(false)} className="absolute top-4 right-4 text-zinc-600 hover:text-red-500">
-              <X />
-            </button>
+  <div className="fixed inset-0 bg-[#000000d9] bg-opacity-40 flex justify-center items-center z-50">
+    <div className="bg-white rounded-2xl shadow-2xl w-[95%] max-w-2xl p-8 relative border border-blue-100">
+      {/* Close Button */}
+      <button
+        onClick={() => setShowForm(false)}
+        className="absolute cursor-pointer top-4 right-4 text-zinc-600 hover:text-red-500"
+      >
+        <X />
+      </button>
 
-            {/* Stepper Line */}
-            <div className="flex justify-between mb-6">
-              {[1, 2, 3].map(s => (
-                <div key={s} className="flex-1 flex items-center">
-                  <div className={`w-8 h-8 rounded-full text-white text-sm flex items-center justify-center ${s <= step ? 'bg-blue-600' : 'bg-zinc-300'}`}>
-                    {s}
-                  </div>
-                  {s < 3 && <div className={`flex-1 h-[2px] ${s < step ? 'bg-blue-600' : 'bg-zinc-300'}`}></div>}
-                </div>
-              ))}
+      {/* Stepper with Names */}
+      <div className="flex justify-between items-center mb-8">
+        {[
+          { step: 1, label: 'Basic Info' },
+          { step: 2, label: 'Media' },
+          { step: 3, label: 'Departments' }
+        ].map((item, idx, arr) => (
+          <div key={item.step} className="flex items-center w-full">
+            <div className="flex flex-col items-center">
+              <div
+                className={`w-10 h-10 rounded-full text-white text-sm flex items-center justify-center font-semibold shadow transition-all duration-300 ${
+                  step >= item.step ? 'bg-blue-600' : 'bg-zinc-300'
+                }`}
+              >
+                {item.step}
+              </div>
+              <span className="text-xs mt-2 text-center text-zinc-600 font-medium">
+                {item.label}
+              </span>
             </div>
-
-            {/* Step Forms */}
-            {step === 1 && (
-              <div className="space-y-4">
-                <input name="name" value={formData.name} onChange={handleChange} placeholder="College Name" className="w-full border border-zinc-300 rounded-md px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-blue-500" />
-                <input name="place" value={formData.place} onChange={handleChange} placeholder="Place" className="w-full border border-zinc-300 rounded-md px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-blue-500" />
-                <input name="category" value={formData.category} onChange={handleChange} placeholder="Category (e.g., Engineering)" className="w-full border border-zinc-300 rounded-md px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-blue-500" />
-              </div>
+            {idx < arr.length - 1 && (
+              <div
+                className={`flex-1 h-[3px] mx-2 rounded-full transition-all duration-300 ${
+                  step > item.step ? 'bg-blue-600' : 'bg-zinc-300'
+                }`}
+              ></div>
             )}
-            {step === 2 && (
-              <div className="space-y-4">
-                <input name="logo" value={formData.logo} onChange={handleChange} placeholder="Logo URL" className="w-full border border-zinc-300 rounded-md px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-blue-500" />
-                <input name="image" value={formData.image} onChange={handleChange} placeholder="Image URL" className="w-full border border-zinc-300 rounded-md px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-blue-500" />
-              </div>
-            )}
-            {step === 3 && (
-              <div className="space-y-4">
-                <textarea name="departments" value={formData.departments} onChange={handleChange} placeholder="Departments (comma-separated)" className="w-full border border-zinc-300 rounded-md px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-blue-500" />
-              </div>
-            )}
-
-            {/* Buttons */}
-            <div className="mt-6 flex justify-between">
-              <button onClick={handlePrev} disabled={step === 1} className="bg-zinc-200 px-4 py-2 rounded-md text-sm">
-                Previous
-              </button>
-              {step < 3 ? (
-                <button onClick={handleNext} className="bg-blue-600 text-white px-4 py-2 rounded-md text-sm">
-                  Next
-                </button>
-              ) : (
-                <button onClick={handleSubmit} className="bg-green-600 text-white px-4 py-2 rounded-md text-sm">
-                  Submit
-                </button>
-              )}
-            </div>
           </div>
+        ))}
+      </div>
+
+      {/* Step Forms */}
+      {step === 1 && (
+        <div className="space-y-4">
+          <input
+            name="name"
+            value={formData.name}
+            onChange={handleChange}
+            placeholder="College Name"
+            className="w-full border border-zinc-300 rounded-md px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-blue-500"
+          />
+          <input
+            name="place"
+            value={formData.place}
+            onChange={handleChange}
+            placeholder="Place"
+            className="w-full border border-zinc-300 rounded-md px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-blue-500"
+          />
+          <input
+            name="category"
+            value={formData.category}
+            onChange={handleChange}
+            placeholder="Category (e.g., Engineering)"
+            className="w-full border border-zinc-300 rounded-md px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-blue-500"
+          />
         </div>
       )}
+
+{step === 2 && (
+  <div className="space-y-4">
+    {/* Logo Upload */}
+    <div>
+      <label className="block text-sm font-medium text-zinc-700 mb-1">Logo</label>
+      <input
+        type="file"
+        name="logo"
+        accept="image/*"
+        onChange={(e) =>
+          setFormData({ ...formData, logo: e.target.files?.[0] || null })
+        }
+        className="w-full border border-zinc-300 rounded-md px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-blue-500"
+      />
+    </div>
+
+    {/* Image Upload */}
+    <div>
+      <label className="block text-sm font-medium text-zinc-700 mb-1">Image</label>
+      <input
+        type="file"
+        name="image"
+        accept="image/*"
+        onChange={(e) =>
+          setFormData({ ...formData, image: e.target.files?.[0] || null })
+        }
+        className="w-full border border-zinc-300 rounded-md px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-blue-500"
+      />
+    </div>
+  </div>
+)}
+
+
+      {step === 3 && (
+        <div className="space-y-4">
+          <textarea
+            name="departments"
+            value={formData.departments}
+            onChange={handleChange}
+            placeholder="Departments (comma-separated)"
+            className="w-full border border-zinc-300 rounded-md px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-blue-500"
+          />
+        </div>
+      )}
+
+      {/* Buttons */}
+      <div className="mt-6 flex justify-between">
+        <button
+          onClick={handlePrev}
+          disabled={step === 1}
+          className="bg-zinc-200 px-4 py-2 rounded-md text-sm hover:bg-zinc-300"
+        >
+          Previous
+        </button>
+        {step < 3 ? (
+          <button
+            onClick={handleNext}
+            className="bg-blue-600 text-white px-4 py-2 rounded-md text-sm hover:bg-blue-700"
+          >
+            Next
+          </button>
+        ) : (
+          <button
+            onClick={handleSubmit}
+            className="bg-green-600 text-white px-4 py-2 rounded-md text-sm hover:bg-green-700"
+          >
+            Submit
+          </button>
+        )}
+      </div>
+    </div>
+  </div>
+)}
+
     </div>
   );
 };

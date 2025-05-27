@@ -1,4 +1,4 @@
-import Navbar from '../../Components/Admin/Navbar';
+import Navbar from './Navbar';
 
 interface AdminDashboardProps {
   Component: React.ComponentType;
