@@ -9,39 +9,11 @@ import TableRow from '@mui/material/TableRow';
 import { ArrowLeft } from "lucide-react";
 import { useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
+import { useGetCollegeQuery } from '../../Redux/API/Admin';
+import { Capitalize } from '../../Utils/toCapitalize';
 
-const colleges = [
-    {
-        id: 1,
-        name: "ABC Engineering College",
-        logo: "https://png.pngtree.com/png-vector/20230303/ourmid/pngtree-education-and-college-logo-design-template-vector-png-image_6627789.png",
-        image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQSgg2_55kmn9bL9aE4dyljGN7nfyX1ehuvig&s",
-        place: "Chennai, Tamil Nadu",
-        category: "Engineering",
-        departments: ["CSE", "ECE", "EEE", "MECH", "CIVIL"],
-        hods: 4,
-        teachers: 15,
-        students: 412
-    },
-];
 
-const hodData = [
-    { name: "Dr. A Kumar", email: "akumar@college.edu", department: "CSE" },
-    { name: "Dr. B Sharma", email: "bsharma@college.edu", department: "ECE" },
-    { name: "Dr. C Iyer", email: "ciyer@college.edu", department: "EEE" },
-];
 
-const teacherData = [
-    { name: "Prof. R Singh", email: "rsingh@college.edu", department: "CSE" },
-    { name: "Prof. M Roy", email: "mroy@college.edu", department: "ECE" },
-    { name: "Prof. P Nair", email: "pnair@college.edu", department: "MECH" },
-];
-
-const studentData = [
-    { name: "Anjali", email: "anjali@student.edu", department: "CSE" },
-    { name: "Ravi", email: "ravi@student.edu", department: "ECE" },
-    { name: "Kiran", email: "kiran@student.edu", department: "EEE" },
-];
 
 const AdminView = () => {
     const [page, setPage] = useState(0);
@@ -49,9 +21,9 @@ const AdminView = () => {
     const location = useLocation();
     const navigate = useNavigate();
     const id = location.state?.id;
-    const college = colleges.find((c) => c.id === id);
-
-    const handleChangePage = (event: unknown, newPage: number) => {
+    const {data:College} = useGetCollegeQuery(id);
+    
+    const handleChangePage = (_event: unknown, newPage: number) => {
         setPage(newPage);
     };
 
@@ -59,7 +31,7 @@ const AdminView = () => {
         setRowsPerPage(+event.target.value);
         setPage(0);
     };
-
+    
     return (
         <div className="p-6">
             <div className="flex items-center mb-6">
@@ -72,29 +44,29 @@ const AdminView = () => {
                 </button>
             </div>
 
-            {college ? (
+            {College?.CollegeDetails ? (
                 <div>
                     <div className="flex mb-2 items-center gap-4">
                         <img
-                            src={college.logo}
-                            alt={`${college.name} logo`}
+                            src={College?.CollegeDetails.logoUrl}
+                            alt={`${College?.CollegeDetails.collegename} logo`}
                             className="w-12 h-12 rounded-full border"
                         />
-                        <h1 className="text-2xl font-bold text-zinc-800">{college.name}</h1>
+                        <h1 className="text-2xl font-bold text-zinc-800">{Capitalize(College?.CollegeDetails.collegename)}</h1>
                     </div>
 
                     <hr className="my-4" />
 
                     <div className="relative w-full h-[300px] rounded-xl overflow-hidden mb-8">
                         <img
-                            src={college.image}
-                            alt={`${college.name} banner`}
+                            src={College?.CollegeDetails.imageUrl}
+                            alt={`${College?.CollegeDetails.collegename} banner`}
                             className="w-full h-full object-cover"
                         />
                         <div className="absolute inset-0 bg-black/40" />
                         <div className="absolute bottom-4 left-4 text-white">
-                            <h2 className="text-2xl font-bold">{college.name}</h2>
-                            <p className="text-sm">{college.place}</p>
+                            <h2 className="text-2xl font-bold">{Capitalize(College?.CollegeDetails.collegename)}</h2>
+                            <p className="text-sm">{College?.CollegeDetails.place}</p>
                         </div>
                     </div>
 
@@ -102,22 +74,22 @@ const AdminView = () => {
                         <h1 className="text-2xl font-extrabold font-mono">Information:-</h1>
                         <div className="flex justify-around">
                             <div className="text-sm bg-sky-200 p-4 rounded-xl text-zinc-700 space-y-2">
-                                <p className="font-semibold text-xl">📍 Place: {college.place}</p>
-                                <p className="font-semibold text-xl">🏷️ Category: {college.category}</p>
-                                <p className="font-semibold text-xl">🎓 Departments: {college.departments.join(', ')}</p>
+                                <p className="font-semibold text-xl">📍 Place: {Capitalize(College?.CollegeDetails.place)}</p>
+                                <p className="font-semibold text-xl">🏷️ Category: {College?.CollegeDetails.category}</p>
+                                <p className="font-semibold text-xl">🎓 Departments: {College?.CollegeDetails.department}</p>
                             </div>
                             <div className="text-sm bg-sky-200 p-4 rounded-xl text-zinc-700 space-y-2">
-                                <p className="font-semibold text-xl">🤵🏻‍♂️ Head Of Departments: {college.hods}</p>
-                                <p className="font-semibold text-xl">👨🏻‍🏫 Teachers: {college.teachers}</p>
-                                <p className="font-semibold text-xl">🙎🏻 Students: {college.students}</p>
+                                <p className="font-semibold text-xl">🤵🏻‍♂️ Head Of Departments: {College.CollegeDetails.HodCount}</p>
+                                <p className="font-semibold text-xl">👨🏻‍🏫 Teachers: {College.CollegeDetails.TeacherCount}</p>
+                                <p className="font-semibold text-xl">🙎🏻 Students: {College.CollegeDetails.StudentCount}</p>
                             </div>
                         </div>
                     </div>
 
                     <section className="mt-4">
-                        <InfoTable title="Head of Departments" data={hodData} page={page} onPageChange={handleChangePage} onRowsPerPageChange={handleChangeRowsPerPage} rowsPerPage={rowsPerPage} />
-                        <InfoTable title="Teachers" data={teacherData} page={page} onPageChange={handleChangePage} onRowsPerPageChange={handleChangeRowsPerPage} rowsPerPage={rowsPerPage} />
-                        <InfoTable title="Students" data={studentData} page={page} onPageChange={handleChangePage} onRowsPerPageChange={handleChangeRowsPerPage} rowsPerPage={rowsPerPage} />
+                        <InfoTable title="Head of Departments" data={College?.CollegeDetails.Hods} page={page} onPageChange={handleChangePage} onRowsPerPageChange={handleChangeRowsPerPage} rowsPerPage={rowsPerPage} />
+                        <InfoTable title="Teachers" data={College?.CollegeDetails.Teachers} page={page} onPageChange={handleChangePage} onRowsPerPageChange={handleChangeRowsPerPage} rowsPerPage={rowsPerPage} />
+                        <InfoTable title="Students" data={College?.CollegeDetails.Students} page={page} onPageChange={handleChangePage} onRowsPerPageChange={handleChangeRowsPerPage} rowsPerPage={rowsPerPage} />
                     </section>
                 </div>
             ) : (
@@ -136,7 +108,7 @@ const InfoTable = ({
     onRowsPerPageChange
 }: {
     title: string;
-    data: { name: string; email: string; department: string }[];
+    data: { fullName: string; email: string; departmentName: string }[];
     page: number;
     rowsPerPage: number;
     onPageChange: (event: unknown, newPage: number) => void;
@@ -160,9 +132,9 @@ const InfoTable = ({
                         <TableBody>
                             {paginatedData.map((row, index) => (
                                 <TableRow key={index}>
-                                    <TableCell>{row.name}</TableCell>
+                                    <TableCell>{row.fullName}</TableCell>
                                     <TableCell>{row.email}</TableCell>
-                                    <TableCell>{row.department}</TableCell>
+                                    <TableCell>{row.departmentName}</TableCell>
                                 </TableRow>
                             ))}
                         </TableBody>

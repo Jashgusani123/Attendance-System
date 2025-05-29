@@ -12,6 +12,7 @@ import { pandingExits } from "../Redux/slices/PandingSlices";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import { LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
+import { Capitalize } from "../Utils/toCapitalize";
 
 const SignUp = () => {
   const dispatch = useDispatch();
@@ -22,7 +23,8 @@ const SignUp = () => {
   const [PandingRequest] = PandingReuestMution();
   const [loading, setloading] = useState(false);
   const [collegeLists, setCollegeLists] = useState([]);
-  const [departmentLists, setDepartmentLists] = useState([]);
+  const [departmentLists, setDepartmentLists] = useState<string[]>([]);
+  const navigate = useNavigate();
   const [IsError, setIsError] = useState({
     error: false,
     message: ""
@@ -38,7 +40,10 @@ const SignUp = () => {
     semester: 1,
     gender: ""
   });
-
+  interface Response {
+    success:boolean,
+    departmentNames:string[]
+  }
   useEffect(() => {
     const fetchColleges = async () => {
       const response = await fetch(`${import.meta.env.VITE_SERVER}/api/v1/supported/getallcollege`);
@@ -56,6 +61,7 @@ const SignUp = () => {
   useEffect(() => {
     const fetchDepartment = async () => {
       if (!formData.collegeName) return;
+      setDepartmentLists([])
       const response = await fetch(`${import.meta.env.VITE_SERVER}/api/v1/supported/getalldepartment`, {
         method: "POST",
         headers: {
@@ -63,9 +69,9 @@ const SignUp = () => {
         },
         body: JSON.stringify({ collegeName: formData.collegeName }),
       });
-      const data = await response.json();
+      const data:Response = await response.json();
       if (data.success) {
-        setDepartmentLists(data.departmentNames);
+        setDepartmentLists(data.departmentNames)
       }
     };
 
@@ -73,18 +79,13 @@ const SignUp = () => {
   }, [formData.collegeName]); // ✅ Depend only on collegeName change
 
 
-  const navigate = useNavigate();
-
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setloading(true);
   
     try {
-      
-  
       // 3. Continue submission if all fields are filled
       let res;
-  
       if (role === "student") {
         // 1. Define required fields and their labels
       const requiredFields = {
@@ -385,25 +386,32 @@ const SignUp = () => {
           {/* Hod Fields */}
           {role === "Hod" && (
             <>
-              {/* Department  */}
-              <input
-                type="text"
-                placeholder="Department Name"
-                className="w-full p-2 border rounded-md font-semibold"
-                name="departmentName"
-                required
-                value={formData.departmentName}
-                onChange={handleChange}
-              ></input>
               <select
-                className="w-full p-2 border rounded-md text-blue-700 font-semibold"
-                name="collegeName"
+              className="w-full p-2 border rounded-md text-blue-700 font-semibold"
+              name="collegeName"
+              required
+              value={Capitalize(formData.collegeName)}
+              onChange={handleChange}
+            >
+              <option value="">Select College</option>
+              {collegeLists?.map((i) => (
+                <option value={i}>{i}</option>
+              ))}
+            </select>
+              {/* Department  */}
+              <select
+                className={`${formData.collegeName === "" ? "text-gray-600" : "text-blue-700"} w-full p-2 border rounded-md font-semibold`}
+                name="departmentName"
+                value={Capitalize(formData.departmentName)}
                 required
                 onChange={handleChange}
               >
-                <option value="">Select College</option>
-                <option value="Goverment Polytechnic Junagadh">Goverment Polytechnic Junagadh</option>
-                <option value="Nobal College Junagadh">Nobal College Junagadh</option>
+                <option value="" > {formData.collegeName === ""
+                  ? "First Select College Name"
+                  : "Select Department"}</option>
+                {departmentLists.length > 0 && formData.collegeName !== "" && departmentLists.map((i) => (
+                  <option value={i}>{i}</option>
+                ))}
               </select>
 
             </>
@@ -419,7 +427,7 @@ const SignUp = () => {
             >
               <option value="">Select College</option>
               {collegeLists?.map((i) => (
-                <option value={i}>{i}</option>
+                <option value={i}>{Capitalize(i)}</option>
               ))}
             </select>
           )}
@@ -433,7 +441,7 @@ const SignUp = () => {
               <select
                 className={`${formData.collegeName === "" ? "text-gray-600" : "text-blue-700"} w-full p-2 border rounded-md font-semibold`}
                 name="departmentName"
-                value={formData.departmentName}
+                value={Capitalize(formData.departmentName)}
                 required
                 onChange={handleChange}
               >
@@ -477,11 +485,12 @@ const SignUp = () => {
           {role === "teacher" && (
             <>
               {/* Department  */}
+              
               <select
                 className={`${formData.collegeName === "" ? "text-gray-600" : "text-blue-700"} w-full p-2 border rounded-md font-semibold`}
                 name="departmentName"
                 required
-                value={formData.departmentName}
+                value={Capitalize(formData.departmentName)}
                 onChange={handleChange}
               >
                 <option value="" > {formData.collegeName === ""

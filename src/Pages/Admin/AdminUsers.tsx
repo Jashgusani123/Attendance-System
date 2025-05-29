@@ -8,27 +8,14 @@ import TablePagination from '@mui/material/TablePagination';
 import TableRow from '@mui/material/TableRow';
 import { useState } from 'react';
 import InnerNavbar from '../../Components/Admin/InnerNavbar';
+import { useGetAllUsersQuery } from '../../Redux/API/Admin';
+import { Capitalize } from '../../Utils/toCapitalize';
 
-const hodData = [
-    { name: "Dr. A Kumar", email: "akumar@college.edu", department: "CSE" },
-    { name: "Dr. B Sharma", email: "bsharma@college.edu", department: "ECE" },
-    { name: "Dr. C Iyer", email: "ciyer@college.edu", department: "EEE" },
-];
 
-const teacherData = [
-    { name: "Prof. R Singh", email: "rsingh@college.edu", department: "CSE" },
-    { name: "Prof. M Roy", email: "mroy@college.edu", department: "ECE" },
-    { name: "Prof. P Nair", email: "pnair@college.edu", department: "MECH" },
-];
-
-const studentData = [
-    { name: "Anjali", email: "anjali@student.edu", department: "CSE" },
-    { name: "Ravi", email: "ravi@student.edu", department: "ECE" },
-    { name: "Kiran", email: "kiran@student.edu", department: "EEE" },
-];
 const AdminUsers = () => {
     const [page, setPage] = useState(0);
     const [rowsPerPage, setRowsPerPage] = useState(10);
+    const {data:UsersData} = useGetAllUsersQuery();
     const handleChangePage = (event: unknown, newPage: number) => {
         console.log(event);
 
@@ -44,10 +31,9 @@ const AdminUsers = () => {
             <div className="user_con p-4">
                 <InnerNavbar Name='All Users'/>
                 <section className="mt-4">
-                    <InfoTable title="Head of Departments" data={hodData} page={page} onPageChange={handleChangePage} onRowsPerPageChange={handleChangeRowsPerPage} rowsPerPage={rowsPerPage} />
-                    <InfoTable title="Teachers" data={teacherData} page={page} onPageChange={handleChangePage} onRowsPerPageChange={handleChangeRowsPerPage} rowsPerPage={rowsPerPage} />
-                    <InfoTable title="Students" data={studentData} page={page} onPageChange={handleChangePage} onRowsPerPageChange={handleChangeRowsPerPage} rowsPerPage={rowsPerPage} />
-
+                    <InfoTable title="Head of Departments" data={UsersData?.Users.Hods?UsersData?.Users.Hods:[]} page={page} onPageChange={handleChangePage} onRowsPerPageChange={handleChangeRowsPerPage} rowsPerPage={rowsPerPage} />
+                    <InfoTable title="Teachers" data={UsersData?.Users.Teachers?UsersData?.Users.Teachers:[]} page={page} onPageChange={handleChangePage} onRowsPerPageChange={handleChangeRowsPerPage} rowsPerPage={rowsPerPage} />
+                    <InfoTable title="Students" data={UsersData?.Users.Students?UsersData?.Users.Students:[]} page={page} onPageChange={handleChangePage} onRowsPerPageChange={handleChangeRowsPerPage} rowsPerPage={rowsPerPage} />
                 </section>
             </div>
         </>
@@ -62,7 +48,7 @@ const InfoTable = ({
     onRowsPerPageChange
 }: {
     title: string;
-    data: { name: string; email: string; department: string }[];
+    data: {_id:string , fullName: string; email: string; departmentName: string }[];
     page: number;
     rowsPerPage: number;
     onPageChange: (event: unknown, newPage: number) => void;
@@ -86,9 +72,9 @@ const InfoTable = ({
                         <TableBody>
                             {paginatedData.map((row, index) => (
                                 <TableRow key={index}>
-                                    <TableCell>{row.name}</TableCell>
+                                    <TableCell>{Capitalize(row.fullName)}</TableCell>
                                     <TableCell>{row.email}</TableCell>
-                                    <TableCell>{row.department}</TableCell>
+                                    <TableCell>{Capitalize(row.departmentName)}</TableCell>
                                 </TableRow>
                             ))}
                         </TableBody>

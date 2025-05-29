@@ -23,30 +23,13 @@ import {
   YAxis
 } from 'recharts';
 import InnerNavbar from '../../Components/Admin/InnerNavbar';
-interface Column {
-  id: 'college' | 'departments' | 'hods' | 'teachers' | 'students';
-  label: string;
-  minWidth?: number;
-  align?: 'right' | 'left' | 'center';
-  format?: (value: number) => string;
-}
-
-const columns: readonly Column[] = [
-  { id: 'college', label: 'College Name', minWidth: 150 },
-  { id: 'departments', label: 'Departments', minWidth: 100, align: 'center' },
-  { id: 'hods', label: 'HODs', minWidth: 100, align: 'center' },
-  { id: 'teachers', label: 'Teachers', minWidth: 100, align: 'center' },
-  { id: 'students', label: 'Students', minWidth: 100, align: 'center' },
-];
+import { useGetFirstCardsQuery, useGetJoingTableQuery } from '../../Redux/API/Admin';
+import { Capitalize } from '../../Utils/toCapitalize';
+import { Data } from '../../Types/API/AdminType';
 
 
-interface Data {
-  college: string;
-  departments: number;
-  hods: number;
-  teachers: number;
-  students: number;
-}
+
+
 
 function createData(
   college: string,
@@ -58,58 +41,58 @@ function createData(
   return { college, departments, hods, teachers, students };
 }
 
-const rows = [
-  createData('ABC College', 5, 5, 35, 450),
-  createData('XYZ Institute', 8, 8, 60, 900),
-  createData('PQR University', 10, 10, 80, 1200),
-  createData('LMN College', 4, 4, 28, 350),
-  createData('DEF Institute', 6, 6, 40, 600),
-  createData('UVW Academy', 3, 3, 22, 300),
-  createData('HIJ College', 7, 7, 55, 870),
-];
-
-
-const data = [
-  { name: "Hods", count: 301, fill: "#2563eb" },
-  { name: "Teachers", count: 230, fill: "#fbbf24" },
-  { name: "Students", count: 300, fill: "#837279" },
-];
 
 const AdminHome = () => {
-  const [page, setPage] = React.useState(0);
-  const [rowsPerPage, setRowsPerPage] = React.useState(10);
-
-  const handleChangePage = (event: unknown, newPage: number) => {
-    console.log(event);
-
+  const [page, setPage] = useState(0);
+  const [rowsPerPage, setRowsPerPage] =useState(10);
+  const { data: FirstCardData } = useGetFirstCardsQuery();
+  const { data: JoingTableData } = useGetJoingTableQuery();
+  const handleChangePage = (_event: unknown, newPage: number) => {
     setPage(newPage);
+    
   };
 
   const handleChangeRowsPerPage = (event: React.ChangeEvent<HTMLInputElement>) => {
     setRowsPerPage(+event.target.value);
     setPage(0);
   };
-  const [data1] = useState<any[]>([
-    { name: "Mon", Created: 20, TotalPresent: 15 },
-    { name: "Tue", Created: 18, TotalPresent: 71 },
-    { name: "Wed", Created: 22, TotalPresent: 33 },
-    { name: "Thu", Created: 19, TotalPresent: 78 },
-    { name: "Fri", Created: 21, TotalPresent: 41 },
-  ]);
+  const data1 = FirstCardData?.Data.cardSecond?.map((item: any) => ({
+    name: item.date,
+    Created: item.CreatedClassCount,
+    TotalPresent: item.PresentCount
+  })) || [];
+
+
+  const data = [
+    { name: "HODs", count: FirstCardData?.Data.cardFirst?.HODs || 0, fill: "#8884d8" },
+    { name: "Teachers", count: FirstCardData?.Data.cardFirst?.Teachers || 0, fill: "#82ca9d" },
+    { name: "Students", count: FirstCardData?.Data.cardFirst?.Student || 0, fill: "#ffc658" },
+  ];
+  const requestsData = FirstCardData?.Data.cardThird?.map((item: any) => ({
+    name: item.date,
+    pending: item.PandingRequestCount,
+    notifications: item.NotificationRequestCount
+  })) || [];
+
+  const rows: Data[] = JoingTableData?.tableData?.map((item: any) =>
+    createData(item.college, item.departments, item.hods, item.teachers, item.students)
+  ) || [];
+
+
   return (
     <>
       {/* Main content */}
       <div className="h-screen flex flex-col p-4">
         {/* Sticky Navbar */}
         <InnerNavbar Name='Admin Dashbord' Components={<div className="right_side flex items-center gap-2">
-            <input
-              type="text"
-              placeholder="Search Here.."
-              className="bg-white border-2 border-zinc-400 px-3 h-10 rounded-md text-sm outline-none"
-            />
-            <Search className="bg-white border-zinc-400 border-2 text-blue-900 p-1 rounded-full shadow cursor-pointer h-10 w-13" />
-          </div>} />
-          
+          <input
+            type="text"
+            placeholder="Search Here.."
+            className="bg-white border-2 border-zinc-400 px-3 h-10 rounded-md text-sm outline-none"
+          />
+          <Search className="bg-white border-zinc-400 border-2 text-blue-900 p-1 rounded-full shadow cursor-pointer h-10 w-13" />
+        </div>} />
+
 
         <hr />
 
@@ -145,6 +128,7 @@ const AdminHome = () => {
                   </div>
                 ))}
               </div>
+
             </div>
           </motion.div>
 
@@ -177,13 +161,7 @@ const AdminHome = () => {
             <h2 className="text-blue-900 font-semibold text-lg mb-2">Requests</h2>
             <div className="w-full">
               <ResponsiveContainer width="100%" height={200}>
-                <LineChart data={[
-                  { name: "Mon", pending: 10, notifications: 5 },
-                  { name: "Tue", pending: 15, notifications: 7 },
-                  { name: "Wed", pending: 20, notifications: 10 },
-                  { name: "Thu", pending: 25, notifications: 13 },
-                  { name: "Fri", pending: 30, notifications: 17 }
-                ]}>
+                <LineChart data={requestsData}>
                   <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
                   <XAxis dataKey="name" hide />
                   <YAxis hide />
@@ -207,44 +185,30 @@ const AdminHome = () => {
           </motion.div>
         </section>
 
-        {/* Joinings Section */}
         <section className="mt-4">
-          <h1 className="text-lg font-bold text-zinc-800 mb-2">Joining (Last 5 Days)</h1>
+          <h1 className="text-lg font-bold text-zinc-800 mb-2">JoiningData Table</h1>
           <Paper sx={{ width: '100%', overflow: 'hidden' }}>
             <TableContainer sx={{ maxHeight: 440 }}>
-              <Table stickyHeader aria-label="sticky table">
+              <Table stickyHeader>
                 <TableHead>
-                  <TableRow>
-                    {columns.map((column) => (
-                      <TableCell
-                        key={column.id}
-                        align={column.align}
-                        style={{ minWidth: column.minWidth, backgroundColor: "#a8a8a8" }}
-                      >
-                        {column.label}
-                      </TableCell>
-                    ))}
+                  <TableRow >
+                    <TableCell style={{backgroundColor:"#747474"}}>College</TableCell>
+                    <TableCell align="center" style={{backgroundColor:"#747474"}}>Departments</TableCell>
+                    <TableCell align="center" style={{backgroundColor:"#747474"}}>HODs</TableCell>
+                    <TableCell align="center" style={{backgroundColor:"#747474"}}>Teachers</TableCell>
+                    <TableCell align="center" style={{backgroundColor:"#747474"}}>Students</TableCell>
                   </TableRow>
                 </TableHead>
                 <TableBody>
-                  {rows
-                    .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-                    .map((row) => {
-                      return (
-                        <TableRow hover role="checkbox" tabIndex={-1} key={row.hods}>
-                          {columns.map((column) => {
-                            const value = row[column.id];
-                            return (
-                              <TableCell key={column.id} align={column.align}>
-                                {column.format && typeof value === 'number'
-                                  ? column.format(value)
-                                  : value}
-                              </TableCell>
-                            );
-                          })}
-                        </TableRow>
-                      );
-                    })}
+                  {rows.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((row, index) => (
+                    <TableRow key={index}>
+                      <TableCell>{Capitalize(row.college)}</TableCell>
+                      <TableCell align="center">{row.departments}</TableCell>
+                      <TableCell align="center">{row.hods}</TableCell>
+                      <TableCell align="center">{row.teachers}</TableCell>
+                      <TableCell align="center">{row.students}</TableCell>
+                    </TableRow>
+                  ))}
                 </TableBody>
               </Table>
             </TableContainer>
@@ -256,10 +220,10 @@ const AdminHome = () => {
               page={page}
               onPageChange={handleChangePage}
               onRowsPerPageChange={handleChangeRowsPerPage}
-              className='flex'
             />
           </Paper>
         </section>
+
       </div>
     </>
   )
