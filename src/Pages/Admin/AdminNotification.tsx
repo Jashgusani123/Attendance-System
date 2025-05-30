@@ -1,12 +1,11 @@
-import { useState } from "react";
-import NotificationForm from "../../Components/Admin/NotificationForm";
 import NotificationCard from "../../Components/Admin/NotificationCard";
-import { useNotificationMutation } from "../../Redux/API/Admin";
+import NotificationForm from "../../Components/Admin/NotificationForm";
+import { useDeleteNotificationMutation, useGetAllNotificationsQuery, useNotificationMutation } from "../../Redux/API/Admin";
 
 const AdminNotifications = () => {
-  const [notifications, setNotifications] = useState<any[]>([]);
-  const [NotificationCreatation] = useNotificationMutation()
-
+  const {data:Notifications} = useGetAllNotificationsQuery();
+  const [NotificationCreatation] = useNotificationMutation();
+  const [NotificationDeletation] = useDeleteNotificationMutation();
   const handleSend = (data: {
     upperHeading: string,
     description: string,
@@ -31,8 +30,8 @@ const AdminNotifications = () => {
 
   };
 
-  const handleDelete = (id: number) => {
-    setNotifications((prev) => prev.filter((note) => note.id !== id));
+  const handleDelete = async(id: string) => {
+    NotificationDeletation(id);
   };
 
   return (
@@ -42,8 +41,8 @@ const AdminNotifications = () => {
       <div>
         <h2 className="text-xl font-bold text-blue-900 mb-3">🗂 Sent Notifications</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {notifications.map((note) => (
-            <NotificationCard key={note.id} note={note} onDelete={() => handleDelete(note.id)} />
+          {Notifications?.Notifications.map((note) => (
+            <NotificationCard key={note._id} note={note} onDelete={() => handleDelete(note._id)} />
           ))}
         </div>
       </div>

@@ -1,5 +1,5 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
-import { AdminRequest, AdminResponse, ClassesResponse, Departments, FirstCard, JoingTableDataResponse, RequestNotification, RequestResponse, ResponseDeleteResponse, ResponseForCollege, ResponseOfAllCollege, ResponseOfNotification, SearchWordResponse, UsersResponse } from "../../Types/API/AdminType";
+import { AdminRequest, AdminResponse, AllNotificationsResponse, ClassesResponse, Departments, FirstCard, JoingTableDataResponse, RequestNotification, RequestResponse, ResponseDeleteResponse, ResponseForCollege, ResponseOfAllCollege, ResponseOfNotification, SearchWordResponse, UsersResponse } from "../../Types/API/AdminType";
 
 export const AdminAPI = createApi({
     reducerPath: "AdminAPI",
@@ -7,7 +7,7 @@ export const AdminAPI = createApi({
         baseUrl: `${import.meta.env.VITE_SERVER}/api/v1/admin`, 
         credentials: "include"  // ✅ Ensure cookies are sent with requests
     }),
-    tagTypes: ["admin" , "requests"],  //  Added tagTypes for caching
+    tagTypes: ["admin" , "requests" , "notification"],  //  Added tagTypes for caching
     endpoints: (builders) => ({
         createcollege: builders.mutation<AdminResponse,AdminRequest >({
             query: (formData) => ({
@@ -81,14 +81,29 @@ export const AdminAPI = createApi({
               }),
               invalidatesTags: ["requests"]
         }),
+        getAllNotifications: builders.query<AllNotificationsResponse, void>({
+            query: () => ({
+                url: `getnotifications`,
+                method: "GET",
+              }),
+              providesTags:["notification"]
+        }),
         notification: builders.mutation<ResponseOfNotification, RequestNotification>({
-            query: ({description , to,type, upperHeadding}) => ({
+            query: ({ description, to, type, upperHeadding }) => ({
                 url: `${import.meta.env.VITE_SERVER}/notification/create`,
                 method: "POST",
-                body:{description , to , type ,upperHeadding},
+                body: { description, to, type, upperHeadding },
+            }),
+            invalidatesTags: ["notification"] 
+        }),
+        deleteNotification: builders.mutation<ResponseDeleteResponse, String>({
+            query: (id) => ({
+                url: `deletenotification?id=${id}`,
+                method: "DELETE",
               }),
+              invalidatesTags: ["notification"]
         }),
     })
 });
 
-export const { useCreatecollegeMutation , useGetAllCollegesQuery , useGetCollegeQuery ,useSearchCollegeQuery , useGetAllDepartmentsQuery, useGetAllClassesQuery ,useGetFirstCardsQuery , useGetJoingTableQuery , useGetAllUsersQuery , useGetRequestsQuery , useDeleteRequestMutation , useNotificationMutation} = AdminAPI;
+export const { useCreatecollegeMutation , useGetAllCollegesQuery , useGetCollegeQuery ,useSearchCollegeQuery , useGetAllDepartmentsQuery, useGetAllClassesQuery ,useGetFirstCardsQuery , useGetJoingTableQuery , useGetAllUsersQuery , useGetRequestsQuery , useDeleteRequestMutation , useNotificationMutation , useGetAllNotificationsQuery , useDeleteNotificationMutation} = AdminAPI;

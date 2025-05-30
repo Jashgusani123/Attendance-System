@@ -7,7 +7,6 @@ import TableHead from '@mui/material/TableHead';
 import TablePagination from '@mui/material/TablePagination';
 import TableRow from '@mui/material/TableRow';
 import { motion } from "framer-motion";
-import { Search } from 'lucide-react';
 import React, { useState } from 'react';
 import {
   Bar,
@@ -22,10 +21,11 @@ import {
   XAxis,
   YAxis
 } from 'recharts';
+import Clock from '../../Components/Admin/Clock';
 import InnerNavbar from '../../Components/Admin/InnerNavbar';
 import { useGetFirstCardsQuery, useGetJoingTableQuery } from '../../Redux/API/Admin';
-import { Capitalize } from '../../Utils/toCapitalize';
 import { Data } from '../../Types/API/AdminType';
+import { Capitalize } from '../../Utils/toCapitalize';
 
 
 
@@ -44,12 +44,12 @@ function createData(
 
 const AdminHome = () => {
   const [page, setPage] = useState(0);
-  const [rowsPerPage, setRowsPerPage] =useState(10);
+  const [rowsPerPage, setRowsPerPage] = useState(10);
   const { data: FirstCardData } = useGetFirstCardsQuery();
   const { data: JoingTableData } = useGetJoingTableQuery();
   const handleChangePage = (_event: unknown, newPage: number) => {
     setPage(newPage);
-    
+
   };
 
   const handleChangeRowsPerPage = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -84,14 +84,7 @@ const AdminHome = () => {
       {/* Main content */}
       <div className="h-screen flex flex-col p-4">
         {/* Sticky Navbar */}
-        <InnerNavbar Name='Admin Dashbord' Components={<div className="right_side flex items-center gap-2">
-          <input
-            type="text"
-            placeholder="Search Here.."
-            className="bg-white border-2 border-zinc-400 px-3 h-10 rounded-md text-sm outline-none"
-          />
-          <Search className="bg-white border-zinc-400 border-2 text-blue-900 p-1 rounded-full shadow cursor-pointer h-10 w-13" />
-        </div>} />
+        <InnerNavbar Name='Admin Dashbord' Components={<Clock />} />
 
 
         <hr />
@@ -192,11 +185,11 @@ const AdminHome = () => {
               <Table stickyHeader>
                 <TableHead>
                   <TableRow >
-                    <TableCell style={{backgroundColor:"#747474"}}>College</TableCell>
-                    <TableCell align="center" style={{backgroundColor:"#747474"}}>Departments</TableCell>
-                    <TableCell align="center" style={{backgroundColor:"#747474"}}>HODs</TableCell>
-                    <TableCell align="center" style={{backgroundColor:"#747474"}}>Teachers</TableCell>
-                    <TableCell align="center" style={{backgroundColor:"#747474"}}>Students</TableCell>
+                    <TableCell style={{ backgroundColor: "#747474" }}>College</TableCell>
+                    <TableCell align="center" style={{ backgroundColor: "#747474" }}>Departments</TableCell>
+                    <TableCell align="center" style={{ backgroundColor: "#747474" }}>HODs</TableCell>
+                    <TableCell align="center" style={{ backgroundColor: "#747474" }}>Teachers</TableCell>
+                    <TableCell align="center" style={{ backgroundColor: "#747474" }}>Students</TableCell>
                   </TableRow>
                 </TableHead>
                 <TableBody>

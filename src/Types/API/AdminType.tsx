@@ -195,10 +195,19 @@ export interface ResponseOfNotification {
     message:string
 }
 export interface RequestNotification{
-    
         type:string, 
         upperHeadding:string, 
         description:string,
         to:string
-    
+}
+
+export interface AllNotificationsResponse {
+    success:boolean,
+    Notifications:{
+        _id:string,
+        upperHeadding:string,
+        description:string,
+        allUsers:string[]
+        to:string 
+        userType:string}[]
 }
