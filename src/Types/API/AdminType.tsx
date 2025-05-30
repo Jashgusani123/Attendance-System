@@ -139,3 +139,66 @@ export interface SearchWordResponse {
     success: boolean,
     colleges: College[]
 }
+
+export interface Departments {
+    success: true,
+    data:  {
+        collegeName: String,
+        departments: {
+            name: String,
+            hod: String
+        }[]
+    }[]
+}
+
+export interface ClassesResponse {
+    success: true,
+    data: {
+        liveClasses: {
+            title:string,
+            college: string,
+            department: string,
+            teacher: string,
+            time: string,
+            status: string
+        }[],
+        lastClasses: {
+            title:string,
+            college: string,
+            department: string,
+            teacher: string,
+            time: string,
+            status: string
+        }[]
+    }
+}
+
+export interface RequestResponse {
+    success: true,
+    data: {
+        id: String,
+        title: String,
+        college: String,
+        department: String,
+        reason: String,
+        requestedTo: String,
+        date: String,
+        status: String
+    }[]
+}
+
+export interface ResponseDeleteResponse {
+    success:boolean
+}
+export interface ResponseOfNotification {
+    success:boolean,
+    message:string
+}
+export interface RequestNotification{
+    
+        type:string, 
+        upperHeadding:string, 
+        description:string,
+        to:string
+    
+}

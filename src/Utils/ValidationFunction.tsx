@@ -50,7 +50,6 @@ function getApprovedClasses(): Record<string, Set<string>> {
 // Save attendance approval for a specific class
 function saveApprovedClassAttendance(classId: string, deviceId: string) {
     const approvedClasses = getApprovedClasses();
-    console.log(approvedClasses);
     
     if (!approvedClasses[classId]) {
         approvedClasses[classId] = new Set();

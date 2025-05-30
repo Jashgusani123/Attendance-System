@@ -18,7 +18,6 @@ const AdminUsers = () => {
     const {data:UsersData} = useGetAllUsersQuery();
     const handleChangePage = (event: unknown, newPage: number) => {
         console.log(event);
-
         setPage(newPage);
     };
 

@@ -52,7 +52,6 @@ const HodDashboard = () => {
           if (response?.data?.success && response.data?.StudentData) {
             setStudentsData(response.data.StudentData);
           } else {
-            console.log(response.data);
           }
         } catch (error) {
           console.log(error);

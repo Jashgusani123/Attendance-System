@@ -69,7 +69,6 @@ const AdminColleges = () => {
 
   useEffect(() => {
     if (DebouncedSearchTerm) {
-      console.log("Searching:", DebouncedSearchTerm);
     }
   }, [DebouncedSearchTerm]);
 

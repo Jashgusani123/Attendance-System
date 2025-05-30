@@ -266,7 +266,6 @@ export default function TeacherDashboard() {
           if (data.success) {
             setattendanceGraphData(data.last7DaysData);
           } else {
-            console.log(data);
           }
         };
         const GetLastClasses = async () => {
@@ -278,7 +277,6 @@ export default function TeacherDashboard() {
           if (data.success) {
             setlastClasses(data.allClasses);
           } else {
-            console.log(data);
           }
         };
 

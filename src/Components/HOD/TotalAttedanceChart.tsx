@@ -17,7 +17,6 @@ const AttendanceChart = ({ isOther, userId }: { isOther?: boolean, userId?: stri
     const GetOverviewLast7daysFunc = async () => {
       const response = await GetOverviewLast7Days(userId);
       if(response && "data" in response && response.data.success && response.data.DataOf7Days){
-        console.log(response.data);
         
         setData(response.data.DataOf7Days.map((item: any) => ({
           name: item.date, // Set the X-axis name

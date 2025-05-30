@@ -1,12 +1,34 @@
 import { useState } from "react";
 import NotificationForm from "../../Components/Admin/NotificationForm";
 import NotificationCard from "../../Components/Admin/NotificationCard";
+import { useNotificationMutation } from "../../Redux/API/Admin";
 
 const AdminNotifications = () => {
   const [notifications, setNotifications] = useState<any[]>([]);
+  const [NotificationCreatation] = useNotificationMutation()
 
-  const handleSend = (data: any) => {
-    setNotifications((prev) => [...prev, { id: Date.now(), ...data }]);
+  const handleSend = (data: {
+    upperHeading: string,
+    description: string,
+    target: string,
+    college: string,
+    role: string,
+    user: string,
+    department: string,
+    status: string,
+    read: string,
+    createdAt: Date,
+    to:string
+  }) => {
+
+    if(data.target === "all"){
+      NotificationCreatation({upperHeadding:data.upperHeading,description:data.description , to:data.target , type:"adminmessage"})
+    }else if(data.target ==="college"){
+      NotificationCreatation({upperHeadding:data.upperHeading,description:data.description , to:data.to , type:"adminmessage"})
+    }else{
+      NotificationCreatation({upperHeadding:data.upperHeading,description:data.description , to:data.to , type:"adminmessage"})
+    }
+
   };
 
   const handleDelete = (id: number) => {
