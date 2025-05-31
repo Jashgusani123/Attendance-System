@@ -1,5 +1,5 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
-import { AdminRequest, AdminResponse, AllNotificationsResponse, ClassesResponse, Departments, FirstCard, JoingTableDataResponse, RequestNotification, RequestResponse, ResponseDeleteResponse, ResponseForCollege, ResponseOfAllCollege, ResponseOfNotification, SearchWordResponse, UsersResponse } from "../../Types/API/AdminType";
+import { AdminCreatetationRequest, AdminCreatetationResponse, AdminLoginRequest, AdminLoginResponse, AdminLogoutRespose, AdminRequest, AdminResponse, AllNotificationsResponse, ClassesResponse, Departments, FingerprintRegisterRequest, FingerprintRegisterRespose, FirstCard, JoingTableDataResponse, RequestNotification, RequestResponse, ResponseDeleteResponse, ResponseForCollege, ResponseOfAllCollege, ResponseOfNotification, SearchWordResponse, UsersResponse } from "../../Types/API/AdminType";
 
 export const AdminAPI = createApi({
     reducerPath: "AdminAPI",
@@ -9,6 +9,29 @@ export const AdminAPI = createApi({
     }),
     tagTypes: ["admin" , "requests" , "notification"],  //  Added tagTypes for caching
     endpoints: (builders) => ({
+        createAdmin: builders.mutation<AdminCreatetationResponse,AdminCreatetationRequest >({
+            query: (formData) => ({
+                url: "registraction",
+                method: "POST",
+                body: formData,
+            }),
+            invalidatesTags: ["admin"]  //  Invalidate cache after signup
+        }),
+        LoginAdmin: builders.mutation<AdminLoginResponse,AdminLoginRequest >({
+            query: (formData) => ({
+                url: "login",
+                method: "POST",
+                body: formData,
+            }),
+            invalidatesTags: ["admin"]  //  Invalidate cache after signup
+        }),
+        logoutAdmin: builders.mutation<AdminLogoutRespose,void >({
+            query: () => ({
+                url: "logout",
+                method: "POST",
+            }),
+            invalidatesTags: ["admin"]  //  Invalidate cache after signup
+        }),
         createcollege: builders.mutation<AdminResponse,AdminRequest >({
             query: (formData) => ({
                 url: "createclg",
@@ -103,7 +126,23 @@ export const AdminAPI = createApi({
               }),
               invalidatesTags: ["notification"]
         }),
+        FingerprintRegister: builders.mutation<FingerprintRegisterRespose, FingerprintRegisterRequest>({
+            query: ({credentialID, publicKey, counter, transports}) => ({
+                url: `register-credential`,
+                method: "PUT",
+                body:{credentialID, publicKey, counter, transports}
+              }),
+              invalidatesTags: ["notification"]
+        }),
+        FingerprintLogin: builders.mutation({
+            query: ({ credentialID }) => ({
+              url: "/login-fingerprint",
+              method: "PUT",
+              body: { credentialID }
+            })
+          }),
+          
     })
 });
 
-export const { useCreatecollegeMutation , useGetAllCollegesQuery , useGetCollegeQuery ,useSearchCollegeQuery , useGetAllDepartmentsQuery, useGetAllClassesQuery ,useGetFirstCardsQuery , useGetJoingTableQuery , useGetAllUsersQuery , useGetRequestsQuery , useDeleteRequestMutation , useNotificationMutation , useGetAllNotificationsQuery , useDeleteNotificationMutation} = AdminAPI;
+export const { useCreateAdminMutation , useLoginAdminMutation , useLogoutAdminMutation , useFingerprintRegisterMutation, useFingerprintLoginMutation  ,useCreatecollegeMutation , useGetAllCollegesQuery , useGetCollegeQuery ,useSearchCollegeQuery , useGetAllDepartmentsQuery, useGetAllClassesQuery ,useGetFirstCardsQuery , useGetJoingTableQuery , useGetAllUsersQuery , useGetRequestsQuery , useDeleteRequestMutation , useNotificationMutation , useGetAllNotificationsQuery , useDeleteNotificationMutation} = AdminAPI;

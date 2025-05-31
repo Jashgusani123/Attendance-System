@@ -1,10 +1,8 @@
 export interface AdminRequest {
-    collegename: string;
-    place: string;
-    category: string[];
-    logo: File | null;
-    image: File | null;
-    department: string[];
+    _id: string,
+    email: string,
+    password: string,
+    credentials: [],
 }
 
 export interface AdminResponse {
@@ -210,4 +208,47 @@ export interface AllNotificationsResponse {
         allUsers:string[]
         to:string 
         userType:string}[]
+}
+
+export interface AdminCreatetationResponse {
+    success: boolean,
+    message: string,
+    user: {
+        _id: string,
+        email: string,
+        password: string,
+        credentials: [],
+    }
+}
+export interface AdminCreatetationRequest{
+    email:string,
+    password:string
+}
+
+export interface AdminLoginResponse {
+    success: boolean,
+    message: string,
+    user: {
+        _id: string,
+        email: string,
+        password: string,
+        credentials: [],
+    }
+}
+
+export interface AdminLoginRequest{
+    email:string,
+    password:string
+}
+
+export interface AdminLogoutRespose{
+    success:boolean,
+    message:string
+}
+
+export interface FingerprintRegisterRespose {
+    message:string
+}
+export interface FingerprintRegisterRequest {
+    credentialID:string, publicKey:string, counter:number, transports:string[]
 }

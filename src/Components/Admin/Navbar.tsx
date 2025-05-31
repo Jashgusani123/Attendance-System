@@ -13,6 +13,9 @@ import {
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import Notification from '../../Pages/Notification';
+import { useLogoutAdminMutation } from '../../Redux/API/Admin';
+import { useDispatch } from 'react-redux';
+import { AdminNotExits } from '../../Redux/slices/AdminSlices';
 
 interface NotificationType {
   _id: string;
@@ -35,6 +38,8 @@ const Navbar = () => {
   const navigate = useNavigate();
   const [isExpanded, setIsExpanded] = useState(false);
   const [showNotifications, setShowNotifications] = useState(false);
+  const [Logout] = useLogoutAdminMutation();
+  const dispatch = useDispatch();
   const [notifications] = useState<NotificationType[]>([
    { _id: "string",
     upperHeadding: "string",
@@ -46,6 +51,15 @@ const Navbar = () => {
   const handleSetting = () => {
     navigate('/admin/setting', { state: { type: 'Admin' } });
   };
+
+  const handleLogout = async()=>{
+    const res = await Logout();
+    if(res.data?.success){
+      alert("Logout Successfully !!");
+      dispatch(AdminNotExits());
+    }
+    
+  }
 
   return (
     <div
@@ -125,7 +139,7 @@ const Navbar = () => {
           )}
 
           <span
-            onClick={handleSetting}
+            onClick={handleLogout}
             className="text-blue-900 rounded-full flex items-center justify-center w-10 h-10 cursor-pointer bg-white shadow-md relative"
           >
             <Tooltip title="Logout">

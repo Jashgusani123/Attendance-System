@@ -36,7 +36,7 @@ const LandingNav = ({
         <div className="landing_navbar sticky top-0 h-15 w-full z-20">
             <nav className="flex justify-between items-center p-2 w-full h-full bg-amber-400">
                 <div className="image">
-                    <Link to={home ? home : "/"} className="font-bold text-2xl text-blue-900">
+                    <Link to={home ? home : "/admin/login"} className="font-bold text-2xl text-blue-900">
                         QuickAttend
                     </Link>
                 </div>
