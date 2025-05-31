@@ -2,16 +2,6 @@ import { lazy, useEffect, useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Route, Routes, useNavigate } from "react-router-dom";
 import "./App.css";
-import AdminDashbord from "./Components/Admin/AdminDashbord";
-import AdminClasses from "./Pages/Admin/AdminClasses";
-import AdminColleges from "./Pages/Admin/AdminColleges";
-import AdminDepartment from "./Pages/Admin/AdminDepartments";
-import AdminHome from "./Pages/Admin/AdminHome";
-import AdminNotifications from "./Pages/Admin/AdminNotification";
-import AdminRequests from "./Pages/Admin/AdminRequest";
-import AdminUsers from "./Pages/Admin/AdminUsers";
-import AdminView from "./Pages/Admin/AdminView";
-import ShowAllStudent from "./Pages/HOD/ShowAllStudent";
 import { useDeletePandingRequstMutation } from "./Redux/API/Panding";
 import { useSignupMutation } from "./Redux/API/Teacher";
 import { HodExits, HodNotExits } from "./Redux/slices/HodSlices";
@@ -42,6 +32,16 @@ const Analysis = lazy(() => import("./Pages/HOD/Analysis"));
 const AdminSetting = lazy(() => import("./Pages/Admin/AdminSetting"));
 const AdminLogin = lazy(() => import("./Pages/Admin/Login"));
 const AdminRegistration = lazy(() => import("./Pages/Admin/Registration"));
+const AdminDashbord = lazy(() => import("./Components/Admin/AdminDashbord"));
+const AdminClasses = lazy(() => import("./Pages/Admin/AdminClasses"));
+const AdminColleges = lazy(() => import("./Pages/Admin/AdminColleges"));
+const AdminDepartment = lazy(() => import("./Pages/Admin/AdminDepartments"));
+const AdminHome = lazy(() => import("./Pages/Admin/AdminHome"));
+const AdminNotifications = lazy(() => import("./Pages/Admin/AdminNotification"));
+const AdminRequests = lazy(() => import("./Pages/Admin/AdminRequest"));
+const AdminUsers = lazy(() => import("./Pages/Admin/AdminUsers"));
+const AdminView = lazy(() => import("./Pages/Admin/AdminView"));
+const ShowAllStudent = lazy(() => import("./Pages/HOD/ShowAllStudent"));
 
 function App() {
   const { loading: studentLoading, student } = useSelector(
