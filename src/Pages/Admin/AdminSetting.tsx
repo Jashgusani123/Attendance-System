@@ -20,8 +20,8 @@ const AdminSetting = () => {
             },
             pubKeyCredParams: [{ alg: -7, type: "public-key" }],
             authenticatorSelection: {
-                userVerification: "required",
                 authenticatorAttachment: "platform",
+                userVerification: "required" as const,
             },
             timeout: 60000,
             attestation: "none",
@@ -49,7 +49,7 @@ const AdminSetting = () => {
         }
     };
 
-    return adminLoading ? <h1>Loading...</h1>: (
+    return adminLoading ? <h1>Loading...</h1> : (
         <div className="setting_container h-screen flex justify-center items-center">
             <div className="p-6 w-96 mx-auto bg-gray-900 text-white rounded-2xl shadow-xl space-y-6">
                 <h2 className="text-2xl font-bold text-blue-400">⚙️ Admin Settings</h2>
