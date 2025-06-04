@@ -2,14 +2,16 @@ import { ArrowLeft } from "lucide-react";
 import { useState } from "react";
 import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
-import { useFingerprintLoginMutation, useLoginAdminMutation } from "../../Redux/API/Admin";
+import { useLoginAdminMutation, useLoginCredentialMutation, useVerifyLoginMutation } from "../../Redux/API/Admin";
 import { AdminExits } from "../../Redux/slices/AdminSlices";
+import { startAuthentication } from "@simplewebauthn/browser";
 
 const AdminLogin = () => {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [Login] = useLoginAdminMutation();
-    const [FingerprintLogin] = useFingerprintLoginMutation();
+    const [FingerprintLogin] = useLoginCredentialMutation();
+    const [FingerprintVerify] = useVerifyLoginMutation();
     const dispatch = useDispatch();
     const navigate = useNavigate();
 
@@ -26,22 +28,18 @@ const AdminLogin = () => {
     };
 
     const handleFingerprintLogin = async () => {
-        try {
-            const publicKey = {
-                challenge: new Uint8Array(32),
-                allowCredentials: [],
-                timeout: 60000,
-                userVerification: "required" as const
-,
-            };
-
-            const assertion = await navigator.credentials.get({ publicKey }) as PublicKeyCredential;
-            const rawId = btoa(String.fromCharCode(...new Uint8Array(assertion.rawId)));
-
-            const res = await FingerprintLogin({ credentialID: rawId });
-
-            if (res && "data" in res && res.data?.success) {
-                dispatch(AdminExits(res.data.user));
+        try {   
+            if(!email) 
+            {
+                alert("Please enter the email First !")
+                return
+            }
+                const FirstStep = await FingerprintLogin({Id:email})
+                const secondStep = await startAuthentication(FirstStep.data?.options);
+                const LoginVerify = await FingerprintVerify({email , cred:secondStep})
+                
+            if (LoginVerify && LoginVerify.data?.success) {
+                dispatch(AdminExits(LoginVerify.data.user));
                 navigate("/admin");
             } else {
                 alert("Fingerprint login failed");
@@ -51,6 +49,7 @@ const AdminLogin = () => {
             alert("Fingerprint authentication failed");
         }
     };
+    
 
     return (
         <div className="login_container h-screen w-full flex justify-center items-center bg-blue-100">

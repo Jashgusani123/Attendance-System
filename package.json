@@ -22,6 +22,7 @@
     "@mui/x-date-pickers": "^8.4.0",
     "@radix-ui/react-popover": "^1.1.14",
     "@reduxjs/toolkit": "^2.5.1",
+    "@simplewebauthn/browser": "^13.1.0",
     "@tailwindcss/vite": "^4.0.3",
     "@zxing/library": "^0.21.3",
     "date-fns": "^4.1.0",

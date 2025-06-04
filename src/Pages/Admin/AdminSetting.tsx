@@ -1,51 +1,23 @@
 import { useState } from "react";
-import { useFingerprintRegisterMutation } from "../../Redux/API/Admin";
+import {useRegisterPasskeyMutation , useVerifyPasskeyMutation } from "../../Redux/API/Admin";
 import { useSelector } from "react-redux";
 import { AdminReducerInitialState } from "../../Types/API/AdminType";
+import { startRegistration } from '@simplewebauthn/browser'
 
 const AdminSetting = () => {
     const { loading: adminLoading, admin } = useSelector(
         (state: { admin: AdminReducerInitialState }) => state.admin
     );
     const [email] = useState(admin?.email); // Static fetched email
-    const [FingerprintRegister] = useFingerprintRegisterMutation();
+    const [RegistartationPasskey] = useRegisterPasskeyMutation();
+    const [verifyCredential] = useVerifyPasskeyMutation();
+
     const registerFingerprint = async () => {
-        const publicKey: PublicKeyCredentialCreationOptions = {
-            challenge: new Uint8Array(32),
-            rp: { name: "Admin Portal" },
-            user: {
-                id: new Uint8Array(16),
-                name: email ? email : "abc@gmail.com",
-                displayName: "Admin",
-            },
-            pubKeyCredParams: [{ alg: -7, type: "public-key" }],
-            authenticatorSelection: {
-                authenticatorAttachment: "platform",
-                userVerification: "required" as const,
-            },
-            timeout: 60000,
-            attestation: "none",
-        };
-
-        try {
-            const credential = await navigator.credentials.create({ publicKey }) as PublicKeyCredential;
-            const rawId = btoa(String.fromCharCode(...new Uint8Array(credential!.rawId)));
-
-            const res = await FingerprintRegister({
-                credentialID: rawId,
-                publicKey: "dummy-public-key",
-                counter: 0,
-                transports: ["internal"],
-            })
-
-            if (res.data?.message) {
-                alert("Fingerprint registered!");
-            } else {
-                alert("Failed to register fingerprint");
-            }
-        } catch (err) {
-            console.error("Fingerprint registration error:", err);
-            alert("Fingerprint registration failed");
+        const FirstStep = await RegistartationPasskey({Id:admin?._id!});
+        const SecondStep = await startRegistration(FirstStep.data?.options);
+        const VerifyCredential = await verifyCredential({Id:admin?._id!,cred:SecondStep});
+        if(VerifyCredential.data?.success){
+            alert("Successfully Done")
         }
     };
 

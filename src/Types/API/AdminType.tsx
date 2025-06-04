@@ -140,7 +140,7 @@ export interface SearchWordResponse {
 
 export interface Departments {
     success: true,
-    data:  {
+    data: {
         collegeName: String,
         departments: {
             name: String,
@@ -153,7 +153,7 @@ export interface ClassesResponse {
     success: true,
     data: {
         liveClasses: {
-            title:string,
+            title: string,
             college: string,
             department: string,
             teacher: string,
@@ -161,7 +161,7 @@ export interface ClassesResponse {
             status: string
         }[],
         lastClasses: {
-            title:string,
+            title: string,
             college: string,
             department: string,
             teacher: string,
@@ -186,28 +186,29 @@ export interface RequestResponse {
 }
 
 export interface ResponseDeleteResponse {
-    success:boolean
+    success: boolean
 }
 export interface ResponseOfNotification {
-    success:boolean,
-    message:string
+    success: boolean,
+    message: string
 }
-export interface RequestNotification{
-        type:string, 
-        upperHeadding:string, 
-        description:string,
-        to:string
+export interface RequestNotification {
+    type: string,
+    upperHeadding: string,
+    description: string,
+    to: string
 }
 
 export interface AllNotificationsResponse {
-    success:boolean,
-    Notifications:{
-        _id:string,
-        upperHeadding:string,
-        description:string,
-        allUsers:string[]
-        to:string 
-        userType:string}[]
+    success: boolean,
+    Notifications: {
+        _id: string,
+        upperHeadding: string,
+        description: string,
+        allUsers: string[]
+        to: string
+        userType: string
+    }[]
 }
 
 export interface AdminCreatetationResponse {
@@ -220,9 +221,9 @@ export interface AdminCreatetationResponse {
         credentials: [],
     }
 }
-export interface AdminCreatetationRequest{
-    email:string,
-    password:string
+export interface AdminCreatetationRequest {
+    email: string,
+    password: string
 }
 
 export interface AdminLoginResponse {
@@ -236,19 +237,28 @@ export interface AdminLoginResponse {
     }
 }
 
-export interface AdminLoginRequest{
+export interface AdminLoginRequest {
+    email: string,
+    password: string
+}
+
+export interface AdminLogoutRespose {
+    success: boolean,
+    message: string
+}
+
+export interface RegisterCredentialResponse {
+    message: string,
+    options: any
+}
+export interface RegisterCredentialRequest {
+    Id: string
+}
+export interface LoginFingerprintVerificationRequest {
     email:string,
-    password:string
+    cred:any
 }
-
-export interface AdminLogoutRespose{
+export interface LoginFingerprintVerificationRespose {
     success:boolean,
-    message:string
-}
-
-export interface FingerprintRegisterRespose {
-    message:string
-}
-export interface FingerprintRegisterRequest {
-    credentialID:string, publicKey:string, counter:number, transports:string[]
+    user:AdminRequest
 }
