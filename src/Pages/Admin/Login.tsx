@@ -20,8 +20,7 @@ const AdminLogin = () => {
         const res = await Login({ email, password });
         if (res && "data" in res && res.data?.success) {
             dispatch(AdminExits(res.data.user));
-            alert("Welcome Admin!");
-            navigate("/admin");
+            window.location.reload();
         } else {
             alert("Login failed");
         }
