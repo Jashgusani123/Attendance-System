@@ -99,8 +99,8 @@ const AdminHome = () => {
             className="bg-white shadow rounded-2xl h-full flex flex-col justify-center items-center"
           >
             <div className="text-blue-900 font-semibold text-lg mb-2">Total Students</div>
-            <div className='flex w-80 justify-center items-center'>
-              <ResponsiveContainer width="50%" height={130}>
+            <div className='flex flex-col sm:flex-row w-full justify-center items-center'>
+  <ResponsiveContainer width="100%" height={130}>
                 <RadialBarChart
                   innerRadius="40%"
                   outerRadius="100%"
