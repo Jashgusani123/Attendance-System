@@ -58,14 +58,14 @@ const AdminColleges = () => {
     navigate("/admin/colleges/view", { state: { id: id } })
   }
 
-  useEffect(()=>{
+  useEffect(() => {
     const handler = setTimeout(() => {
       setDebouncedSearchTerm(searchtearm);
     }, 600); // 300ms delay
-    return ()=>{
+    return () => {
       clearTimeout(handler);
     }
-  },[searchtearm])
+  }, [searchtearm])
 
   useEffect(() => {
     if (DebouncedSearchTerm) {
@@ -73,25 +73,33 @@ const AdminColleges = () => {
   }, [DebouncedSearchTerm]);
 
   return (
-    <div className="p-6 w-full">
+    <div className="p-6 w-full overflow-x-hidden">
       {/* NAVBAR */}
-      <InnerNavbar Name='All Colleges' Components={<div className="flex items-center gap-2">
-        <input
-          type="text"
-          placeholder="Search Here.."
-          className="bg-white border-2 border-zinc-400 px-3 h-10 rounded-md text-sm outline-none"
-          value={searchtearm}
-          onChange={(e) => setSearchtearm(e.target.value)}
-        />
-        <Search className="bg-white border-zinc-400 border-2 text-blue-900 p-1 rounded-full shadow cursor-pointer h-10 w-10" />
-        <button
-          onClick={() => setShowForm(true)}
-          className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-full text-sm"
-        >
-          <Plus className="w-4 h-4" />
-          Add College
-        </button>
-      </div>} />
+      <InnerNavbar
+        Name="All Colleges"
+        Components={
+          <div className="flex flex-col md:flex-row items-start md:items-center w-full md:gap-2 gap-4">
+            <div className="flex w-full md:w-auto items-center gap-2">
+              <input
+                type="text"
+                placeholder="Search Here.."
+                className="flex-1 bg-white border-2 border-zinc-400 px-3 h-10 rounded-md text-sm outline-none w-full md:w-auto"
+                value={searchtearm}
+                onChange={(e) => setSearchtearm(e.target.value)}
+              />
+              <Search className="bg-white border-zinc-400 border-2 text-blue-900 p-1 rounded-full shadow cursor-pointer h-10 w-10" />
+            </div>
+            <button
+              onClick={() => setShowForm(true)}
+              className="flex items-center gap-2 bg-blue-600 justify-center hover:bg-blue-700 text-white w-full md:w-auto md:px-4 py-2 rounded-full text-sm"
+            >
+              <Plus className="w-4 h-4" />
+              Add College
+            </button>
+          </div>
+        }
+      />
+
 
       {/* CARDS */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">

@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { Capitalize } from "../../Utils/toCapitalize";
 
 const roles = ["All","Students", "Teachers", "HODs" ];
 
@@ -153,7 +154,7 @@ const NotificationForm = ({ onSend }: { onSend: (data: any) => void }) => {
                 <option value="">Select User</option>
                 {userList.map((u) => (
                   <option key={u.value} value={u.value}>
-                    {u.label}
+                    {Capitalize(u.label)}
                   </option>
                 ))}
               </select>
@@ -164,7 +165,7 @@ const NotificationForm = ({ onSend }: { onSend: (data: any) => void }) => {
                 <option value="">Select College</option>
                 {collegeList.map((c) => (
                   <option key={c} value={c}>
-                    {c}
+                    {Capitalize(c)}
                   </option>
                 ))}
               </select>
@@ -191,7 +192,7 @@ const NotificationForm = ({ onSend }: { onSend: (data: any) => void }) => {
                 <option value="">Select College</option>
                 {collegeList.map((c) => (
                   <option key={c} value={c}>
-                    {c}
+                    {Capitalize(c)}
                   </option>
                 ))}
               </select>

@@ -82,7 +82,7 @@ const AdminHome = () => {
   return (
     <>
       {/* Main content */}
-      <div className="h-screen flex flex-col p-4">
+      <div className="min-h-screen flex flex-col p-4 overflow-y-auto">
         {/* Sticky Navbar */}
         <InnerNavbar Name='Admin Dashbord' Components={<Clock />} />
 
@@ -90,7 +90,7 @@ const AdminHome = () => {
         <hr />
 
         {/* Dashboard cards */}
-        <section className="w-full grid grid-cols-3 gap-4 p-2 ">
+        <section className="w-full grid md:grid-cols-3 gap-4 p-2 overflow-x-hidden">
           {/* Total Students Card */}
           <motion.div
             initial={{ x: "-100%", opacity: 0, rotate: -15, scale: 0.8 }}

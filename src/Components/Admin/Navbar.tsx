@@ -41,34 +41,36 @@ const Navbar = () => {
   const [Logout] = useLogoutAdminMutation();
   const dispatch = useDispatch();
   const [notifications] = useState<NotificationType[]>([
-   { _id: "string",
-    upperHeadding: "string",
-    description: "string",
-    type: "string",
-    pandingId: "string"
-  }]);
+    {
+      _id: "string",
+      upperHeadding: "string",
+      description: "string",
+      type: "string",
+      pandingId: "string"
+    }]);
 
   const handleSetting = () => {
     navigate('/admin/setting', { state: { type: 'Admin' } });
   };
 
-  const handleLogout = async()=>{
+  const handleLogout = async () => {
     const res = await Logout();
-    if(res.data?.success){
+    if (res.data?.success) {
       alert("Logout Successfully !!");
       dispatch(AdminNotExits());
     }
-    
+
   }
 
   return (
     <div
       onMouseEnter={() => setIsExpanded(true)}
       onMouseLeave={() => setIsExpanded(false)}
-      className={`transition-all duration-100 ${isExpanded ? 'w-[25%]' : 'w-[5%]'} h-full z-50`}
+      className={ `${isExpanded ? 'w-[50%]' : 'w-[10%]'}  transition-all duration-100 ${isExpanded ? 'md:w-[25%]' : 'md:w-[5%]'} h-full z-50`}
     >
+
       <nav className="flex flex-col justify-between items-center p-4 w-full h-full bg-amber-400 rounded-tr-2xl rounded-br-2xl shadow-lg ">
-        
+
         {/* Header with Logo and Menu Button */}
         <div className={`flex items-center w-full ${isExpanded ? 'justify-between' : 'justify-center'} h-16`}>
           {isExpanded && (

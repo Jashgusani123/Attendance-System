@@ -72,7 +72,7 @@ const AdminView = () => {
 
                     <div className="flex flex-col gap-3 p-4 bg-zinc-100 rounded-2xl">
                         <h1 className="text-2xl font-extrabold font-mono">Information:-</h1>
-                        <div className="flex justify-around">
+                        <div className="flex justify-around flex-wrap gap-4 md:gap-0">
                             <div className="text-sm bg-sky-200 p-4 rounded-xl text-zinc-700 space-y-2">
                                 <p className="font-semibold text-xl">📍 Place: {Capitalize(College?.CollegeDetails.place)}</p>
                                 <p className="font-semibold text-xl">🏷️ Category: {College?.CollegeDetails.category}</p>
