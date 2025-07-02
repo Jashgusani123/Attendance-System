@@ -1,4 +1,4 @@
-import { lazy, useEffect, useRef } from "react";
+import { lazy, useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Route, Routes, useNavigate } from "react-router-dom";
 import "./App.css";
@@ -62,7 +62,8 @@ function App() {
 
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  const [TeacherSignup] = useSignupMutation()
+  const [TeacherSignup] = useSignupMutation();
+  const [routesReady, setRoutesReady] = useState(false);
   const [DeletePandingRequest] = useDeletePandingRequstMutation();
   const user = student ? "Student" : teacher ? "Teacher" : hod ? "hod" : panding ? "Panding" : admin ? "Admin" : ""
   const loading = studentLoading || teacherLoading || hodLoading || pandingLoading || adminLoading;
@@ -132,6 +133,8 @@ function App() {
         }
       } catch (error) {
         console.error("Fetch user error:", error);
+      } finally {
+        setRoutesReady(true);
       }
     };
 
@@ -139,6 +142,7 @@ function App() {
   }, []);
 
   useEffect(() => {
+    if (!routesReady) return;
 
     if (user === "Student" && window.location.pathname !== "/student") {
       navigate("/student", { replace: true });
@@ -150,17 +154,35 @@ function App() {
       navigate("/requstsend", { replace: true });
     } else if (user === "Admin" && window.location.pathname !== "/admin") {
       navigate("/admin", { replace: true });
-    }
-    else if (!user && !["/login", "/register", , "/admin/login", "/admin/registraction"].includes(window.location.pathname)) {
+    } else if (
+      !user &&
+      !["/login", "/register", "/admin/login", "/admin/registraction"].includes(window.location.pathname)
+    ) {
       navigate("/", { replace: true });
     }
-  }, [user]);  // ✅ Run whenever `user` updates
+  }, [user, routesReady]);
 
 
   return (
     <>
-      {loading ? (
-        <div>Loading...</div> // Show loading state
+      {loading || !routesReady ? (
+        <div className="flex justify-center items-center h-screen relative">
+          <div className="absolute w-72 h-72 rounded-full bg-yellow-400 opacity-30 animate-ping"></div>
+          <div className="absolute w-72 h-72 rounded-full bg-yellow-400 opacity-30 animate-ping"></div>
+          <div className="absolute w-72 h-72 rounded-full bg-yellow-400 opacity-30 animate-ping"></div>
+
+          <div className="z-10 flex justify-center flex-col items-center h-60 w-60 rounded-full bg-yellow-300 shadow-xl">
+            <p className="font-bold text-2xl">Quick <span className="text-blue-900">Attend</span></p>
+
+            <p className="font-semibold text-lg mt-2">
+              <span className="text-blue-900">Loading</span>
+              <span className="animate-blink inline-block">.</span>
+              <span className="animate-blink delay-200 inline-block">.</span>
+              <span className="animate-blink delay-400 inline-block">.</span>
+            </p>
+          </div>
+        </div>
+
       ) : (
         <Routes>
           {/* Public Routes */}
@@ -182,7 +204,7 @@ function App() {
             </>
           )}
 
-          {user === "Admin" && (  
+          {user === "Admin" && (
             <>
               <Route path="/admin" element={<AdminDashbord Component={AdminHome} />} />
               <Route path="/admin/colleges" element={<AdminDashbord Component={AdminColleges} />} />
@@ -223,9 +245,6 @@ function App() {
             </>
           )}
 
-
-          {/* 404 Page */}
-          <Route path="*" element={<>Sorry, page not found</>} />
         </Routes>
       )}
     </>

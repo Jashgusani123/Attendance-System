@@ -1,9 +1,11 @@
 @import "tailwindcss";
 
-body, html {
+body,
+html {
   height: 100%;
   width: 100%;
-  overflow-x: hidden; /* Prevent horizontal scroll */
+  overflow-x: hidden;
+  /* Prevent horizontal scroll */
 }
 
 #root {
@@ -53,11 +55,13 @@ body, html {
     height: 100px;
     opacity: 0.5;
   }
+
   50% {
     width: 300px;
     height: 300px;
     opacity: 1;
   }
+
   100% {
     width: 100px;
     height: 100px;
@@ -80,22 +84,28 @@ body, html {
 
 @keyframes ImageUpDown {
   0% {
-    transform: translateY(0); /* Start at original position */
+    transform: translateY(0);
+    /* Start at original position */
   }
+
   50% {
-    transform: translateY(10px); /* Moves slightly down */
+    transform: translateY(10px);
+    /* Moves slightly down */
   }
+
   100% {
-    transform: translateY(0); /* Moves back up */
+    transform: translateY(0);
+    /* Moves back up */
   }
 }
+
 .setting-icon {
   transition: transform 2s all;
   cursor: pointer;
 }
 
 .setting-icon:hover {
-  
+
   transform: rotate(200deg);
 }
 
@@ -113,17 +123,21 @@ body, html {
     top: 0;
     opacity: 1;
   }
+
   25% {
     opacity: 0;
   }
+
   50% {
     left: 20.5%;
     top: 0%;
     opacity: 1;
   }
+
   75% {
     opacity: 0;
   }
+
   100% {
     left: 78%;
     top: 0%;
@@ -133,14 +147,18 @@ body, html {
 
 /* Media Queries to Adjust Layout */
 @media (max-width: 768px) {
+
   /* For small screens (Mobile first) */
   .loginFormsImage,
   .signupFormsImage {
-    margin-bottom: 20px; /* Space below the form */
+    margin-bottom: 20px;
+    /* Space below the form */
   }
 
-  .DashbordLanding_Container .left, .DashbordLanding_Container .right {
-    flex-direction: column !important; /* Stack the form and image vertically */
+  .DashbordLanding_Container .left,
+  .DashbordLanding_Container .right {
+    flex-direction: column !important;
+    /* Stack the form and image vertically */
     align-items: center;
     justify-content: center;
   }
@@ -148,32 +166,39 @@ body, html {
 }
 
 @media (min-width: 768px) {
+
   /* For larger screens (Tablets, Desktops) */
-  .DashbordLanding_Container .left, .DashbordLanding_Container .right {
-    flex-direction: row !important; /* Stack horizontally for wider screens */
+  .DashbordLanding_Container .left,
+  .DashbordLanding_Container .right {
+    flex-direction: row !important;
+    /* Stack horizontally for wider screens */
   }
 
   .DashbordLanding_Container .right {
-    margin-top: 0; /* Remove extra margin for large screens */
+    margin-top: 0;
+    /* Remove extra margin for large screens */
   }
 
   .signupFormsImage {
-    animation: none; /* Remove animation for large screens */
+    animation: none;
+    /* Remove animation for large screens */
   }
 }
 
 .dialogforclass {
-  background-color: rgba(0, 38, 255, 0.525); 
-  border: 4px solid #170bb8; 
+  background-color: rgba(0, 38, 255, 0.525);
+  border: 4px solid #170bb8;
   overflow: hidden;
   border-radius: 8px;
 }
-.innerHeading{
+
+.innerHeading {
   background-color: var(--color-amber-400);
   color: #080889;
   font-weight: bold;
   font-size: larger;
 }
+
 /* Dialog content styling */
 .innerClassDialog {
   background-color: var(--color-blue-100);
@@ -184,7 +209,8 @@ body, html {
 
 /* Scrollable form inside dialog */
 .dialogforclass .MuiDialogContent-root {
-  max-height: 300px; /* Adjust as needed */
+  max-height: 300px;
+  /* Adjust as needed */
   overflow-y: auto;
 }
 
@@ -214,12 +240,14 @@ body, html {
 }
 
 .dialogforclass .MuiDialogContent-root::-webkit-scrollbar-track {
-  background: #440ff1; /* Light yellow */
+  background: #440ff1;
+  /* Light yellow */
   border-radius: 4px;
 }
 
 .dialogforclass .MuiDialogContent-root::-webkit-scrollbar-thumb {
-  background: #0b0eb8; /* Dark yellow */
+  background: #0b0eb8;
+  /* Dark yellow */
   border-radius: 4px;
 }
 
@@ -257,7 +285,8 @@ body, html {
 .scanner-video-wrapper {
   position: relative;
   width: 100%;
-  padding-top: 100%;  /* Aspect Ratio 1:1 for square shape */
+  padding-top: 100%;
+  /* Aspect Ratio 1:1 for square shape */
   background-color: #333;
   border-radius: 10px;
   overflow: hidden;
@@ -272,9 +301,11 @@ body, html {
   0% {
     transform: scale(1);
   }
+
   50% {
     transform: scale(1.2);
   }
+
   100% {
     transform: scale(1);
   }
@@ -325,6 +356,7 @@ body, html {
   position: relative;
   animation: l24 1s infinite linear;
 }
+
 .loader:before,
 .loader:after {
   content: "";
@@ -335,27 +367,35 @@ body, html {
   animation: inherit;
   animation-duration: 2s;
 }
+
 .loader:after {
   animation-duration: 4s;
 }
+
 @keyframes l24 {
-  100% {transform: rotate(1turn)}
+  100% {
+    transform: rotate(1turn)
+  }
 }
-.WavingStudent{
+
+.WavingStudent {
   height: 200px;
   z-index: 40;
   animation: comeHello 1s ease-in;
 }
+
 @keyframes comeHello {
-  0%{
+  0% {
     opacity: 0;
   }
-  100%{
+
+  100% {
     opacity: 1;
   }
 }
+
 .intro_Images {
-  height:89vh;
+  height: 89vh;
   position: absolute;
   left: 75%;
   top: 55.5%;
@@ -369,6 +409,7 @@ body, html {
     transform: translate(-50%, -50%) scale(0);
     opacity: 0;
   }
+
   100% {
     transform: translate(-50%, -50%) scale(1);
     opacity: 1;
@@ -376,38 +417,64 @@ body, html {
 }
 
 @keyframes Updown {
-  0%, 100% {
+
+  0%,
+  100% {
     transform: translate(-50%, -50%);
   }
+
   50% {
     transform: translate(-50%, calc(-50% - 10px));
   }
 }
 
-.teacher_info{
+.teacher_info {
   border-top-left-radius: 20px;
   border-bottom-left-radius: 20px;
 }
 
-.rbc-allday-cell{
+.rbc-allday-cell {
   display: none;
 }
 
-.rbc-time-header-cell .rbc-today{
+.rbc-time-header-cell .rbc-today {
   background-color: aliceblue !important;
 }
 
-.rbc-time-slot{
+.rbc-time-slot {
   color: #0b76b8;
   z-index: 1;
 }
 
-.rbc-time-slot:not(.rbc-today , .rbc-time-slot){
+.rbc-time-slot:not(.rbc-today, .rbc-time-slot) {
   background-color: rgb(196, 0, 0);
 }
 
 .rbc-event,
-.rbc-background-event{
+.rbc-background-event {
   z-index: 2;
 }
 
+@keyframes blink {
+
+  0%,
+  100% {
+    opacity: 1;
+  }
+
+  50% {
+    opacity: 0;
+  }
+}
+
+.animate-blink {
+  animation: blink 1s infinite steps(1, start);
+}
+
+.delay-200 {
+  animation-delay: 0.2s;
+}
+
+.delay-400 {
+  animation-delay: 0.4s;
+}
