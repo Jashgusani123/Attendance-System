@@ -48,6 +48,7 @@ const SignUp = () => {
     const fetchColleges = async () => {
       const response = await fetch(`${import.meta.env.VITE_SERVER}/api/v1/supported/getallcollege`);
       const data = await response.json();
+      console.log(data);
       if (data.success) {
         setCollegeLists(data.collegeNames);
       }
