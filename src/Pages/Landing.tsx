@@ -12,7 +12,7 @@ const Landing = ({ login, register }: { login: boolean, register: boolean }) => 
     <>
       {login && <div className="DashbordLanding_Container h-screen w-full relative z-10">
         {/* Navbar */}
-        <LandingNav />
+        <LandingNav home="/"/>
 
         <section className="h-fit flex justify-between relative overflow-hidden pt-6 rounded-3xl bg-[#f8eee3] items-center  flex-wrap">
           <div className="balls"></div>
@@ -28,7 +28,7 @@ const Landing = ({ login, register }: { login: boolean, register: boolean }) => 
       {register && (
         <div className="DashbordLanding_Container h-screen w-full relative z-10">
           {/* Navbar */}
-          <LandingNav />
+          <LandingNav home="/"/>
 
           <section className="min-h-screen flex justify-around flex-wrap relative overflow-hidden rounded-3xl pt-6 bg-[#f8eee3] items-center">
             <div className="balls"></div>

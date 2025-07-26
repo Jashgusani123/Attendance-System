@@ -22,6 +22,7 @@ const SignUp = () => {
   const [HodSignup] = HodSignupMution();
   const [PandingRequest] = PandingReuestMution();
   const [loading, setloading] = useState(false);
+  const [dropdownLoading, setDropdownLoading] = useState(false);
   const [collegeLists, setCollegeLists] = useState([]);
   const [departmentLists, setDepartmentLists] = useState<string[]>([]);
   const navigate = useNavigate();
@@ -41,91 +42,104 @@ const SignUp = () => {
     gender: ""
   });
   interface Response {
-    success:boolean,
-    departmentNames:string[]
+    success: boolean,
+    departmentNames: string[]
   }
   useEffect(() => {
     const fetchColleges = async () => {
-      const response = await fetch(`${import.meta.env.VITE_SERVER}/api/v1/supported/getallcollege`);
-      const data = await response.json();
-      if (data.success) {
-        setCollegeLists(data.collegeNames);
+      try {
+        setDropdownLoading(true); // ⬅️ start loader
+        const response = await fetch(`${import.meta.env.VITE_SERVER}/api/v1/supported/getallcollege`);
+        const data = await response.json();
+        if (data.success) {
+          setCollegeLists(data.collegeNames);
+        }
+      } catch (error) {
+        console.error("Failed to fetch colleges:", error);
+      } finally {
+        setDropdownLoading(false); // ⬅️ stop loader
       }
     };
 
-    return () => {
+    if (role === "student" || role === "teacher" || role === "Hod") {
       fetchColleges();
     }
-  }, [role === "student" || role === "teacher"]);
+  }, [role]);
+
 
   useEffect(() => {
     const fetchDepartment = async () => {
       if (!formData.collegeName) return;
-      setDepartmentLists([])
-      const response = await fetch(`${import.meta.env.VITE_SERVER}/api/v1/supported/getalldepartment`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ collegeName: formData.collegeName }),
-      });
-      const data:Response = await response.json();
-      if (data.success) {
-        setDepartmentLists(data.departmentNames)
+      try {
+        setDropdownLoading(true); // ⬅️ start loader
+        const response = await fetch(`${import.meta.env.VITE_SERVER}/api/v1/supported/getalldepartment`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ collegeName: formData.collegeName }),
+        });
+        const data: Response = await response.json();
+        if (data.success) {
+          setDepartmentLists(data.departmentNames);
+        }
+      } catch (error) {
+        console.error("Failed to fetch departments:", error);
+      } finally {
+        setDropdownLoading(false); // ⬅️ stop loader
       }
     };
 
-    fetchDepartment(); // ✅ Correct place to call it
-  }, [formData.collegeName]); // ✅ Depend only on collegeName change
+    fetchDepartment();
+  }, [formData.collegeName]);
+  // ✅ Depend only on collegeName change
 
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setloading(true);
-  
+
     try {
       // 3. Continue submission if all fields are filled
       let res;
       if (role === "student") {
         // 1. Define required fields and their labels
-      const requiredFields = {
-        fullName: formData.fullName,
-        email: formData.email,
-        departmentName: formData.departmentName,
-        collegeName: formData.collegeName,
-        collegeJoiningDate: formData.collegeJoiningDate,
-        enrollmentNumber: formData.enrollmentNumber,
-        gender: formData.gender,
-        password: formData.password,
-        semester: formData.semester,
-      };
-  
-      const fieldLabels = {
-        fullName: "Full Name",
-        email: "Email",
-        departmentName: "Department Name",
-        collegeName: "College Name",
-        collegeJoiningDate: "College Joining Date",
-        enrollmentNumber: "Enrollment Number",
-        gender: "Gender",
-        password: "Password",
-        semester: "Semester",
-      };
-  
-      // 2. Find any empty fields
-      const emptyFields = Object.entries(requiredFields)
-      .filter(([_, value]) => value === "" || value === 0 || value === null || value === undefined)
-      .map(([key]) => fieldLabels[key as keyof typeof fieldLabels]);
-    
-  
-      if (emptyFields.length > 0) {
-        setIsError({
-          error: true,
-          message: `Fille Up This : ${emptyFields.join(", ")}`,
-        });
-        setloading(false);
-        return; 
-      }
+        const requiredFields = {
+          fullName: formData.fullName,
+          email: formData.email,
+          departmentName: formData.departmentName,
+          collegeName: formData.collegeName,
+          collegeJoiningDate: formData.collegeJoiningDate,
+          enrollmentNumber: formData.enrollmentNumber,
+          gender: formData.gender,
+          password: formData.password,
+          semester: formData.semester,
+        };
+
+        const fieldLabels = {
+          fullName: "Full Name",
+          email: "Email",
+          departmentName: "Department Name",
+          collegeName: "College Name",
+          collegeJoiningDate: "College Joining Date",
+          enrollmentNumber: "Enrollment Number",
+          gender: "Gender",
+          password: "Password",
+          semester: "Semester",
+        };
+
+        // 2. Find any empty fields
+        const emptyFields = Object.entries(requiredFields)
+          .filter(([_, value]) => value === "" || value === 0 || value === null || value === undefined)
+          .map(([key]) => fieldLabels[key as keyof typeof fieldLabels]);
+
+
+        if (emptyFields.length > 0) {
+          setIsError({
+            error: true,
+            message: `Fille Up This : ${emptyFields.join(", ")}`,
+          });
+          setloading(false);
+          return;
+        }
 
         const formDataWithLowercase = {
           fullName: formData.fullName.toLowerCase(),
@@ -138,9 +152,9 @@ const SignUp = () => {
           semester: formData.semester,
           gender: formData.gender.toLowerCase()
         };
-  
+
         res = await StudentSignup(formDataWithLowercase);
-  
+
         if (res && "data" in res && res.data?.success) {
           const userData = res.data?.user;
           dispatch(studentExits(userData));
@@ -156,41 +170,41 @@ const SignUp = () => {
             setIsError({ error: true, message: "An unexpected error occurred." });
           }
         }
-  
+
       } else if (role === "teacher") {
         // 1. Define required fields and their labels
-      const requiredFields = {
-        fullName: formData.fullName,
-        email: formData.email,
-        departmentName: formData.departmentName,
-        collegeName: formData.collegeName,
-        gender: formData.gender,
-        password: formData.password,
-      };
-  
-      const fieldLabels = {
-        fullName: "Full Name",
-        email: "Email",
-        departmentName: "Department Name",
-        collegeName: "College Name",
-        gender: "Gender",
-        password: "Password",
-      };
-  
-      // 2. Find any empty fields
-      const emptyFields = Object.entries(requiredFields)
-      .filter(([_, value]) => value === "" || value === null || value === undefined)
-      .map(([key]) => fieldLabels[key as keyof typeof fieldLabels]);
-    
-  
-      if (emptyFields.length > 0) {
-        setIsError({
-          error: true,
-          message: `Fille Up This : ${emptyFields.join(", ")}`,
-        });
-        setloading(false);
-        return; 
-      }
+        const requiredFields = {
+          fullName: formData.fullName,
+          email: formData.email,
+          departmentName: formData.departmentName,
+          collegeName: formData.collegeName,
+          gender: formData.gender,
+          password: formData.password,
+        };
+
+        const fieldLabels = {
+          fullName: "Full Name",
+          email: "Email",
+          departmentName: "Department Name",
+          collegeName: "College Name",
+          gender: "Gender",
+          password: "Password",
+        };
+
+        // 2. Find any empty fields
+        const emptyFields = Object.entries(requiredFields)
+          .filter(([_, value]) => value === "" || value === null || value === undefined)
+          .map(([key]) => fieldLabels[key as keyof typeof fieldLabels]);
+
+
+        if (emptyFields.length > 0) {
+          setIsError({
+            error: true,
+            message: `Fille Up This : ${emptyFields.join(", ")}`,
+          });
+          setloading(false);
+          return;
+        }
         const obj = {
           fullName: formData.fullName.toLowerCase(),
           email: formData.email.toLowerCase(),
@@ -199,13 +213,13 @@ const SignUp = () => {
           departmentName: formData.departmentName.toLowerCase(),
           gender: formData.gender.toLowerCase()
         };
-  
+
         res = await PandingRequest(obj);
-  
+
         if (res && "data" in res && res.data.success) {
           navigate("/");
           dispatch(pandingExits(res.data.newPanding));
-  
+
           const response = await fetch(`${import.meta.env.VITE_SERVER}/notification/create`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
@@ -218,61 +232,61 @@ const SignUp = () => {
               pandingId: res.data.newPanding._id
             }),
           });
-  
+
           const data = await response.json();
           if (data.success) {
             alert("Your Request Sent to Department HOD. Wait for acceptance or ask the HOD to accept it.");
           }
-  
+
         } else {
           console.log(res.error);
         }
-  
+
       } else {
         // 1. Define required fields and their labels
-      const requiredFields = {
-        fullName: formData.fullName,
-        email: formData.email,
-        departmentName: formData.departmentName,
-        collegeName: formData.collegeName,
-        gender: formData.gender,
-        password: formData.password,
-      };
-  
-      const fieldLabels = {
-        fullName: "Full Name",
-        email: "Email",
-        departmentName: "Department Name",
-        collegeName: "College Name",
-        gender: "Gender",
-        password: "Password",
-      };
-  
-      // 2. Find any empty fields
-      const emptyFields = Object.entries(requiredFields)
-      .filter(([_, value]) => value === "" || value === null || value === undefined)
-      .map(([key]) => fieldLabels[key as keyof typeof fieldLabels]);
-    
-  
-      if (emptyFields.length > 0) {
-        setIsError({
-          error: true,
-          message: `Fille Up This : ${emptyFields.join(", ")}`,
-        });
-        setloading(false);
-        return; 
-      }
+        const requiredFields = {
+          fullName: formData.fullName,
+          email: formData.email,
+          departmentName: formData.departmentName,
+          collegeName: formData.collegeName,
+          gender: formData.gender,
+          password: formData.password,
+        };
+
+        const fieldLabels = {
+          fullName: "Full Name",
+          email: "Email",
+          departmentName: "Department Name",
+          collegeName: "College Name",
+          gender: "Gender",
+          password: "Password",
+        };
+
+        // 2. Find any empty fields
+        const emptyFields = Object.entries(requiredFields)
+          .filter(([_, value]) => value === "" || value === null || value === undefined)
+          .map(([key]) => fieldLabels[key as keyof typeof fieldLabels]);
+
+
+        if (emptyFields.length > 0) {
+          setIsError({
+            error: true,
+            message: `Fille Up This : ${emptyFields.join(", ")}`,
+          });
+          setloading(false);
+          return;
+        }
         const obj = {
           fullName: formData.fullName.toLowerCase(),
           email: formData.email.toLowerCase(),
           collegeName: formData.collegeName.toLowerCase(),
           password: formData.password,
           departmentName: formData.departmentName.toLowerCase(),
-          gender:formData.gender
+          gender: formData.gender
         };
-  
+
         res = await HodSignup(obj);
-  
+
         if (res && "data" in res && res.data?.success) {
           const userData = res.data?.user;
           dispatch(HodExits(userData));
@@ -295,7 +309,7 @@ const SignUp = () => {
       setloading(false);
     }
   };
-  
+
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
@@ -387,17 +401,17 @@ const SignUp = () => {
           {role === "Hod" && (
             <>
               <select
-              className="w-full p-2 border rounded-md text-blue-700 font-semibold"
-              name="collegeName"
-              required
-              value={Capitalize(formData.collegeName)}
-              onChange={handleChange}
-            >
-              <option value="">Select College</option>
-              {collegeLists?.map((i) => (
-                <option value={i}>{i}</option>
-              ))}
-            </select>
+                className="w-full p-2 border rounded-md text-blue-700 font-semibold"
+                name="collegeName"
+                required
+                value={Capitalize(formData.collegeName)}
+                onChange={handleChange}
+              >
+                <option value="">Select College</option>
+                {collegeLists?.map((i) => (
+                  <option value={i}>{i}</option>
+                ))}
+              </select>
               {/* Department  */}
               <select
                 className={`${formData.collegeName === "" ? "text-gray-600" : "text-blue-700"} w-full p-2 border rounded-md font-semibold`}
@@ -417,7 +431,24 @@ const SignUp = () => {
             </>
 
           )}
-          {(role === "student" || role === "teacher") && (
+          {/* {(role === "student" || role === "teacher") && (
+            <select
+              className="w-full p-2 border rounded-md text-blue-700 font-semibold"
+              name="collegeName"
+              required
+              value={formData.collegeName}
+              onChange={handleChange}
+            >
+              <option value="">Select College</option>
+              {dropdownLoading ? <div className="loader"></div> : collegeLists?.map((i) => (
+                <option value={i}>{Capitalize(i)}</option>
+              ))}
+            </select>
+          )} */}
+
+          {dropdownLoading && (role === "student" || role === "teacher") ? (
+            <div className="text-start flex justify-start text-blue-500 font-semibold py-2">Loading Colleges...</div>
+          ) : (
             <select
               className="w-full p-2 border rounded-md text-blue-700 font-semibold"
               name="collegeName"
@@ -427,31 +458,34 @@ const SignUp = () => {
             >
               <option value="">Select College</option>
               {collegeLists?.map((i) => (
-                <option value={i}>{Capitalize(i)}</option>
+                <option key={i} value={i}>{Capitalize(i)}</option>
               ))}
             </select>
           )}
 
 
-
           {role === "student" && (
             <>
-
               {/* Department  */}
-              <select
-                className={`${formData.collegeName === "" ? "text-gray-600" : "text-blue-700"} w-full p-2 border rounded-md font-semibold`}
-                name="departmentName"
-                value={Capitalize(formData.departmentName)}
-                required
-                onChange={handleChange}
-              >
-                <option value="" > {formData.collegeName === ""
-                  ? "First Select College Name"
-                  : "Select Department"}</option>
-                {departmentLists.length > 0 && formData.collegeName !== "" && departmentLists.map((i) => (
-                  <option value={i}>{i}</option>
-                ))}
-              </select>
+              {dropdownLoading ? (
+                <div className="text-start flex justify-start text-blue-500 font-semibold py-2">Loading Departments...</div>
+              ) : (
+                <select
+                  className={`${formData.collegeName === "" ? "text-gray-600" : "text-blue-700"} w-full p-2 border rounded-md font-semibold`}
+                  name="departmentName"
+                  required
+                  value={Capitalize(formData.departmentName)}
+                  onChange={handleChange}
+                >
+                  <option value="">
+                    {formData.collegeName === "" ? "First Select College Name" : "Select Department"}
+                  </option>
+                  {departmentLists.length > 0 && departmentLists.map((i) => (
+                    <option key={i} value={i}>{Capitalize(i)}</option>
+                  ))}
+                </select>
+              )}
+
             </>
           )}
 
@@ -485,21 +519,25 @@ const SignUp = () => {
           {role === "teacher" && (
             <>
               {/* Department  */}
-              
-              <select
-                className={`${formData.collegeName === "" ? "text-gray-600" : "text-blue-700"} w-full p-2 border rounded-md font-semibold`}
-                name="departmentName"
-                required
-                value={Capitalize(formData.departmentName)}
-                onChange={handleChange}
-              >
-                <option value="" > {formData.collegeName === ""
-                  ? "First Select College Name"
-                  : "Select Department"}</option>
-                {departmentLists.length > 0 && formData.collegeName !== "" && departmentLists.map((i) => (
-                  <option value={i}>{i}</option>
-                ))}
-              </select>
+              {dropdownLoading ? (
+                <div className="text-start flex justify-start text-blue-500 font-semibold py-2">Loading Department...</div>
+              ) : (
+                <select
+                  className={`${formData.collegeName === "" ? "text-gray-600" : "text-blue-700"} w-full p-2 border rounded-md font-semibold`}
+                  name="departmentName"
+                  required
+                  value={Capitalize(formData.departmentName)}
+                  onChange={handleChange}
+                >
+                  <option value="">
+                    {formData.collegeName === "" ? "First Select College Name" : "Select Department"}
+                  </option>
+                  {departmentLists.length > 0 && departmentLists.map((i) => (
+                    <option key={i} value={i}>{Capitalize(i)}</option>
+                  ))}
+                </select>
+              )}
+
             </>
 
           )}
