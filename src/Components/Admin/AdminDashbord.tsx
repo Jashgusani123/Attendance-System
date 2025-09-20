@@ -1,7 +1,7 @@
 import Navbar from './Navbar';
 
 interface AdminDashboardProps {
-  Component: React.ComponentType;
+  Component:  React.ReactNode;
 }
 
 const AdminDashboard: React.FC<AdminDashboardProps> = ({ Component }) => {
@@ -13,7 +13,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ Component }) => {
 
       {/* Main scrollable area */}
       <div className="flex-1 h-screen overflow-y-auto overflow-x-hidden">
-        <Component />
+      {Component}
       </div>
     </div>
   );

@@ -1,4 +1,4 @@
-import { lazy, useEffect, useRef, useState } from "react";
+import { lazy, useEffect, useRef, useState, Suspense } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Route, Routes, useNavigate } from "react-router-dom";
 import "./App.css";
@@ -14,7 +14,6 @@ import { StudentReducerInitialState } from "./Types/API/StudentApiType";
 import { TeacherReducerInitialState } from "./Types/API/TeacherApiType";
 import { AdminExits } from "./Redux/slices/AdminSlices";
 import { AdminReducerInitialState } from "./Types/API/AdminType";
-
 
 const Landing = lazy(() => import("./Pages/Landing"));
 const Setting = lazy(() => import("./Pages/Setting"));
@@ -65,8 +64,23 @@ function App() {
   const [TeacherSignup] = useSignupMutation();
   const [routesReady, setRoutesReady] = useState(false);
   const [DeletePandingRequest] = useDeletePandingRequstMutation();
-  const user = student ? "Student" : teacher ? "Teacher" : hod ? "hod" : panding ? "Panding" : admin ? "Admin" : ""
-  const loading = studentLoading || teacherLoading || hodLoading || pandingLoading || adminLoading;
+  const user = student
+    ? "Student"
+    : teacher
+    ? "Teacher"
+    : hod
+    ? "hod"
+    : panding
+    ? "Panding"
+    : admin
+    ? "Admin"
+    : "";
+  const loading =
+    studentLoading ||
+    teacherLoading ||
+    hodLoading ||
+    pandingLoading ||
+    adminLoading;
   const hasSignedUp = useRef(false);
   const hasGetuser = useRef(false);
 
@@ -114,7 +128,6 @@ function App() {
             if (response?.data?.success) {
               dispatch(teacherExits(response.data.user));
             }
-
           } else {
             const response = await DeletePandingRequest(null);
             if (response?.data?.success) {
@@ -125,8 +138,7 @@ function App() {
           }
         } else if (data.type === "Admin") {
           dispatch(AdminExits(data.user));
-        }
-        else {
+        } else {
           dispatch(studentNotExits());
           dispatch(teacherNotExits());
           dispatch(HodNotExits());
@@ -150,18 +162,22 @@ function App() {
       navigate("/teacher", { replace: true });
     } else if (user === "hod" && window.location.pathname !== "/hod") {
       navigate("/hod", { replace: true });
-    } else if (user === "Panding" && window.location.pathname !== "/requstsend") {
+    } else if (
+      user === "Panding" &&
+      window.location.pathname !== "/requstsend"
+    ) {
       navigate("/requstsend", { replace: true });
     } else if (user === "Admin" && window.location.pathname !== "/admin") {
       navigate("/admin", { replace: true });
     } else if (
       !user &&
-      !["/login", "/register", "/admin/login", "/admin/registraction"].includes(window.location.pathname)
+      !["/login", "/register", "/admin/login", "/admin/registraction"].includes(
+        window.location.pathname
+      )
     ) {
       navigate("/", { replace: true });
     }
   }, [user, routesReady]);
-
 
   return (
     <>
@@ -172,7 +188,9 @@ function App() {
           <div className="absolute w-72 h-72 rounded-full bg-yellow-400 opacity-30 animate-ping"></div>
 
           <div className="z-10 flex justify-center flex-col items-center h-60 w-60 rounded-full bg-yellow-300 shadow-xl">
-            <p className="font-bold text-2xl">Quick <span className="text-blue-900">Attend</span></p>
+            <p className="font-bold text-2xl">
+              Quick <span className="text-blue-900">Attend</span>
+            </p>
 
             <p className="font-semibold text-lg mt-2">
               <span className="text-blue-900">Loading</span>
@@ -182,70 +200,115 @@ function App() {
             </p>
           </div>
         </div>
-
       ) : (
-        <Routes>
-          {/* Public Routes */}
-          {!user && (
-            <>
-              <Route path="/" element={<Landing login={false} register={false} />} />
-              <Route path="/login" element={<Landing login={true} register={false} />} />
-              <Route path="/register" element={<Landing register={true} login={false} />} />
-              <Route path="/admin/login" element={<AdminLogin />} />
-              <Route path="/admin/registraction" element={<AdminRegistration />} />
-            </>
-          )}
-          {/* Student Routes */}
-          {user === "Student" && (
-            <>
-              <Route path="/student" element={<StudentLanding />} />
-              <Route path="/student/dashboard" element={<StudentDashboard />} />
-              <Route path="/student/setting" element={<Setting />} />
-            </>
-          )}
+        <Suspense
+          fallback={
+            <div className="flex justify-center items-center h-screen">
+              <p className="text-xl font-bold">Loading...</p>
+            </div>
+          }
+        >
+          <Routes>
+            {/* Public Routes */}
+            {!user && (
+              <>
+                <Route
+                  path="/"
+                  element={<Landing login={false} register={false} />}
+                />
+                <Route
+                  path="/login"
+                  element={<Landing login={true} register={false} />}
+                />
+                <Route
+                  path="/register"
+                  element={<Landing register={true} login={false} />}
+                />
+                <Route path="/admin/login" element={<AdminLogin />} />
+                <Route
+                  path="/admin/registraction"
+                  element={<AdminRegistration />}
+                />
+              </>
+            )}
+            {/* Student Routes */}
+            {user === "Student" && (
+              <>
+                <Route path="/student" element={<StudentLanding />} />
+                <Route path="/student/dashboard" element={<StudentDashboard />} />
+                <Route path="/student/setting" element={<Setting />} />
+              </>
+            )}
 
-          {user === "Admin" && (
-            <>
-              <Route path="/admin" element={<AdminDashbord Component={AdminHome} />} />
-              <Route path="/admin/colleges" element={<AdminDashbord Component={AdminColleges} />} />
-              <Route path="/admin/colleges/view" element={<AdminDashbord Component={AdminView} />} />
-              <Route path="/admin/departments" element={<AdminDashbord Component={AdminDepartment} />} />
-              <Route path="/admin/users" element={<AdminDashbord Component={AdminUsers} />} />
-              <Route path="/admin/classes" element={<AdminDashbord Component={AdminClasses} />} />
-              <Route path="/admin/requests" element={<AdminDashbord Component={AdminRequests} />} />
-              <Route path="/admin/notifications" element={<AdminDashbord Component={AdminNotifications} />} />
-              <Route path="/admin/setting" element={<AdminDashbord Component={AdminSetting} />} />
-            </>
-          )}
+            {user === "Admin" && (
+              <>
+                <Route
+                  path="/admin"
+                  element={<AdminDashbord Component={<AdminHome />} />}
+                />
+                <Route
+                  path="/admin/colleges"
+                  element={<AdminDashbord Component={<AdminColleges />} />}
+                />
+                <Route
+                  path="/admin/colleges/view"
+                  element={<AdminDashbord Component={<AdminView />} />}
+                />
+                <Route
+                  path="/admin/departments"
+                  element={<AdminDashbord Component={<AdminDepartment />} />}
+                />
+                <Route
+                  path="/admin/users"
+                  element={<AdminDashbord Component={<AdminUsers />} />}
+                />
+                <Route
+                  path="/admin/classes"
+                  element={<AdminDashbord Component={<AdminClasses />} />}
+                />
+                <Route
+                  path="/admin/requests"
+                  element={<AdminDashbord Component={<AdminRequests />} />}
+                />
+                <Route
+                  path="/admin/notifications"
+                  element={<AdminDashbord Component={<AdminNotifications />} />}
+                />
+                <Route
+                  path="/admin/setting"
+                  element={<AdminDashbord Component={<AdminSetting />} />}
+                />
+              </>
+            )}
 
-          {/* Teacher Routes */}
-          {user === "Teacher" && (
-            <>
-              <Route path="/teacher" element={<TeacherLanding />} />
-              <Route path="/teacher/dashboard" element={<TeacherDashboard />} />
-              <Route path="/teacher/setting" element={<Setting />} />
-              <Route path="/attendance" element={<AttendanceSheet />} />
-            </>
-          )}
-          {/* Panding Routes */}
-          {user === "Panding" && (
-            <>
-              <Route path="/requstsend" element={<PandingRequst />} />
-            </>
-          )}
-          {/* hod Route */}
-          {user === "hod" && (
-            <>
-              <Route path="/hod" element={<HodDashboard />} />
-              <Route path="/hod/manage" element={<Manage />} />
-              <Route path="/hod/view" element={<ViewPage />} />
-              <Route path="/hod/analysis" element={<Analysis />} />
-              <Route path="/hod/setting" element={<HodSetting />} />
-              <Route path="/hod/student_list" element={<ShowAllStudent />} />
-            </>
-          )}
-
-        </Routes>
+            {/* Teacher Routes */}
+            {user === "Teacher" && (
+              <>
+                <Route path="/teacher" element={<TeacherLanding />} />
+                <Route path="/teacher/dashboard" element={<TeacherDashboard />} />
+                <Route path="/teacher/setting" element={<Setting />} />
+                <Route path="/attendance" element={<AttendanceSheet />} />
+              </>
+            )}
+            {/* Panding Routes */}
+            {user === "Panding" && (
+              <>
+                <Route path="/requstsend" element={<PandingRequst />} />
+              </>
+            )}
+            {/* hod Route */}
+            {user === "hod" && (
+              <>
+                <Route path="/hod" element={<HodDashboard />} />
+                <Route path="/hod/manage" element={<Manage />} />
+                <Route path="/hod/view" element={<ViewPage />} />
+                <Route path="/hod/analysis" element={<Analysis />} />
+                <Route path="/hod/setting" element={<HodSetting />} />
+                <Route path="/hod/student_list" element={<ShowAllStudent />} />
+              </>
+            )}
+          </Routes>
+        </Suspense>
       )}
     </>
   );

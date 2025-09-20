@@ -22,7 +22,7 @@ const AdminRegister = () => {
       alert("Registered successfully!");
       navigate("/admin")
     } else {
-      alert("Registration failed");
+      alert("Only one Admin is Allow, sorry you can't Register");
     }
   }
 

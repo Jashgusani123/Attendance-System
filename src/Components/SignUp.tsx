@@ -226,8 +226,8 @@ const SignUp = () => {
             credentials: "include",
             body: JSON.stringify({
               type: "request",
-              upperHeadding: `${res.data.newPanding.fullName} is Send an Request to ...`,
-              description: `${res.data.newPanding.fullName} is Send an Request to Create an Account For \n Teacher, If Yes then Click on Accept otherwise click on Reject Button.`,
+              upperHeadding: `${Capitalize(res.data.newPanding.fullName)} is Send an Request to ...`,
+              description: `${Capitalize(res.data.newPanding.fullName)} is Send an Request to Create an Account For \n Teacher, If Yes then Click on Accept otherwise click on Reject Button.`,
               to: res.data.newPanding.hodId,
               pandingId: res.data.newPanding._id
             }),
@@ -396,22 +396,27 @@ const SignUp = () => {
               onChange={handleChange}
             />
           )}
+          {dropdownLoading  ? (
+            <div className="text-start flex justify-start text-blue-500 font-semibold py-2">Loading Colleges...</div>
+          ) : (
+            <select
+              className="w-full p-2 border rounded-md text-blue-700 font-semibold"
+              name="collegeName"
+              required
+              value={formData.collegeName}
+              onChange={handleChange}
+            >
+              <option value="">Select College</option>
+              {collegeLists?.map((i) => (
+                <option key={i} value={i}>{Capitalize(i)}</option>
+              ))}
+            </select>
+          )}
 
           {/* Hod Fields */}
           {role === "Hod" && (
             <>
-              <select
-                className="w-full p-2 border rounded-md text-blue-700 font-semibold"
-                name="collegeName"
-                required
-                value={Capitalize(formData.collegeName)}
-                onChange={handleChange}
-              >
-                <option value="">Select College</option>
-                {collegeLists?.map((i) => (
-                  <option value={i}>{i}</option>
-                ))}
-              </select>
+              
               {/* Department  */}
               <select
                 className={`${formData.collegeName === "" ? "text-gray-600" : "text-blue-700"} w-full p-2 border rounded-md font-semibold`}
@@ -446,22 +451,7 @@ const SignUp = () => {
             </select>
           )} */}
 
-          {dropdownLoading && (role === "student" || role === "teacher") ? (
-            <div className="text-start flex justify-start text-blue-500 font-semibold py-2">Loading Colleges...</div>
-          ) : (
-            <select
-              className="w-full p-2 border rounded-md text-blue-700 font-semibold"
-              name="collegeName"
-              required
-              value={formData.collegeName}
-              onChange={handleChange}
-            >
-              <option value="">Select College</option>
-              {collegeLists?.map((i) => (
-                <option key={i} value={i}>{Capitalize(i)}</option>
-              ))}
-            </select>
-          )}
+          
 
 
           {role === "student" && (

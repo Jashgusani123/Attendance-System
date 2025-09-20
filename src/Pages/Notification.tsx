@@ -66,7 +66,7 @@ const Notification = ({ fun, notifications, type }: { fun: any, notifications: a
                             <span>{notification.upperHeadding}</span>
                             {notification.description && (
                                 <ChevronDown
-                                    className={`w-5 h-5 cursor-pointer transition-transform ${expandedNotification === notification._id ? "rotate-180" : ""
+                                    className={`w-5 h-5  transition-transform ${expandedNotification === notification._id ? "rotate-180" : ""
                                         }`}
                                     onClick={(e) => {
                                         e.stopPropagation();
@@ -103,10 +103,10 @@ const Notification = ({ fun, notifications, type }: { fun: any, notifications: a
                                 )}
                                 {notification.type === "request" && type === "Hod" && (
                                     <div className="flex flex-wrap gap-2 justify-center flex-row">
-                                        {text ? <p className="text-[#a39e9e] ">{Capitalize(text)}</p> : <><button className="bg-green-800 mt-1 text-white rounded-xl h-7 w-[20%]" onClick={() => acceptRequestFunc(notification.pandingId, notification._id)}>
+                                        {text ? <p className="text-[#a39e9e] ">{Capitalize(text)}</p> : <><button className="bg-green-800 mt-1 text-white rounded-xl h-7 w-[20%] cursor-pointer" onClick={() => acceptRequestFunc(notification.pandingId, notification._id)}>
                                             Accept
                                         </button>
-                                            <button className="bg-red-800 mt-1 text-white rounded-xl h-7 w-[20%]" onClick={() => rejectRequestFunc(notification.pandingId, notification._id)}>
+                                            <button className="bg-red-800 mt-1 text-white rounded-xl h-7 w-[20%] cursor-pointer" onClick={() => rejectRequestFunc(notification.pandingId, notification._id)}>
                                                 Reject
                                             </button></>}
                                     </div>

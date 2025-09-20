@@ -99,8 +99,8 @@ const AdminHome = () => {
             className="bg-white shadow rounded-2xl h-full flex flex-col justify-center items-center"
           >
             <div className="text-blue-900 font-semibold text-lg mb-2">Total Students</div>
-            <div className='flex flex-col sm:flex-row w-full justify-center items-center'>
-  <ResponsiveContainer width="100%" height={130}>
+            <div className='flex flex-col sm:flex-row w-70 justify-center items-center'>
+              <ResponsiveContainer width="100%" height={130}>
                 <RadialBarChart
                   innerRadius="40%"
                   outerRadius="100%"
@@ -113,7 +113,7 @@ const AdminHome = () => {
                 </RadialBarChart>
               </ResponsiveContainer>
 
-              <div className="flex justify-around mt-2 h-full flex-col text-sm">
+              <div className="flex justify-around mt-2 h-full w-40 flex-col text-sm">
                 {data.map((item, index) => (
                   <div key={index} className="flex items-center gap-1">
                     <div className="w-3 h-3 rounded-full" style={{ backgroundColor: item.fill }}></div>

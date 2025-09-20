@@ -41,11 +41,11 @@ const AdminLogin = () => {
                 dispatch(AdminExits(LoginVerify.data.user));
                 navigate("/admin");
             } else {
-                alert("Fingerprint login failed");
+                alert("Faild to login ");
             }
         } catch (err) {
             console.error("Fingerprint login error", err);
-            alert("Fingerprint authentication failed");
+            alert("Please, In Admin Setting integreat Fingerprint system.");    
         }
     };
     

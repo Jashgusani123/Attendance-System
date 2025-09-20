@@ -72,6 +72,8 @@ const HodDashboard = () => {
       const GetNotificationsData = async () => {
         try {
           const response = await GetAllNotificationData(null);
+          console.log(response);
+          
           if (response?.data?.success && response.data?.notifications) {
             setNotifications(response.data.notifications);
           }
