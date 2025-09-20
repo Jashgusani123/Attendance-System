@@ -20,7 +20,6 @@ const AdminLogin = () => {
         const res = await Login({ email, password });
         if (res && "data" in res && res.data?.success) {
             dispatch(AdminExits(res.data.user));
-            window.location.reload();
         } else {
             alert("Login failed");
         }
@@ -39,7 +38,8 @@ const AdminLogin = () => {
                 
             if (LoginVerify && LoginVerify.data?.success) {
                 dispatch(AdminExits(LoginVerify.data.user));
-                navigate("/admin");
+                // navigate("/admin");
+                // window.location.reload();
             } else {
                 alert("Faild to login ");
             }
